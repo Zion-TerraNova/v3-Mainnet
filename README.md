@@ -280,6 +280,7 @@ v3-Mainnet/
 ├── Cargo.toml              # Rust workspace root
 ├── SECURITY.md             # Vulnerability reporting
 ├── CONTRIBUTING.md         # Contribution guide
+├── CHANGELOG.md            # Version history (v3.0.0 → v3.0.4-beta)
 └── LICENSE                 # MIT
 ```
 
@@ -402,6 +403,57 @@ cargo run --release -p zion-core --bin zion-node
 ### Community
 - [Contributing](./CONTRIBUTING.md) — How to contribute
 - [Code of Conduct](./CODE_OF_CONDUCT.md) — Community standards
+
+## Versioning & Development Status
+
+> **ZION is under active development.** The project evolves continuously with regular versioned releases.
+
+### Current Version
+
+| | |
+|---|---|
+| **Protocol** | 3.0.4 |
+| **Release** | v3.0.4-beta (Mainnet Beta) |
+| **Status** | Live — mining active (at your own risk) |
+| **Official launch** | 2026-12-31 |
+
+### Versioning Scheme
+
+ZION uses a modified semantic versioning scheme:
+
+| Component | Format | Example |
+|-----------|--------|---------|
+| Protocol | `MAJOR.MINOR.PATCH` | `3.0.4` |
+| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.4-beta` |
+| Suffix | `-beta`, `-rc`, `-stable` | `v3.1.0-rc1` |
+
+- **MAJOR** — consensus-breaking changes (new genesis, hard fork)
+- **MINOR** — new features, backward-compatible
+- **PATCH** — bug fixes, security patches
+- **-beta** — Mainnet Beta (pre-official launch)
+- **-rc** — Release Candidate
+- **-stable** — Official stable release
+
+### Roadmap
+
+| Version | Target | Status |
+|---------|--------|--------|
+| 3.0.4-beta | Mainnet Beta | ✅ Live (2026-07-09) |
+| 3.0.4-stable | Official Public Launch | 📅 2026-12-31 |
+| 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
+| 3.2.0 | Proof-of-Care hybrid (NPU mining) | 🔜 2027 |
+| 4.0.0 | Full Proof-of-Care consensus | 🔜 2028+ |
+
+### Version History
+
+See [CHANGELOG.md](./CHANGELOG.md) for the full version history, including all changes from v3.0.0 through v3.0.4-beta.
+
+Key milestones:
+- **v3.0.0** (2026-05-20) — Initial V3 mainnet launch
+- **v3.0.1** (2026-06-05) — First genesis hard reset, Hiran v2.3, L2/L3 upgrades
+- **v3.0.2** (2026-06-15) — Fire algorithm optimization, explorer + dashboard upgrades
+- **v3.0.3** (2026-06-27) — Decimal fork (1e12→1e6), LI.FI DEX, WARP 12 chains, Stargate logo
+- **v3.0.4-beta** (2026-07-09) — Hard genesis reset, DeFi contracts, security hardening, Mainnet Beta
 
 ## License
 
