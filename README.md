@@ -10,7 +10,7 @@
 
 **A multichain Dharma ecosystem secured by proof-of-work consensus.**
 
-[www.newerth.cz]| (https://www.newearth.cz)
+[www.newerth.cz]
 [www.zionterranova.com](https://www.zionterranova.com)
 
 <br/>
