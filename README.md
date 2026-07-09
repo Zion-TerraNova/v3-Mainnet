@@ -100,6 +100,7 @@ v3-Mainnet/
 ├── docs/
 │   ├── whitepaper.md       # Technical whitepaper
 │   ├── ETHICS_PHILOSOPHY.md # Ethics & philosophy of 4 ZION books
+│   ├── ZION_CODEX_BODHISATTVA.md # Bodhisattva Vow codex (Guardian + validator pledges)
 │   ├── genesis.md          # Genesis block documentation
 │   ├── LEGAL_DISCLAIMER.md # Legal disclaimer (no investment advice)
 │   ├── TERMS_OF_USE.md     # Terms of use
@@ -211,6 +212,7 @@ cargo run --release -p zion-core --bin zion-node
 ### Technical
 - [Whitepaper](./docs/whitepaper.md) — Technical whitepaper (consensus, economics, architecture)
 - [Ethics & Philosophy](./docs/ETHICS_PHILOSOPHY.md) — Four books of ZION: Genesis, Quantum Revolution, Ekam Deeksha, Terra Nova
+- [ZION Codex — Bodhisattva Vow](./docs/ZION_CODEX_BODHISATTVA.md) — Foundational vow: 4 Great Vows, 8 Bodhisattvas, 8 Guardian pledges, 11 Sefirot validator vows
 - [evoluZion V2](./evoluZionV2.md) — PoW → Proof-of-Care evolution (10-year hybrid roadmap)
 - [Genesis Block](./docs/genesis.md) — Genesis block, premine allocations, creator signature
 - [Architecture](./V3/docs/) — L1/L2 architecture docs
