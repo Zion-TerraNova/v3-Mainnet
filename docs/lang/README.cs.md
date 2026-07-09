@@ -1,47 +1,103 @@
-# ZION
-
 <div align="center">
 
-<img src="../../docs/stargate/nebula.jpg" width="260" height="260" alt="ZION Stargate" style="border-radius: 50%; object-fit: cover; box-shadow: 0 0 50px rgba(0,180,255,0.25);" />
+<!-- Hero banner — Stargate OG image -->
+<img src="../../docs/stargate/stargate-og.png" width="100%" alt="ZION Stargate" />
 
-<br/>
+<!-- Animated Z logo -->
+<img src="../../docs/stargate/Z.gif" width="80" height="80" alt="ZION" />
 
-## Terra Nova — 100 let evoluZionu
+<!-- Title -->
+<h1>ZION</h1>
 
-**Multichain Dharma ekosystém zabezpečený proof-of-work konsenzem.**
+<h3>Terra Nova — 100 let evoluZionu</h3>
 
-[www.zionterranova.com](https://www.zionterranova.com)
+<p><em>Multichain Dharma ekosystém zabezpečený proof-of-work konsenzem.</em></p>
 
-<br/>
+<!-- Badges -->
+<p>
+
+![Status: Mainnet Beta](https://img.shields.io/badge/Status-Mainnet_Beta-orange?style=for-the-badge)
+![Protocol](https://img.shields.io/badge/Protocol-3.0.4-blue?style=for-the-badge)
+![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Rust](https://img.shields.io/badge/Rust-2021-orange?style=for-the-badge)
+![PoW](https://img.shields.io/badge/Consensus-PoW-purple?style=for-the-badge)
+
+</p>
+
+<!-- Links -->
+<p>
+
+[🌐 Web](https://www.zionterranova.com)
+&nbsp;·&nbsp;
+[📖 Whitepaper](../../docs/whitepaper.md)
+&nbsp;·&nbsp;
+[🎮 Oasis](../../V3/L4/oasis/README.md)
+&nbsp;·&nbsp;
+[⚡ CLI](../../V3/cli/README.md)
+&nbsp;·&nbsp;
+[🔒 Security](../../SECURITY.md)
+
+</p>
 
 </div>
 
-ZION je vícevrstvý blockchain: L1 PoW jádro, L2 DeFi a cross-chain bridge, L3 WARP a Hiran AI a L4 Oasis — duchovní MMORPG s těžbou vědomí.
+---
 
-Tento repozitář obsahuje kód hlavní sítě v3. Aktuálně je v **Mainnet Beta**: živá, produkuje bloky a těžba je na vlastní nebezpečí.
+<div align="center">
+
+## Čtyři vrstvy
+
+</div>
+
+| Vrstva | Název | Co dělá |
+|:-----:|:----:|:--------|
+| **L1** | **Core** | PoW blockchain — základ. Vlastní algoritmus `deeksha_lite_v1`, 60s bloky, CPU + GPU těžba. |
+| **L2** | **DeFi** | Staking, farming, governance, cross-chain bridge na 6 EVM chainů (Base, Arbitrum, BSC, Polygon, Optimism, Avalanche). |
+| **L3** | **WARP** | Cross-chain router — 21 registrovaných chain adaptérů, atomic swapy, Hiran AI inference vrstva. |
+| **L4** | **Oasis** | Duchovní MMORPG s těžbou vědomí — 199 avatarů, 245 úkolů, Golden Egg (108 clue), 1B ZION prize pool. |
+
+<div align="center">
+
+*ZION je vícevrstvý blockchain: L1 PoW jádro, L2 DeFi a cross-chain bridge, L3 WARP a Hiran AI a L4 Oasis — duchovní MMORPG s těžbou vědomí.*
+
+*Tento repozitář obsahuje kód hlavní sítě v3. Aktuálně je v **Mainnet Beta**: živá, produkuje bloky a těžba je na vlastní nebezpečí.*
+
+</div>
 
 ---
+
+<div align="center">
 
 ## Vstupte do Oasisu
 
+</div>
+
 | Portál | Cesta |
-|---|---|
-| **Těžit** | Spusť uzel nebo miner na ZION L1. Začni v [`V3/cli/README.md`](../../V3/cli/README.md). |
-| **Hrát** | Vstup do světa L4 Oasis — avatary, úkoly, gildy a Golden Egg. Viz [`V3/L4/oasis/README.md`](../../V3/L4/oasis/README.md). |
-| **Stavět** | Prozkoumej kód, kontrakty, RPC a bridge dokumentaci v [`V3/docs/`](../../V3/docs/) a [`docs/`](../../docs/). |
+|:------:|:------|
+| ⛏️ **Těžit** | Spusť uzel nebo miner na ZION L1. Začni v [`V3/cli/README.md`](../../V3/cli/README.md). |
+| 🎮 **Hrát** | Vstup do světa L4 Oasis — avatary, úkoly, gildy a Golden Egg. Viz [`V3/L4/oasis/README.md`](../../V3/L4/oasis/README.md). |
+| 🔨 **Stavět** | Prozkoumej kód, kontrakty, RPC a bridge dokumentaci v [`V3/docs/`](../../V3/docs/) a [`docs/`](../../docs/). |
 
 ---
 
+<div align="center">
+
 ## Status sítě
 
-> **Mainnet Beta — živá na vlastní nebezpečí**
+</div>
+
+> **⚠️ Mainnet Beta — živá na vlastní nebezpečí**
 
 | Parametr | Hodnota |
-|---|---|
-| Status | Mainnet Beta |
-| Protokol | 3.0.4 |
-| Genesis hash | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
-| Oficiální launch | 2026-12-31 |
+|:---------|:--------|
+| **Status** | Mainnet Beta |
+| **Protokol** | 3.0.4 |
+| **Genesis hash** | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
+| **Oficiální launch** | 2026-12-31 |
+| **Block time** | ~60 sekund |
+| **Těžební algoritmus** | `deeksha_lite_v1` (CPU + GPU) |
+| **Celková zásoba** | 144B ZION |
+| **Premine** | 14 slotů (founders, treasury, OASIS pool, liquidity) |
 
 Všechny zveřejněné bezpečnostní problémy byly remediovány. Viz [Security](../../SECURITY.md) a [disclosure report](../../docs/security/SECURITY_DISCLOSURE_2026-07.md).
 
@@ -195,24 +251,40 @@ Otevře se interaktivní menu se šipkami — peněženka, uzel, těžba, pool a
 
 ---
 
+<div align="center">
+
 ## Jazyky
 
-[English](../../README.md) · **Čeština** · [Español](./README.es.md) · [Français](./README.fr.md) · [Português](./README.pt.md)
+</div>
+
+| | | | | |
+|:---:|:---:|:---:|:---:|:---:|
+| [English](../../README.md) | **Čeština** | [Español](./README.es.md) | [Français](./README.fr.md) | [Português](./README.pt.md) |
 
 ---
+
+<div align="center">
 
 ## Plná dokumentace
 
 Kompletní přehled architektury, funkcí, historie a roadmapy najdeš v **[README_FULL.cs.md](./README_FULL.cs.md)**.
 
+</div>
+
 ---
+
+<div align="center">
+
+<img src="../../docs/stargate/Z.gif" width="48" height="48" alt="ZION" />
 
 ## Licence
 
 Tento projekt je licencován pod [MIT Licencí](../../LICENSE).
 
-<div align="center">
+---
 
-Postaveno s péčí, zabezpečeno konsenzem.
+### Postaveno s péčí, zabezpečeno konsenzem.
+
+[🌐 zionterranova.com](https://www.zionterranova.com) · [🔒 Security](../../SECURITY.md) · [📜 Whitepaper](../../docs/whitepaper.md) · [⚖️ Legal](../../docs/LEGAL_DISCLAIMER.md)
 
 </div>

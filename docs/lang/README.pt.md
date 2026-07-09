@@ -1,47 +1,103 @@
-# ZION
-
 <div align="center">
 
-<img src="../../docs/stargate/nebula.jpg" width="260" height="260" alt="ZION Stargate" style="border-radius: 50%; object-fit: cover; box-shadow: 0 0 50px rgba(0,180,255,0.25);" />
+<!-- Hero banner — Stargate OG image -->
+<img src="../../docs/stargate/stargate-og.png" width="100%" alt="ZION Stargate" />
 
-<br/>
+<!-- Animated Z logo -->
+<img src="../../docs/stargate/Z.gif" width="80" height="80" alt="ZION" />
 
-## Terra Nova — 100 anos de evoluZion
+<!-- Title -->
+<h1>ZION</h1>
 
-**Um ecossistema Dharma multichain protegido por consenso proof-of-work.**
+<h3>Terra Nova — 100 anos de evoluZion</h3>
 
-[www.zionterranova.com](https://www.zionterranova.com)
+<p><em>Um ecossistema Dharma multichain protegido por consenso proof-of-work.</em></p>
 
-<br/>
+<!-- Badges -->
+<p>
+
+![Status: Mainnet Beta](https://img.shields.io/badge/Status-Mainnet_Beta-orange?style=for-the-badge)
+![Protocol](https://img.shields.io/badge/Protocol-3.0.4-blue?style=for-the-badge)
+![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Rust](https://img.shields.io/badge/Rust-2021-orange?style=for-the-badge)
+![PoW](https://img.shields.io/badge/Consensus-PoW-purple?style=for-the-badge)
+
+</p>
+
+<!-- Links -->
+<p>
+
+[🌐 Website](https://www.zionterranova.com)
+&nbsp;·&nbsp;
+[📖 Whitepaper](../../docs/whitepaper.md)
+&nbsp;·&nbsp;
+[🎮 Oasis](../../V3/L4/oasis/README.md)
+&nbsp;·&nbsp;
+[⚡ CLI](../../V3/cli/README.md)
+&nbsp;·&nbsp;
+[🔒 Security](../../SECURITY.md)
+
+</p>
 
 </div>
 
-ZION é uma blockchain de múltiplas camadas: núcleo PoW L1, DeFi L2 e ponte cross-chain, WARP L3 e Hiran AI, e Oasis L4 — um MMORPG espiritual de mineração da consciência.
+---
 
-Este repositório contém a base de código da rede principal v3. Atualmente está em **Mainnet Beta**: ativa, produzindo blocos e aberta à mineração por sua própria conta e risco.
+<div align="center">
+
+## As quatro camadas
+
+</div>
+
+| Camada | Nome | O que faz |
+|:-----:|:----:|:----------|
+| **L1** | **Core** | Blockchain PoW — a fundação. Algoritmo próprio `deeksha_lite_v1`, blocos de 60s, mineração CPU + GPU. |
+| **L2** | **DeFi** | Staking, farming, governança, ponte cross-chain para 6 cadeias EVM (Base, Arbitrum, BSC, Polygon, Optimism, Avalanche). |
+| **L3** | **WARP** | Router cross-chain — 21 adaptadores de cadeia registados, atomic swaps, camada de inferência Hiran AI. |
+| **L4** | **Oasis** | MMORPG espiritual de mineração de consciência — 199 avatares, 245 missões, Golden Egg (108 pistas), 1B ZION em prémios. |
+
+<div align="center">
+
+*ZION é uma blockchain multicamada: núcleo L1 PoW, L2 DeFi e ponte cross-chain, L3 WARP e Hiran AI, e L4 Oasis — um MMORPG espiritual de mineração de consciência.*
+
+*Este repositório contém o código base da rede principal v3. Está atualmente em **Mainnet Beta**: ativa, a produzir blocos, e aberta a mineração por sua conta e risco.*
+
+</div>
 
 ---
+
+<div align="center">
 
 ## Entre no Oasis
 
+</div>
+
 | Portal | Caminho |
-|---|---|
-| **Minerar** | Execute um nó ou minerador na ZION L1. Comece em [`V3/cli/README.md`](../../V3/cli/README.md). |
-| **Jogar** | Entre no mundo L4 Oasis — avatares, missões, guildas e o Golden Egg. Veja [`V3/L4/oasis/README.md`](../../V3/L4/oasis/README.md). |
-| **Construir** | Explore o código, contratos, RPC e documentação da ponte em [`V3/docs/`](../../V3/docs/) e [`docs/`](../../docs/). |
+|:------:|:-------|
+| ⛏️ **Minar** | Execute um nó ou minerador no ZION L1. Comece com [`V3/cli/README.md`](../../V3/cli/README.md). |
+| 🎮 **Jogar** | Entre no mundo L4 Oasis — avatares, missões, guildas e o Golden Egg. Ver [`V3/L4/oasis/README.md`](../../V3/L4/oasis/README.md). |
+| 🔨 **Construir** | Explore o código, contratos, RPC e documentação da ponte em [`V3/docs/`](../../V3/docs/) e [`docs/`](../../docs/). |
 
 ---
 
-## Status da rede
+<div align="center">
 
-> **Mainnet Beta — ativa por sua própria conta e risco**
+## Estado da rede
+
+</div>
+
+> **⚠️ Mainnet Beta — ativo por sua conta e risco**
 
 | Parâmetro | Valor |
-|---|---|
-| Status | Mainnet Beta |
-| Protocolo | 3.0.4 |
-| Hash do gênesis | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
-| Lançamento oficial | 2026-12-31 |
+|:----------|:------|
+| **Estado** | Mainnet Beta |
+| **Protocolo** | 3.0.4 |
+| **Genesis hash** | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
+| **Lançamento oficial** | 2026-12-31 |
+| **Tempo de bloco** | ~60 segundos |
+| **Algoritmo de mineração** | `deeksha_lite_v1` (CPU + GPU) |
+| **Oferta total** | 144B ZION |
+| **Premine** | 14 slots (founders, treasury, OASIS pool, liquidity) |
 
 Todos os problemas de segurança divulgados foram remediados. Veja [Security](../../SECURITY.md) e o [relatório de divulgação](../../docs/security/SECURITY_DISCLOSURE_2026-07.md).
 
@@ -195,24 +251,40 @@ Abre-se um menu interativo com setas — carteira, nó, mineração, pool e conf
 
 ---
 
+<div align="center">
+
 ## Idiomas
 
-[English](../../README.md) · [Čeština](./README.cs.md) · [Español](./README.es.md) · [Français](./README.fr.md) · **Português**
+</div>
+
+| | | | | |
+|:---:|:---:|:---:|:---:|:---:|
+| [English](../../README.md) | [Čeština](./README.cs.md) | [Español](./README.es.md) | [Français](./README.fr.md) | **Português** |
 
 ---
+
+<div align="center">
 
 ## Documentação completa
 
-Para uma visão completa da arquitetura, recursos, histórico e roteiro, consulte **[README_FULL.pt.md](./README_FULL.pt.md)**.
+Para uma visão completa de arquitetura, funcionalidades, história e roadmap, ver **[README_FULL.pt.md](./README_FULL.pt.md)**.
+
+</div>
 
 ---
+
+<div align="center">
+
+<img src="../../docs/stargate/Z.gif" width="48" height="48" alt="ZION" />
 
 ## Licença
 
 Este projeto está licenciado sob a [Licença MIT](../../LICENSE).
 
-<div align="center">
+---
 
-Construído com cuidado, protegido por consenso.
+### Construído com cuidado, protegido por consenso.
+
+[🌐 zionterranova.com](https://www.zionterranova.com) · [🔒 Security](../../SECURITY.md) · [📜 Whitepaper](../../docs/whitepaper.md) · [⚖️ Legal](../../docs/LEGAL_DISCLAIMER.md)
 
 </div>

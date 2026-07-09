@@ -1,49 +1,103 @@
-# ZION
-
 <div align="center">
 
-<img src="./docs/stargate/nebula.jpg" width="260" height="260" alt="ZION Stargate" style="border-radius: 50%; object-fit: cover; box-shadow: 0 0 50px rgba(0,180,255,0.25);" />
+<!-- Hero banner — Stargate OG image -->
+<img src="./docs/stargate/stargate-og.png" width="100%" alt="ZION Stargate" />
 
-<br/>
+<!-- Animated Z logo -->
+<img src="./docs/stargate/Z.gif" width="80" height="80" alt="ZION" />
 
-## Terra Nova — 100 years of evoluZion
+<!-- Title -->
+<h1>ZION</h1>
 
-**A multichain Dharma ecosystem secured by proof-of-work consensus.**
+<h3>Terra Nova — 100 years of evoluZion</h3>
 
-[www.newerth.cz]
-<br/>
-[www.zionterranova.com](https://www.zionterranova.com)
+<p><em>A multichain Dharma ecosystem secured by proof-of-work consensus.</em></p>
 
-<br/>
+<!-- Badges -->
+<p>
+
+![Status: Mainnet Beta](https://img.shields.io/badge/Status-Mainnet_Beta-orange?style=for-the-badge)
+![Protocol](https://img.shields.io/badge/Protocol-3.0.4-blue?style=for-the-badge)
+![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Rust](https://img.shields.io/badge/Rust-2021-orange?style=for-the-badge)
+![PoW](https://img.shields.io/badge/Consensus-PoW-purple?style=for-the-badge)
+
+</p>
+
+<!-- Links -->
+<p>
+
+[🌐 Website](https://www.zionterranova.com)
+&nbsp;·&nbsp;
+[📖 Whitepaper](./docs/whitepaper.md)
+&nbsp;·&nbsp;
+[🎮 Oasis](./V3/L4/oasis/README.md)
+&nbsp;·&nbsp;
+[⚡ CLI](./V3/cli/README.md)
+&nbsp;·&nbsp;
+[🔒 Security](./SECURITY.md)
+
+</p>
 
 </div>
 
-ZION is a multi-layer blockchain: L1 PoW core, L2 DeFi and cross-chain bridge, L3 WARP and Hiran AI, and L4 Oasis — a consciousness-mining spiritual MMORPG.
+---
 
-This repository contains the v3 mainnet codebase. It is currently in **Mainnet Beta**: live, producing blocks, and open for mining at your own risk.
+<div align="center">
+
+## The Four Layers
+
+</div>
+
+| Layer | Name | What it does |
+|:-----:|:----:|:-------------|
+| **L1** | **Core** | PoW blockchain — the foundation. Custom algorithm `deeksha_lite_v1`, 60s blocks, CPU + GPU mining. |
+| **L2** | **DeFi** | Staking, farming, governance, cross-chain bridge to 6 EVM chains (Base, Arbitrum, BSC, Polygon, Optimism, Avalanche). |
+| **L3** | **WARP** | Cross-chain router — 21 registered chain adapters, atomic swaps, Hiran AI inference layer. |
+| **L4** | **Oasis** | Consciousness-mining spiritual MMORPG — 199 avatars, 245 quests, the Golden Egg (108 clues), 1B ZION prize pool. |
+
+<div align="center">
+
+*ZION is a multi-layer blockchain: L1 PoW core, L2 DeFi and cross-chain bridge, L3 WARP and Hiran AI, and L4 Oasis — a consciousness-mining spiritual MMORPG.*
+
+*This repository contains the v3 mainnet codebase. It is currently in **Mainnet Beta**: live, producing blocks, and open for mining at your own risk.*
+
+</div>
 
 ---
+
+<div align="center">
 
 ## Enter the Oasis
 
+</div>
+
 | Portal | Path |
-|---|---|
-| **Mine** | Run a node or miner on the ZION L1. Start with [`V3/cli/README.md`](./V3/cli/README.md). |
-| **Play** | Enter the L4 Oasis world — avatars, quests, guilds, and the Golden Egg. See [`V3/L4/oasis/README.md`](./V3/L4/oasis/README.md). |
-| **Build** | Explore the codebase, contracts, RPC, and bridge docs in [`V3/docs/`](./V3/docs/) and [`docs/`](./docs/). |
+|:------:|:-----|
+| ⛏️ **Mine** | Run a node or miner on the ZION L1. Start with [`V3/cli/README.md`](./V3/cli/README.md). |
+| 🎮 **Play** | Enter the L4 Oasis world — avatars, quests, guilds, and the Golden Egg. See [`V3/L4/oasis/README.md`](./V3/L4/oasis/README.md). |
+| 🔨 **Build** | Explore the codebase, contracts, RPC, and bridge docs in [`V3/docs/`](./V3/docs/) and [`docs/`](./docs/). |
 
 ---
 
+<div align="center">
+
 ## Network Status
 
-> **Mainnet Beta — live at your own risk**
+</div>
+
+> **⚠️ Mainnet Beta — live at your own risk**
 
 | Parameter | Value |
-|---|---|
-| Status | Mainnet Beta |
-| Protocol | 3.0.4 |
-| Genesis hash | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
-| Official launch | 2026-12-31 |
+|:----------|:------|
+| **Status** | Mainnet Beta |
+| **Protocol** | 3.0.4 |
+| **Genesis hash** | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
+| **Official launch** | 2026-12-31 |
+| **Block time** | ~60 seconds |
+| **Mining algorithm** | `deeksha_lite_v1` (CPU + GPU) |
+| **Total supply** | 144B ZION |
+| **Premine** | 14 slots (founders, treasury, OASIS pool, liquidity) |
 
 All disclosed security issues have been remediated. See [Security](./SECURITY.md) and the [disclosure report](./docs/security/SECURITY_DISCLOSURE_2026-07.md).
 
@@ -197,24 +251,40 @@ This opens an interactive arrow-key menu with all options — wallet, node, mini
 
 ---
 
+<div align="center">
+
 ## Languages
 
-English · [Čeština](./docs/lang/README.cs.md) · [Español](./docs/lang/README.es.md) · [Français](./docs/lang/README.fr.md) · [Português](./docs/lang/README.pt.md)
+</div>
+
+| | | | | |
+|:---:|:---:|:---:|:---:|:---:|
+| **English** | [Čeština](./docs/lang/README.cs.md) | [Español](./docs/lang/README.es.md) | [Français](./docs/lang/README.fr.md) | [Português](./docs/lang/README.pt.md) |
 
 ---
+
+<div align="center">
 
 ## Full Documentation
 
 For a complete overview of architecture, features, history, and roadmap, see **[README_FULL.md](./README_FULL.md)**.
 
+</div>
+
 ---
+
+<div align="center">
+
+<img src="./docs/stargate/Z.gif" width="48" height="48" alt="ZION" />
 
 ## License
 
 This project is licensed under the [MIT License](./LICENSE).
 
-<div align="center">
+---
 
-Built with care, secured by consensus.
+### Built with care, secured by consensus.
+
+[🌐 zionterranova.com](https://www.zionterranova.com) · [🔒 Security](./SECURITY.md) · [📜 Whitepaper](./docs/whitepaper.md) · [⚖️ Legal](./docs/LEGAL_DISCLAIMER.md)
 
 </div>
