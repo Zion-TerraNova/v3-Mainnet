@@ -98,8 +98,10 @@ v3-Mainnet/
 │   ├── L5/                 # Community layer
 │   └── docs/               # Architecture documentation
 ├── docs/
+│   ├── whitepaper.md       # Technical whitepaper
+│   ├── genesis.md          # Genesis block documentation
 │   ├── security/           # Security disclosures
-│   └── architecture/       # Architecture docs
+│   └── lang/               # Multilingual README translations
 ├── Cargo.toml              # Rust workspace root
 ├── SECURITY.md             # Vulnerability reporting
 ├── CONTRIBUTING.md         # Contribution guide
@@ -187,6 +189,7 @@ cargo run --release -p zion-core --bin zion-node
 
 | Constant | Value |
 |----------|-------|
+| Genesis hash | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
 | `FLOWERS_PER_ZION` | 1,000,000 (6 decimals) |
 | `BASE_REWARD` | 5,400,067,000 flowers (5,400.067 ZION) |
 | `TAIL_REWARD` | 724,784,723 flowers (~724.785 ZION) |
@@ -199,8 +202,11 @@ cargo run --release -p zion-core --bin zion-node
 
 ## Documentation
 
+- [Whitepaper](./docs/whitepaper.md) — Technical whitepaper (consensus, economics, architecture)
+- [Genesis Block](./docs/genesis.md) — Genesis block, premine allocations, creator signature
 - [Architecture](./V3/docs/) — L1/L2 architecture docs
 - [Mainnet Constants](./V3/docs/MAINNET_CONSTANTS.md) — Canonical chain parameters
+- [CLI Reference](./V3/docs/CLI_REFERENCE.md) — Full CLI command reference
 - [Security Disclosures](./docs/security/) — Public vulnerability disclosures
 - [Contributing](./CONTRIBUTING.md) — How to contribute
 - [Code of Conduct](./CODE_OF_CONDUCT.md) — Community standards

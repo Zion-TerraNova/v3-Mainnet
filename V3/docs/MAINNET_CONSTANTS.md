@@ -1,6 +1,6 @@
 # ZION Mainnet Constants & Fixed Parameters
 
-> **Canonical technical reference** — all values extracted directly from `V3/` source code as of 2026-07-01 (3.0.4 canonical).
+> **Canonical technical reference** — all values extracted directly from `V3/` source code as of 2026-07-06 (3.0.4 hard reset).
 > Source of truth: `V3/L1/core/src/` and `V3/L1/cosmic-harmony/src/`.
 
 ---
@@ -20,7 +20,7 @@
 | `DECAY_DENOMINATOR` | `5` | Decay factor denominator |
 | `MAX_DECAY_DECADES` | `10` | Decades before tail emission |
 | `BASE_REWARD` | `5_400_067_000` flowers | Initial block reward (5,400.067 ZION) — 6-decimal scale (3.0.3 fork) |
-| `GENESIS_HASH` | `d28dc404abfd4e22b313d3a7e8b680453328a77ace68b47466a14d18aff6df5d` | Current canonical genesis |
+| `GENESIS_HASH` | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` | Current canonical genesis (3.0.4 hard reset, 2026-07-06) |
 | `TAIL_REWARD` | `724_784_723` flowers | Perpetual tail emission (~724.7847 ZION) — 6-decimal scale (3.0.3 fork) |
 | `COINBASE_MATURITY` | `100` | Blocks before coinbase spendable |
 | `MINER_PCT` | `89` | Miner share of block reward (%) |
@@ -37,11 +37,11 @@
 | Constant | Value | Description |
 |----------|-------|-------------|
 | `DAO_TREASURY_LOCK_HEIGHT` | `144_000` | ~100 days lock (changed in 3.0.3 fork from 525,600) |
-| `GENESIS_TIMESTAMP` | `1_767_225_600` | Unix seconds (TBD at ceremony) |
+| `GENESIS_TIMESTAMP` | `1_767_225_600` | Unix seconds (2026-01-01 00:00:00 UTC, frozen) |
 | `GENESIS_MESSAGE` | Embedded ASCII dedication | See `GENESIS_MESSAGE.txt` |
-| `PREMINE_OUTPUTS` | 13 outputs | See table below |
+| `PREMINE_OUTPUTS` | 14 outputs | See table below |
 
-### Premine Distribution (13 outputs)
+### Premine Distribution (14 outputs)
 
 | # | Category | Amount (ZION) |
 |---|----------|---------------|
