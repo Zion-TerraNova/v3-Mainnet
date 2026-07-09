@@ -1,0 +1,26 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+ZION v3 Genesis Block — Prohlášení tvůrce
+
+Já, Yose, tvůrce ZION, tímto potvrzuji:
+
+1. Genesis blok s hashem 4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e je kanonický genesis blok ZION v3 mainnet.
+
+2. Všech 14 premine outputů v celkové hodnotě 16 780 000 000 ZION bylo alokováno v souladu s designem protokolu.
+
+3. Genesis zpráva "ZION Mainet Launch v3" je autentická a byla vložena do genesis bloku mnou.
+
+4. Tento genesis blok byl regenerován 2026-07-06 jako součást 3.0.4 hard resetu po odhalení bezpečnostních zranitelností F1 a F5.
+
+5. Předchozí genesis hash d28dc404... je neplatný a patří kompromitovanému řetězci.
+
+Peace & One Love 4ever.
+— Yose / Zion Creator
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQRKs2kHRC99XjTGJDsjMcjfjnXoEwUCak79RAAKCRAjMcjfjnXo
+E45WAQCwt2dtJIOITT3BoUB/MXy4n9xKe4CDnj0etrU6fyK8awD+Ijov8Vq6+HA0
+R38JNZj2qFhyHkLjg6kBDGO4xMQaIw8=
+=5XA4
+-----END PGP SIGNATURE-----
