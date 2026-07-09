@@ -57,7 +57,7 @@ cargo build --release
 cargo run --release -p zion-core --bin zion-node
 
 # Lee la historia completa
-open ../../README_FULL.md
+open README_FULL.es.md
 ```
 
 ---
@@ -70,7 +70,7 @@ open ../../README_FULL.md
 
 ## Documentación completa
 
-Para una visión completa de la arquitectura, funciones, historial y hoja de ruta, consulta **[README_FULL.md](../../README_FULL.md)**.
+Para una visión completa de la arquitectura, funciones, historial y hoja de ruta, consulta **[README_FULL.es.md](./README_FULL.es.md)**.
 
 ---
 

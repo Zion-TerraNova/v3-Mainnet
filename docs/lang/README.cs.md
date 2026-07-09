@@ -57,7 +57,7 @@ cargo build --release
 cargo run --release -p zion-core --bin zion-node
 
 # Přečti celý příběh
-open ../../README_FULL.md
+open README_FULL.cs.md
 ```
 
 ---
@@ -70,7 +70,7 @@ open ../../README_FULL.md
 
 ## Plná dokumentace
 
-Kompletní přehled architektury, funkcí, historie a roadmapy najdeš v **[README_FULL.md](../../README_FULL.md)**.
+Kompletní přehled architektury, funkcí, historie a roadmapy najdeš v **[README_FULL.cs.md](./README_FULL.cs.md)**.
 
 ---
 
