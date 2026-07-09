@@ -183,27 +183,6 @@ pro vejení částky do `u64` limitů. Adresa je odvozena z
 
 ---
 
-## Zamykací mechanismus
-
-### Obouvrstvý zámek
-
-Všechny premine outputy používají **obouvrstvý zámek**:
-
-1. **Time-lock** (`unlock_height`): Bloková výška, která musí být dosažena.
-   - DAO Treasury: blok 144 000 (~100 dní)
-   - Všechny ostatní: bez time-locku (okamžitě po admin-odemčení)
-
-2. **Admin-lock** (`admin_locked`): Vyžaduje 3-of-3 admin multisig + DAO hlasování.
-   - Všech 14 outputů je admin-locked.
-   - `admin_unlocked` closure kontroluje on-chain stav odemčení.
-
-**Oba zámky musí být splněny.** Admin-locked adresa nemůže převést prostředky
-ani po vypršení time-locku, dokud admin multisig + DAO hlasování ji neodemkne.
-
-Viz: `is_premine_transfer_allowed()` v `genesis.rs`.
-
----
-
 ## Kanonické peněženky dotací
 
 Tyto **nejsou** premine outputy — jsou to příjemci průběžné blokové dotace
@@ -300,11 +279,13 @@ za běhu z env/config, nejsou hardcodovány v `genesis.rs`.
 
 ### Admin role
 
-| Role | Jméno | L1 adresa | EVM adresa | Nástupce (Gen Z) |
-|------|-------|-----------|------------|-------------------|
-| Admin-1 (protocol governance, emergency pause) | **Rama** | `zion1m300z2f424k4m0k6c4l0v6v6w8l6j855s7je6e4` | `0xf354ccae30d6e9787e23e987e893e825f312f5c9` | Maitreya Buddha |
-| Admin-2 (treasury oversight, DAO guardian) | **Sita** | `zion1d7z398t0n5c7j874a5n8v4h0d5c8j754z78t7m6` | `0x07e720245cdabc33a265df5bcdc504897ddf0b01` | Sarah Issobela |
-| Admin-3 (bridge admin, EVM multisig) | **Hanuman** | `zion1a363k2y366f6w4z2n2q4h2y822f3s5w2w56y3y4` | `0x9ab8ee6b874578e431aeb45bf28f8ca6041e1de6` | Elizabeth |
+| Role | Jméno | L1 adresa | EVM adresa |
+|------|-------|-----------|------------|
+| Admin-1 (protocol governance, emergency pause) | **Rama** | `zion1m300z2f424k4m0k6c4l0v6v6w8l6j855s7je6e4` | `0xf354ccae30d6e9787e23e987e893e825f312f5c9` |
+| Admin-2 (treasury oversight, DAO guardian) | **Sita** | `zion1d7z398t0n5c7j874a5n8v4h0d5c8j754z78t7m6` | `0x07e720245cdabc33a265df5bcdc504897ddf0b01` |
+| Admin-3 (bridge admin, EVM multisig) | **Hanuman** | `zion1a363k2y366f6w4z2n2q4h2y822f3s5w2w56y3y4` | `0x9ab8ee6b874578e431aeb45bf28f8ca6041e1de6` |
+
+Nástupci (Gen Z): Maitreya Buddha → Rama, Sarah Issobela → Sita, Elizabeth → Hanuman. Viz §Zpráva pro Generaci Z.
 
 Zdroj: `V3/L1/core/src/admin.rs` + `docs/3.0.4/GENESIS_HARD_RESET_CANONICAL.md` §1.5
 
@@ -339,16 +320,20 @@ Zdroj: `V3/L1/core/src/admin.rs` + `docs/3.0.4/GENESIS_HARD_RESET_CANONICAL.md` 
 
 ### Obouvrstvý zámek premine
 
-Všech 14 premine outputů používá **obouvrstvý zámek** (viz výše §Zamykací
-mechanismus). Odemčení vyžaduje:
+Všech 14 premine outputů používá **obouvrstvý zámek**. Odemčení vyžaduje:
 
-1. **Time-lock expired** — DAO Treasury sloty (6, 7, 8) čekají do bloku 144 000
-   (~100 dní). Ostatní sloty nemají time-lock.
+1. **Time-lock** (`unlock_height`): Bloková výška, která musí být dosažena.
+   - DAO Treasury sloty (6, 7, 8): blok 144 000 (~100 dní)
+   - Všechny ostatní: bez time-locku (okamžitě po admin-odemčení)
 2. **Admin multisig (3-of-3)** — všichni 3 admini (Rama + Sita + Hanuman)
-   musí podepsat `TreasurySpend` operaci.
+   musí podepsat `TreasurySpend` operaci. `admin_unlocked` closure
+   kontroluje on-chain stav odemčení.
 3. **DAO vote** — komunita musí schválit `TREASURY_SPEND` návrh
    (quorum 15%, 14d hlasování).
 4. **Time-lock 7 dní** — po schválení DAO se čeká 7 dní před exekucí.
+
+**Oba zámky musí být splněny.** Admin-locked adresa nemůže převést prostředky
+ani po vypršení time-locku, dokud admin multisig + DAO hlasování ji neodemkne.
 
 ```
 Premine transfer povolen pouze když:
