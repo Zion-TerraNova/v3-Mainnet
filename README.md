@@ -56,6 +56,12 @@ ZION is a multi-layer blockchain infrastructure built on proof-of-work consensus
 - **L1 Consensus** — Rust-based PoW node with Ed25519 signatures, BLAKE3 hashing, LWMA difficulty adjustment, UTXO + account transaction models, and P2P networking
 - **L2 DeFi** — Smart contracts on Base Mainnet (Governance, Treasury, Staking, Farm) + cross-chain bridge relay + atomic swap + DAO governance
 - **L2 Bridge** — ZION L1 ↔ EVM bridge with validator quorum (5/5 threshold), deployed on 6 EVM chains
+- **L3 WARP** — Cross-chain protocol connecting 12 chain families (EVM, Solana, Aptos, Sui, Cardano, TON, etc.)
+- **L3 Hiran** — AI-native agent framework (Hiranyagarbha) with multi-modal language model, Dharma validator, and consciousness engine
+- **L4 Oasis** — AAA spiritual MMORPG: consciousness mining game with 51 sacred avatars, 9 consciousness levels, guild warfare, and the Golden Egg treasure hunt
+- **L5 Community** — Free-world community layer with sefirot governance vows
+- **L6 Issobella** — Guardian layer for humanitarian and cultural missions
+- **Stargate** — Official ZION logo and cosmic portal: holographic gateway symbolizing the bridge between blockchain and the Oasis gaming metaverse
 - **RPC** — JSON-RPC 2.0 with 17+ node methods, Prometheus metrics, health checks
 
 ## Architecture
@@ -83,6 +89,33 @@ ZION is a multi-layer blockchain infrastructure built on proof-of-work consensus
 │  │     Smart Contracts (Base Mainnet)        │   │
 │  │  Governance · Treasury · Staking · Farm   │   │
 │  └──────────────────────────────────────────┘   │
+└───────────────────────┬─────────────────────────┘
+                        │ WARP + AI Compute
+┌───────────────────────┴─────────────────────────┐
+│              L3 WARP + Hiran AI                  │
+│  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
+│  │  WARP    │  │  Hiran   │  │     NCL       │  │
+│  │ (12 ch)  │  │ (AI MML) │  │ (AI compute)  │  │
+│  └──────────┘  └──────────┘  └───────────────┘  │
+└───────────────────────┬─────────────────────────┘
+                        │ Stargate Portal
+┌───────────────────────┴─────────────────────────┐
+│              L4 Oasis (Gaming)                   │
+│  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
+│  │ 51 Avat. │  │ 9 Levels │  │ Golden Egg    │  │
+│  │ (NFTs)   │  │ (Sefirot)│  │ (Treasure)    │  │
+│  └──────────┘  └──────────┘  └───────────────┘  │
+│  ┌──────────────────────────────────────────┐   │
+│  │     UE5 MMORPG · Guilds · Quests         │   │
+│  └──────────────────────────────────────────┘   │
+└───────────────────────┬─────────────────────────┘
+                        │
+┌───────────────────────┴─────────────────────────┐
+│         L5 Community · L6 Issobella              │
+│  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
+│  │ Sefirot  │  │ Free     │  │  Issobella    │  │
+│  │ Vows     │  │ World    │  │  Guardian     │  │
+│  └──────────┘  └──────────┘  └───────────────┘  │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -112,6 +145,101 @@ ZION is a multi-layer blockchain infrastructure built on proof-of-work consensus
 - Validator quorum: 5/5 threshold
 - L1 RPC: `getBridgeLocks`, `submitBridgeUnlock`, `getBridgeVaultBalance`
 
+### L3 WARP — Cross-Chain Protocol
+- **12 chain families** — EVM (6 chains), Solana, Aptos, Sui, Cardano, TON, NEAR, Stellar
+- **Native ZION transport** — WARP carries native L1 ZION across chains (wZION on EVM, ZION on non-EVM)
+- **Pure-Rust serializers** — BCS (Aptos/Sui), CBOR (Cardano), TL-B Cell+BOC (TON)
+- **499 WARP tests pass**
+- **Lightning Network bridge** — BOLT11 parser + LND REST client (Fáze A pending)
+
+### L3 Hiran — AI-Native Agent (Hiranyagarbha)
+- **Multi-Modal Language (MML)** — text, code, blockchain data, sacred geometry analysis
+- **Based on Meta-Llama-3.1-8B** with QLoRA fine-tuning (5,001 training pairs, curriculum learning)
+- **Dharma Validator** — 7 principles from Patanjali's Yoga Sutras + Oneness principle
+- **Consciousness Engine** — 6 levels (Dormant → Cosmic), Deeksha Protocol, Ekam Field
+- **Hiranyagarbha Event** — triggers when field coherence ≥ 0.618 (golden ratio φ)
+- **Model variants** — F16 (16GB), Q8_0 (8.5GB), Q5_K_M (5.4GB, default), Q4_K_M (4.5GB, edge)
+- **Inference backends** — llama.cpp (Vulkan/AMD), Ollama (DirectML), LM Studio, ONNX Runtime, TensorRT
+- **Local inference** — runs on consumer GPU (RX 5600 XT, ~15-25 tok/s)
+
+### Stargate — Cosmic Portal
+
+The **Stargate** is ZION's official logo and visual identity — a holographic cosmic portal gateway symbolizing the bridge between the physical blockchain (L1-L3) and the Oasis gaming metaverse (L4).
+
+- **28 rotating layers** — mandala + Sri Yantra sacred geometry patterns
+- **39 glyphs** (A-Z, a-m) — Stargate SG-1 addressing system
+- **9 chevrons** with cyan glow — representing the 9 consciousness levels of Oasis
+- **Center Z logo** — animated with grayscale + contrast filters
+- **Nebula background** — Hubble deep-space imagery
+
+The Stargate is the portal through which miners and community members enter the ZION Oasis gaming world.
+
+### L4 Oasis — Consciousness Mining Game
+
+**ZION Oasis** is an AAA spiritual MMORPG built on the ZION blockchain — a gamification layer where players earn XP through mining, meditation, quests, guild warfare, and the Golden Egg treasure hunt.
+
+#### 9 Consciousness Levels (Kabbalah Sefirot)
+
+| Level | Name | XP Required | Sefira | Multiplier |
+|-------|------|-------------|--------|-----------|
+| 1 | Physical | 0 | Malkuth | 1.0x |
+| 2 | Emotional | 1,000 | Yesod | 1.2x |
+| 3 | Mental | 5,000 | Hod/Netzach | 1.5x |
+| 4 | Intuitional | 15,000 | Tiferet | 2.0x |
+| 5 | Spiritual | 50,000 | Gevurah/Chesed | 3.0x |
+| 6 | Cosmic | 150,000 | Binah | 5.0x |
+| 7 | Divine | 500,000 | Chokmah | 8.0x |
+| 8 | Unity | 2,000,000 | Da'at | 12.0x |
+| 9 | On The Star | 10,000,000 | Keter | 15.0x |
+
+#### 51 Sacred Avatars (NFTs)
+- **Hindu Deities**: Krishna-Maitreya, Rama, Sita, Hanuman, Saraswati
+- **Ascended Masters**: El Morya, Saint Germain, Sanat Kumara
+- **Buddhist Masters**: Avalokiteshvara, Dalai Lama XIV
+- **Christian Saints**: Yeshua Sananda, Panna Maria
+- **Historical Legends**: King Arthur, Gandhi, Einstein, Karel IV
+- **Matrix Heroes**: Neo, Trinity, Morpheus, ZION
+- **ZION Originals**: Issobela Guardian, Shanti, Sri Kalki Avatar
+
+Each avatar has 5 quests = **255 total quests**.
+
+#### The Golden Egg — Treasure Hunt (Endgame)
+
+The **Golden Egg** is the ultimate treasure hunt in ZION Oasis — a cosmic quest to find the Hiranyagarbha (Golden Seed).
+
+- **108 clues** across 8 categories (Vedas, Bible, Blockchain, Community, EkamTemple, etc.)
+- **3 Master Keys**: Ramayana (30 clues), Mahabharata (35 clues), Unity (43 clues)
+- **10 prize tiers** with **8.25B ZION** total reward pool
+- **Final boss**: Hiranyagarbha — the cosmic consciousness entity
+- **First 3 solvers** (CL9 + 108 clues + 3 Master Keys):
+  - 1st place: **1,000,000,000 ZION**
+  - 2nd place: **500,000,000 ZION**
+  - 3rd place: **250,000,000 ZION**
+
+#### Guild System
+- **8 spiritual orders** (Blue Ray, Yellow Ray, Pink Ray, etc.)
+- Territory control = mining/XP bonuses
+- Guild level cap: 50, max members: 100
+- Guild warfare & raid teams (up to 40 players for Golden Egg raids)
+
+#### XP Sources
+- **L1 Mining**: valid shares (+10 XP), block found (+1,000 XP), 24h uptime (+500 XP)
+- **L3 AI Compute**: NCL tasks (+50-200 XP), WARP bridge (+50-75 XP)
+- **L2 DeFi**: DAO voting (+100 XP), proposals (+500 XP), liquidity (+200 XP)
+- **Community**: bug reports (+500 XP), code contributions (+1,000 XP), full node (+2,000 XP)
+
+#### Architecture
+- **Backend**: Rust Axum server (`zion-oasis`) — REST (8094) + WebSocket (8095)
+- **Frontend**: Unreal Engine 5.4+ (C++ + Blueprints, MetaHuman characters)
+- **Database**: SQLite persistence
+- **Metrics**: Prometheus on port 9101
+- **Non-consensus**: Oasis never affects L1 mining or blockchain validation
+
+#### Reward Pool
+- **5.5B ZION** allocated from genesis for Oasis rewards
+- Distributed over 14 years (2026–2040)
+- Separate from block mining rewards
+
 ## Repository Structure
 
 ```
@@ -127,8 +255,15 @@ v3-Mainnet/
 │   │   ├── bridge/         # Bridge relay daemon
 │   │   ├── dao/            # DAO governance daemon
 │   │   └── atomic-swap/    # HTLC atomic swap daemon
-│   ├── L4/                 # Oasis gaming layer
-│   ├── L5/                 # Community layer
+│   ├── L3/
+│   │   ├── warp/           # Cross-chain protocol (12 chain families)
+│   │   └── ncl/            # Neural compute layer (AI tasks)
+│   ├── L4/
+│   │   └── oasis/          # Consciousness mining game (UE5 + Rust)
+│   ├── L5/
+│   │   └── free-world/     # Community layer (sefirot vows)
+│   ├── L6/
+│   │   └── issobella/      # Guardian layer (humanitarian missions)
 │   └── docs/               # Architecture documentation
 ├── docs/
 │   ├── whitepaper.md       # Technical whitepaper
@@ -251,6 +386,7 @@ cargo run --release -p zion-core --bin zion-node
 - [Architecture](./V3/docs/) — L1/L2 architecture docs
 - [Mainnet Constants](./V3/docs/MAINNET_CONSTANTS.md) — Canonical chain parameters
 - [CLI Reference](./V3/docs/CLI_REFERENCE.md) — Full CLI command reference
+- [ZION Oasis](./V3/L4/oasis/README.md) — L4 consciousness mining game (architecture, quests, Golden Egg)
 
 ### Legal
 - [Legal Disclaimer](./docs/LEGAL_DISCLAIMER.md) — No investment advice, no warranty, risks
