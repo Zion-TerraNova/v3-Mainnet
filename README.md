@@ -100,6 +100,11 @@ v3-Mainnet/
 ├── docs/
 │   ├── whitepaper.md       # Technical whitepaper
 │   ├── genesis.md          # Genesis block documentation
+│   ├── LEGAL_DISCLAIMER.md # Legal disclaimer (no investment advice)
+│   ├── TERMS_OF_USE.md     # Terms of use
+│   ├── PRIVACY_POLICY.md   # Privacy policy
+│   ├── JURISDICTION.md     # Jurisdiction & compliance
+│   ├── TOKEN_DISCLOSURE.md # Token disclosure (no ICO, premine)
 │   ├── security/           # Security disclosures
 │   └── lang/               # Multilingual README translations
 ├── Cargo.toml              # Rust workspace root
@@ -202,12 +207,25 @@ cargo run --release -p zion-core --bin zion-node
 
 ## Documentation
 
+### Technical
 - [Whitepaper](./docs/whitepaper.md) — Technical whitepaper (consensus, economics, architecture)
 - [Genesis Block](./docs/genesis.md) — Genesis block, premine allocations, creator signature
 - [Architecture](./V3/docs/) — L1/L2 architecture docs
 - [Mainnet Constants](./V3/docs/MAINNET_CONSTANTS.md) — Canonical chain parameters
 - [CLI Reference](./V3/docs/CLI_REFERENCE.md) — Full CLI command reference
-- [Security Disclosures](./docs/security/) — Public vulnerability disclosures
+
+### Legal
+- [Legal Disclaimer](./docs/LEGAL_DISCLAIMER.md) — No investment advice, no warranty, risks
+- [Terms of Use](./docs/TERMS_OF_USE.md) — Conditions for node operators, miners, users
+- [Privacy Policy](./docs/PRIVACY_POLICY.md) — No personal data collected, pseudonymous network
+- [Jurisdiction & Compliance](./docs/JURISDICTION.md) — Decentralized network, regulatory status
+- [Token Disclosure](./docs/TOKEN_DISCLOSURE.md) — Transparent tokenomics, no ICO, premine details
+
+### Security
+- [Security Disclosures](./docs/security/) — Public vulnerability disclosures (F1-F5, C1-C8)
+- [Security Policy](./SECURITY.md) — How to report vulnerabilities
+
+### Community
 - [Contributing](./CONTRIBUTING.md) — How to contribute
 - [Code of Conduct](./CODE_OF_CONDUCT.md) — Community standards
 
