@@ -2,6 +2,14 @@
 
 <div align="center">
 
+<!-- ════ STARGATE — Cosmic Portal ════ -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./docs/stargate/nebula.jpg">
+  <img src="./docs/stargate/nebula.jpg" width="320" height="320" alt="ZION Stargate — Cosmic Portal" style="border-radius: 50%; object-fit: cover; box-shadow: 0 0 40px rgba(0,180,255,0.3);" />
+</picture>
+
+<br/>
+
 **Multichain Dharma Ecosystem**
 
 A proof-of-work blockchain with dual-algo consensus, cross-chain bridge, DeFi layer, and DAO governance.
@@ -14,6 +22,35 @@ A proof-of-work blockchain with dual-algo consensus, cross-chain bridge, DeFi la
 **English** · [Čeština](./docs/lang/README.cs.md) · [Español](./docs/lang/README.es.md) · [Français](./docs/lang/README.fr.md) · [Português](./docs/lang/README.pt.md)
 
 </div>
+
+<details>
+<summary>🌌 <b>Enter the Stargate</b> — Interactive Portal</summary>
+
+<div align="center">
+
+<img src="./docs/stargate/2.png" width="280" alt="Stargate Layer" style="border-radius: 50%; opacity: 0.3; position: relative; z-index: 1;" />
+<img src="./docs/stargate/1.png" width="280" alt="Stargate Layer" style="border-radius: 50%; opacity: 0.15; margin-top: -280px; position: relative; z-index: 2;" />
+<img src="./docs/stargate/Z.gif" width="64" alt="ZION" style="border-radius: 50%; filter: grayscale(100%) contrast(180%); opacity: 0.7; margin-top: -170px; position: relative; z-index: 3;" />
+
+<br/><br/>
+
+> **The Stargate** is ZION's cosmic portal — a holographic gateway with 28 rotating layers (mandala + Sri Yantra), 39 glyphs (Stargate SG-1 addressing system), and 9 chevrons representing the 9 consciousness levels of the Oasis gaming world.
+>
+> The portal symbolizes the bridge between the physical blockchain (L1–L3) and the Oasis gaming metaverse (L4). On the live website ([zionterranova.com](https://zionterranova.com)), the Stargate is fully animated with CSS rotations and interactive hover effects.
+
+<br/>
+
+| Stargate Element | Symbolism |
+|------------------|-----------|
+| 28 rotating layers | Mandala + Sri Yantra sacred geometry |
+| 39 glyphs (A–Z, a–m) | Stargate SG-1 addressing system |
+| 9 chevrons (cyan glow) | 9 consciousness levels (Kabbalah Sefirot) |
+| Center Z logo | ZION — the seed of consciousness |
+| Nebula background | Hubble deep-space imagery |
+
+</div>
+
+</details>
 
 ---
 
@@ -166,11 +203,14 @@ ZION is a multi-layer blockchain infrastructure built on proof-of-work consensus
 
 The **Stargate** is ZION's official logo and visual identity — a holographic cosmic portal gateway symbolizing the bridge between the physical blockchain (L1-L3) and the Oasis gaming metaverse (L4).
 
+> See the [interactive Stargate](#enter-the-stargate--interactive-portal) at the top of this page, or visit [zionterranova.com](https://zionterranova.com) for the fully animated version.
+
 - **28 rotating layers** — mandala + Sri Yantra sacred geometry patterns
 - **39 glyphs** (A-Z, a-m) — Stargate SG-1 addressing system
 - **9 chevrons** with cyan glow — representing the 9 consciousness levels of Oasis
 - **Center Z logo** — animated with grayscale + contrast filters
 - **Nebula background** — Hubble deep-space imagery
+- **Assets** — [`docs/stargate/`](./docs/stargate/) (images + CSS for web integration)
 
 The Stargate is the portal through which miners and community members enter the ZION Oasis gaming world.
 
@@ -276,6 +316,7 @@ v3-Mainnet/
 │   ├── JURISDICTION.md     # Jurisdiction & compliance
 │   ├── TOKEN_DISCLOSURE.md # Token disclosure (no ICO, premine)
 │   ├── security/           # Security disclosures
+│   ├── stargate/           # Stargate logo assets (images + CSS)
 │   └── lang/               # Multilingual README translations
 ├── Cargo.toml              # Rust workspace root
 ├── SECURITY.md             # Vulnerability reporting
