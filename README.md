@@ -3,9 +3,6 @@
 <!-- Hero banner — Stargate OG image -->
 <img src="./docs/stargate/stargate-og.png" width="320" alt="ZION Stargate" />
 
-<!-- Animated Z logo -->
-<img src="./docs/stargate/Z.gif" width="80" height="80" alt="ZION" />
-
 <!-- Title -->
 <h1>ZION</h1>
 
