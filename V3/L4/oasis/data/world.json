@@ -1,0 +1,216 @@
+{
+  "_comment": "ZION OASIS World Map - 7 Sacred Continents (7 Rays)",
+  "world_name": "ZION OASIS",
+  "version": "1.0.0",
+  "total_playable_area_km2": 500,
+  "continents": [
+    {
+      "id": "aetheria",
+      "name": "Aetheria",
+      "ray": "Blue",
+      "ray_attribute": "Will / Power",
+      "level_range": "1-30",
+      "capital": "New Camelot",
+      "zones": [
+        "Himalayan Peaks",
+        "Darjeeling Retreat",
+        "Akbar's Fortress"
+      ],
+      "dungeons": [
+        { "name": "Everest Summit", "type": "raid", "min_players": 20 },
+        { "name": "Arthur's Tomb", "type": "mythic_plus", "min_players": 5 }
+      ],
+      "world_boss": "El Morya",
+      "pvp_zone": "Battlefield of Will",
+      "starter_continent": true,
+      "description": "Continent of Will and Power. Where seekers begin their journey."
+    },
+    {
+      "id": "illumina",
+      "name": "Illumina",
+      "ray": "Yellow",
+      "ray_attribute": "Wisdom / Intelligence",
+      "level_range": "20-50",
+      "capital": "Alexandria Reborn",
+      "zones": [
+        "Royal Teton Mountains",
+        "Confucius Gardens",
+        "Cosmic Archives"
+      ],
+      "dungeons": [
+        { "name": "Akashic Records", "type": "raid", "min_players": 20 },
+        { "name": "Wisdom Trials", "type": "mythic_plus", "min_players": 5 }
+      ],
+      "world_boss": "Lanto the Sage",
+      "special_feature": "Sacred Library - 6 ancient texts",
+      "description": "Continent of Wisdom. The Sacred Library holds the keys to enlightenment."
+    },
+    {
+      "id": "amora",
+      "name": "Amora",
+      "ray": "Pink",
+      "ray_attribute": "Love / Beauty",
+      "level_range": "30-60",
+      "capital": "Chateau de Liberte",
+      "zones": [
+        "Venice Canals",
+        "Rose Gardens",
+        "Taj Mahal Replica"
+      ],
+      "dungeons": [
+        { "name": "Temple of Love", "type": "raid", "min_players": 20 },
+        { "name": "Heart Trials", "type": "mythic_plus", "min_players": 5 }
+      ],
+      "world_boss": "Paul the Venetian",
+      "special_feature": "Player Housing, Guild Halls, Wedding Chapel",
+      "description": "Continent of Love and Beauty. Where hearts open and guilds are forged."
+    },
+    {
+      "id": "ascendia",
+      "name": "Ascendia",
+      "ray": "White",
+      "ray_attribute": "Purity / Ascension",
+      "level_range": "50-80",
+      "capital": "Luxor Eternal",
+      "zones": [
+        "Mount Shasta",
+        "Egyptian Temples",
+        "Babaji's Cave"
+      ],
+      "dungeons": [
+        { "name": "Ascension Chamber", "type": "raid", "min_players": 40 },
+        { "name": "Purity Gauntlet", "type": "mythic_plus", "min_players": 5 }
+      ],
+      "world_boss": "Serapis Bey + Babaji",
+      "world_boss_type": "duo",
+      "special_feature": "Prestige system, max-level content",
+      "description": "Continent of Purity and Ascension. The path to transcendence."
+    },
+    {
+      "id": "veritara",
+      "name": "Veritara",
+      "ray": "Green",
+      "ray_attribute": "Truth / Healing",
+      "level_range": "40-70",
+      "capital": "CERN Nexus",
+      "zones": [
+        "Temple of Truth (Crete)",
+        "Damascus Road",
+        "Emerald Forests"
+      ],
+      "dungeons": [
+        { "name": "Hall of Truth", "type": "raid", "min_players": 20 },
+        { "name": "Healing Springs", "type": "mythic_plus", "min_players": 5 }
+      ],
+      "world_boss": "Hilarion the Healer",
+      "special_feature": "Hospital hub, research labs",
+      "description": "Continent of Truth and Healing. Science and spirit unite."
+    },
+    {
+      "id": "servara",
+      "name": "Servara",
+      "ray": "Ruby-Gold",
+      "ray_attribute": "Service / Peace",
+      "level_range": "50-75",
+      "capital": "Shanti Nagar",
+      "zones": [
+        "Arabian Deserts",
+        "Gandhi Ashram",
+        "Taj Mahal Gardens"
+      ],
+      "dungeons": [
+        { "name": "Temple of Service", "type": "raid", "min_players": 20 },
+        { "name": "Peace Trials", "type": "mythic_plus", "min_players": 5 }
+      ],
+      "world_boss": "Lady Nada",
+      "special_feature": "Humanitarian quests, charity integration",
+      "description": "Continent of Service and Peace. The heart of the humanitarian mission."
+    },
+    {
+      "id": "libertas",
+      "name": "Libertas",
+      "ray": "Violet",
+      "ray_attribute": "Freedom / Transmutation",
+      "level_range": "60-85",
+      "capital": "Saint Germain's Castle",
+      "zones": [
+        "Transylvania Mountains",
+        "Portia's Temple",
+        "Alchemy Labs"
+      ],
+      "dungeons": [
+        { "name": "Violet Flame Sanctum", "type": "raid", "min_players": 40 },
+        { "name": "Freedom Fortress", "type": "mythic_plus", "min_players": 5 }
+      ],
+      "world_boss": "Saint Germain",
+      "world_boss_type": "legendary",
+      "special_feature": "Transmutation crafting, karma cleansing",
+      "description": "Continent of Freedom and Transmutation. The final frontier before the Golden Egg."
+    }
+  ],
+  "special_zones": [
+    {
+      "id": "zion_city",
+      "name": "ZION City",
+      "type": "hub",
+      "level_range": "All levels",
+      "safe_zone": true,
+      "features": [
+        "Market Quarter",
+        "Guild District",
+        "Arena",
+        "Housing",
+        "Auction House",
+        "Banks",
+        "Trainers",
+        "The Round Table (DAO governance)",
+        "Maitreya's Palace (story hub)",
+        "WARP Engine (fast travel)"
+      ]
+    },
+    {
+      "id": "sacred_library",
+      "name": "Sacred Library",
+      "type": "instanced",
+      "access_condition": "Complete Saraswati quest",
+      "wings": [
+        "Bhagavad Gita",
+        "Upanishads",
+        "Bible",
+        "Gnostic Texts",
+        "Secret Texts",
+        "ZION Codex"
+      ],
+      "golden_egg_clues": 40,
+      "description": "Dimension of pure knowledge. 40 of 108 Golden Egg clues hidden here."
+    },
+    {
+      "id": "matrix_sector",
+      "name": "Matrix Sector",
+      "type": "hidden_endgame",
+      "access_condition": "CL 8+ and complete Neo questline",
+      "level_range": "80-90",
+      "features": [
+        "The Last City",
+        "Machine City Raid",
+        "Agent Smith encounter",
+        "Humans vs Machines faction war"
+      ],
+      "description": "Hidden endgame zone inspired by the Matrix. The system fights back."
+    },
+    {
+      "id": "ekam_dimension",
+      "name": "EKAM Dimension",
+      "type": "final_raid",
+      "access_condition": "All 3 Master Keys required",
+      "level_range": "90+",
+      "mainnet_only": true,
+      "features": [
+        "108 Pillars (mini-boss gauntlet)",
+        "Final Boss: Hiranyagarbha (Golden Egg itself!)",
+        "1 Billion ZION prize distribution"
+      ],
+      "description": "The ultimate challenge. Where the Golden Egg awaits the worthy."
+    }
+  ]
+}

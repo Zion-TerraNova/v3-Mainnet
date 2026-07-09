@@ -1,0 +1,41 @@
+# Unreal Engine 5 — Generated / Build artifacts
+
+# Build folders
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# Visual Studio
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+.vs/
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+
+# JetBrains
+.idea/
+*.iml
+
+# Compiled source
+*.dll
+*.exe
+*.app
+*.dylib
+*.so
+*.a
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Don't ignore Config/ (manual .ini files)
+# Don't ignore Content/ (assets, but use LFS for .uasset/.umap)

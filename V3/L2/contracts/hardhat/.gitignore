@@ -1,0 +1,16 @@
+# Never commit private keys or secrets
+.env
+.env.local
+.env.mainnet
+
+# Hardhat artifacts
+artifacts/
+cache/
+typechain-types/
+
+# Node modules
+node_modules/
+
+# Deploy outputs with real addresses (commit manually after review)
+# deployed-defi.json
+# deployed-farm-base.json

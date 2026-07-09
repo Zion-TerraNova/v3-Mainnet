@@ -1,0 +1,4217 @@
+{
+  "avatars": [
+    {
+      "id": 0,
+      "name": "Krishna-Maitreya",
+      "subtitle": "Cosmic Integration",
+      "ray": "AllRays",
+      "role": "Final Boss / Ultimate Guide",
+      "location": "EKAM Temple (Hidden Dimension)",
+      "quest_line": "\"The Integration of All Paths\"",
+      "teaching": "Krishna (Mahabharata) + Maitreya (Future Buddha) = Unity",
+      "ability": "**Cosmic Vision** - See all timelines simultaneously",
+      "consciousness_level_required": 9,
+      "consciousness_level_name": "ON THE STAR",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "The Flute of Union",
+          "description": "Hear the cosmic vibration in 7 frequencies"
+        },
+        {
+          "title": "Dance of Rasa Lila",
+          "description": "Find the hidden gopis across all timelines"
+        },
+        {
+          "title": "Maitreya's Blockchain Prophecy",
+          "description": "Decode the genesis message of the future"
+        },
+        {
+          "title": "Integration of All Paths",
+          "description": "Complete one quest from each tradition"
+        },
+        {
+          "title": "ON THE STAR",
+          "description": "Achieve CL 9 and witness the cosmic vision"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Rama",
+      "subtitle": "Dharma King",
+      "ray": "Blue",
+      "role": "Moral Compass / Dharma Teacher",
+      "location": "Ayodhya Palace (Blue Ray Region)",
+      "quest_line": "\"The Path of Righteousness\"",
+      "teaching": "\"Duty before desire, truth before comfort\"",
+      "ability": "**Dharma Shield** - Protects from adharmic attacks",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "Heart Opening",
+      "key": "Ramayana Key (1/3)",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Exile Test",
+          "description": "Choose between power and dharma"
+        },
+        {
+          "title": "The Golden Deer",
+          "description": "Illusion vs reality puzzle"
+        },
+        {
+          "title": "Bridge of Faith",
+          "description": "Build bridge with devotion (mini-game)"
+        },
+        {
+          "title": "Sita's Rescue",
+          "description": "Strategic rescue mission"
+        },
+        {
+          "title": "Return to Ayodhya",
+          "description": "Final blessing"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Sita",
+      "subtitle": "Devotion Queen",
+      "ray": "Pink",
+      "role": "Loyalty Expert / Devotion Mentor",
+      "location": "Ashoka Grove (Pink Ray Region)",
+      "quest_line": "\"The Fire of Purity\"",
+      "teaching": "\"True love endures all tests\"",
+      "ability": "**Agni Pariksha** - Burn away doubts and fears",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "Heart Opening",
+      "key": "Ramayana Key (1/3)",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Abduction",
+          "description": "Protect the innocent"
+        },
+        {
+          "title": "Captivity in Lanka",
+          "description": "Maintain faith in darkness"
+        },
+        {
+          "title": "Fire Test",
+          "description": "Purity meter challenge"
+        },
+        {
+          "title": "Earth's Embrace",
+          "description": "Environmental puzzle"
+        },
+        {
+          "title": "Divine Union",
+          "description": "Blessing ceremony"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Hanuman",
+      "subtitle": "Divine Service",
+      "ray": "RubyGold",
+      "role": "Strength + Devotion Mentor",
+      "location": "Himalayas Cave (Ruby-Gold Region)",
+      "quest_line": "\"The Leap of Faith\"",
+      "teaching": "\"Service to the divine is the highest path\"",
+      "ability": "**Bajrang Bali** - Superhuman strength challenges",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "Ramayana Key (1/3)",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Mountain Lift",
+          "description": "Strength mini-game"
+        },
+        {
+          "title": "Ocean Crossing",
+          "description": "Leap of faith mechanic"
+        },
+        {
+          "title": "Lanka Infiltration",
+          "description": "Stealth mission"
+        },
+        {
+          "title": "Tail of Fire",
+          "description": "Burning Lanka puzzle"
+        },
+        {
+          "title": "Rama's Messenger",
+          "description": "Final devotion test"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Maitreya",
+      "subtitle": "Future Buddha",
+      "ray": "AllRays",
+      "role": "ZION Founder / Community Leader",
+      "location": "ZION City Central (Hub World)",
+      "quest_line": "\"The Blockchain Prophecy\"",
+      "teaching": "\"Technology + Spirituality = Golden Age\"",
+      "ability": "**Blockchain Vision** - See transaction patterns, karma flows",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "Welcome to ZION",
+          "description": "Tutorial quest"
+        },
+        {
+          "title": "The Round Table",
+          "description": "Introduce DAO governance"
+        },
+        {
+          "title": "Consciousness Mining",
+          "description": "Explain CL system"
+        },
+        {
+          "title": "Humanitarian Tithe",
+          "description": "Charity mission"
+        },
+        {
+          "title": "Golden Egg Prophecy",
+          "description": "Unlock treasure hunt"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Saraswati",
+      "subtitle": "Goddess of Knowledge",
+      "ray": "Yellow",
+      "role": "Sacred Library Guardian",
+      "location": "Royal Teton Retreat (Yellow Ray)",
+      "quest_line": "\"The Eternal Student\"",
+      "teaching": "\"Knowledge without wisdom is blind\"",
+      "ability": "**Vidya Shakti** - Unlock hidden texts, decipher clues",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Library Initiation",
+          "description": "Unlock Sacred Library access"
+        },
+        {
+          "title": "Bhagavad Gita Quiz",
+          "description": "Comprehension test"
+        },
+        {
+          "title": "Upanishad Meditation",
+          "description": "Contemplation mini-game"
+        },
+        {
+          "title": "Veena of Harmony",
+          "description": "Music puzzle"
+        },
+        {
+          "title": "Blessing of Knowledge",
+          "description": "Final wisdom test"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Isis-Enamataru",
+      "subtitle": "Divine Feminine",
+      "ray": "Pink",
+      "role": "Feminine Power Teacher",
+      "location": "Luxor Temple (Egypt)",
+      "quest_line": "\"The Throne of Isis\"",
+      "teaching": "\"Divine feminine birthed creation\"",
+      "ability": "**Ankh of Life** - Resurrection, healing powers",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Throne of Isis",
+          "description": "Reassemble the scattered ankh fragments"
+        },
+        {
+          "title": "Wings of Ma'at",
+          "description": "Restore balance in the cosmic scale"
+        },
+        {
+          "title": "Sistrum of Resonance",
+          "description": "Attune to the 108 Hz carrier frequency"
+        },
+        {
+          "title": "Nile Flood Memory",
+          "description": "Decode the water-witness memory glyphs"
+        },
+        {
+          "title": "Ankh of Life",
+          "description": "Revive a fallen ally in guild warfare"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Issobela Guardian",
+      "subtitle": "Protector",
+      "ray": "Blue",
+      "role": "ZION City Defender",
+      "location": "ZION City Walls",
+      "quest_line": "\"The Guardian's Oath\"",
+      "teaching": "\"Protection without control\"",
+      "ability": "**Shield of Light** - Defensive barriers",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "Heart Opening",
+      "key": "",
+      "rarity": "Rare",
+      "quests": [
+        {
+          "title": "The Guardian's Vigil",
+          "description": "Patrol ZION City walls for 24 hours"
+        },
+        {
+          "title": "Shield of Light",
+          "description": "Defend a territory from 3 enemy raids"
+        },
+        {
+          "title": "Issobela's Oath",
+          "description": "Swear the Bodhisattva vow of protection"
+        },
+        {
+          "title": "Watchtower Ascension",
+          "description": "Build 5 consciousness beacons"
+        },
+        {
+          "title": "The Last Stand",
+          "description": "Win a guild war as the sole defender"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Shanti",
+      "subtitle": "Peace Keeper",
+      "ray": "RubyGold",
+      "role": "Conflict Resolution Expert",
+      "location": "Gandhi Ashram",
+      "quest_line": "\"The Way of Ahimsa\"",
+      "teaching": "\"Non-violence is the highest strength\"",
+      "ability": "**Peaceful Resolution** - Convert enemies to allies",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Rare",
+      "quests": [
+        {
+          "title": "The Way of Ahimsa",
+          "description": "Resolve 3 conflicts without combat"
+        },
+        {
+          "title": "Ashram Meditation",
+          "description": "Complete 7 days of meditation streak"
+        },
+        {
+          "title": "Gandhi's Salt March",
+          "description": "Walk the full territory circuit"
+        },
+        {
+          "title": "Peaceful Resolution",
+          "description": "Convert an enemy guild to allies"
+        },
+        {
+          "title": "Non-Violence Mastery",
+          "description": "Reach CL 6 without any combat XP"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Bronu-Christ",
+      "subtitle": "Sacred Warrior",
+      "ray": "Blue",
+      "role": "Warrior Priest",
+      "location": "Camelot Ruins",
+      "quest_line": "\"The Sacred Sword\"",
+      "teaching": "\"Fight for truth, not ego\"",
+      "ability": "**Holy Strike** - Righteous combat power",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Sacred Sword",
+          "description": "Find the sword in the Camelot ruins"
+        },
+        {
+          "title": "Crusade of Truth",
+          "description": "Defeat 10 adharmic shadow creatures"
+        },
+        {
+          "title": "Holy Strike Trial",
+          "description": "Land a perfect righteous combat combo"
+        },
+        {
+          "title": "Warrior Priest Ordination",
+          "description": "Heal and fight in the same battle"
+        },
+        {
+          "title": "Fight for Truth, Not Ego",
+          "description": "Win a duel without taking damage"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Arjuna",
+      "subtitle": "Warrior Seeker",
+      "ray": "Blue",
+      "role": "Battlefield Ethicist",
+      "location": "Kurukshetra (Mahabharata Region)",
+      "quest_line": "\"The Reluctant Warrior\"",
+      "teaching": "\"Duty beyond doubt\" (Bhagavad Gita)",
+      "ability": "**Gandiva Bow** - Precision archery mini-game",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "Mahabharata Key (2/3)",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Dilemma",
+          "description": "Moral choice: fight family or abandon duty?"
+        },
+        {
+          "title": "Krishna's Teaching",
+          "description": "Bhagavad Gita dialogue tree"
+        },
+        {
+          "title": "The Battlefield",
+          "description": "Strategy combat"
+        },
+        {
+          "title": "Detachment Lesson",
+          "description": "Emotional control test"
+        },
+        {
+          "title": "Victory Without Pride",
+          "description": "Final Gita wisdom"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Milan-Bhima",
+      "subtitle": "Strong Protector",
+      "ray": "Blue",
+      "role": "Strength + Justice Champion",
+      "location": "Hastinapura Palace",
+      "quest_line": "\"The Mighty One\"",
+      "teaching": "\"Strength serves justice\"",
+      "ability": "**Mace of Thunder** - Area attack, crowd control",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "Mahabharata Key (2/3)",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Mace of Thunder",
+          "description": "Destroy a fortress gate in guild war"
+        },
+        {
+          "title": "Strength Serves Justice",
+          "description": "Defend the weak from 5 bandit raids"
+        },
+        {
+          "title": "Bhima's Feast",
+          "description": "Gather 108 sacred ingredients"
+        },
+        {
+          "title": "River Crossing",
+          "description": "Carry 10 allies across a hazard zone"
+        },
+        {
+          "title": "The Mighty One",
+          "description": "Deal 1,000,000 damage in a single war"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Artem-Vudce",
+      "subtitle": "Leader",
+      "ray": "Blue",
+      "role": "Leadership Mentor",
+      "location": "ZION Council Chambers",
+      "quest_line": "\"The Chief's Burden\"",
+      "teaching": "\"Lead by example, not force\"",
+      "ability": "**Rally Troops** - Buff allies, inspire courage",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Rare",
+      "quests": [
+        {
+          "title": "The Chief's Burden",
+          "description": "Lead a guild of 50+ members for 30 days"
+        },
+        {
+          "title": "Rally Troops",
+          "description": "Inspire 100 players simultaneously"
+        },
+        {
+          "title": "Council of Seven Rays",
+          "description": "Form a full-spectrum alliance"
+        },
+        {
+          "title": "Lead by Example",
+          "description": "Have the highest contribution in 10 wars"
+        },
+        {
+          "title": "The Round Table",
+          "description": "Host a DAO governance summit"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Mama Yashoda",
+      "subtitle": "Divine Mother",
+      "ray": "Pink",
+      "role": "Unconditional Love Teacher",
+      "location": "Vrindavan (Krishna's Village)",
+      "quest_line": "\"The Mother's Love\"",
+      "teaching": "\"Love without expectation\"",
+      "ability": "**Maternal Blessing** - Heal emotional wounds",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "Heart Opening",
+      "key": "Mahabharata Key (2/3)",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "Baby Krishna",
+          "description": "Care for divine child mini-game"
+        },
+        {
+          "title": "The Butter Thief",
+          "description": "Playful puzzle"
+        },
+        {
+          "title": "Cosmic Vision",
+          "description": "See universe in Krishna's mouth"
+        },
+        {
+          "title": "Letting Go",
+          "description": "Detachment lesson"
+        },
+        {
+          "title": "Blessing of Motherhood",
+          "description": "Final heart opening"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Vishwakarma",
+      "subtitle": "Divine Architect",
+      "ray": "Yellow",
+      "role": "Sacred Geometry Expert",
+      "location": "EKAM Temple Construction Site",
+      "quest_line": "\"The Cosmic Blueprint\"",
+      "teaching": "\"Creation follows divine mathematics\"",
+      "ability": "**Sacred Geometry** - Unlock Fibonacci puzzles, architecture secrets",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "Mahabharata Key (2/3)",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The 108 Pillars",
+          "description": "Build EKAM Temple"
+        },
+        {
+          "title": "Golden Ratio",
+          "description": "Fibonacci pattern puzzle"
+        },
+        {
+          "title": "Platonic Solids",
+          "description": "3D geometry challenge"
+        },
+        {
+          "title": "Source Code",
+          "description": "Meta-game: find clues in game files"
+        },
+        {
+          "title": "Architect's Blessing",
+          "description": "Unlock hidden areas"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Radha",
+      "subtitle": "Divine Beloved",
+      "ray": "Pink",
+      "role": "Divine Love Expert",
+      "location": "Radha Kund (Sacred Lake)",
+      "quest_line": "\"The Eternal Dance\"",
+      "teaching": "\"Love transcends form\"",
+      "ability": "**Rasa Lila** - Dance of devotion (rhythm mini-game)",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "Ramayana Key (1/3)",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Eternal Dance",
+          "description": "Complete the rasa lila rhythm mini-game"
+        },
+        {
+          "title": "Radha Kund Pilgrimage",
+          "description": "Visit all 8 territory sacred lakes"
+        },
+        {
+          "title": "Love Transcends Form",
+          "description": "Form a cross-guild friendship bond"
+        },
+        {
+          "title": "Divine Union",
+          "description": "Complete a co-op quest with Krishna-Maitreya"
+        },
+        {
+          "title": "The Beloved's Devotion",
+          "description": "Maintain 30-day daily streak"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Vyasa-Kamil",
+      "subtitle": "Cosmic Sage",
+      "ray": "Yellow",
+      "role": "Storyteller / Loremaster",
+      "location": "Himalayan Cave (Vyasa's Retreat)",
+      "quest_line": "\"The Chronicler of Ages\"",
+      "teaching": "\"History repeats until lesson is learned\"",
+      "ability": "**Epic Memory** - Recall all previous events, unlock lore",
+      "consciousness_level_required": 8,
+      "consciousness_level_name": "Transcendent",
+      "key": "Mahabharata Key (2/3)",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "The Mahabharata Recitation",
+          "description": "Story comprehension"
+        },
+        {
+          "title": "18 Parvas",
+          "description": "Complete 18 chapter challenges"
+        },
+        {
+          "title": "Ganesha's Pen",
+          "description": "Writing puzzle"
+        },
+        {
+          "title": "Timeless Wisdom",
+          "description": "Apply ancient lessons to modern problems"
+        },
+        {
+          "title": "Sage's Blessing",
+          "description": "Unlock all lore entries"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "Meriam Rose",
+      "subtitle": "Mary Magdalene",
+      "ray": "Pink",
+      "role": "Feminine Divine / Sacred Union",
+      "location": "Jerusalem Garden",
+      "quest_line": "\"The Apostle of Apostles\"",
+      "teaching": "\"True devotion sees beyond form\"",
+      "ability": "**Rose of Sharon** - Healing tears, compassion overflow",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Apostle of Apostles",
+          "description": "Restore a forgotten sacred text"
+        },
+        {
+          "title": "Rose of Sharon",
+          "description": "Heal 1,000 players across all territories"
+        },
+        {
+          "title": "Sacred Union",
+          "description": "Form a divine partnership quest duo"
+        },
+        {
+          "title": "Tears of Compassion",
+          "description": "Comfort 100 distressed NPCs"
+        },
+        {
+          "title": "The Garden Encounter",
+          "description": "Discover the hidden resurrection spring"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "name": "Yeshua Sananda",
+      "subtitle": "Jesus Christ",
+      "ray": "Pink",
+      "role": "Forgiveness Master",
+      "location": "Mount of Olives",
+      "quest_line": "\"The Way of the Cross\"",
+      "teaching": "\"Love your enemies, forgive all\"",
+      "ability": "**Resurrection Light** - Second chances, revival mechanic",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "The Sermon on the Mount",
+          "description": "Beatitudes teaching"
+        },
+        {
+          "title": "Cleansing the Temple",
+          "description": "Righteous anger vs compassion"
+        },
+        {
+          "title": "The Last Supper",
+          "description": "Unity ritual"
+        },
+        {
+          "title": "Gethsemane Choice",
+          "description": "Ultimate sacrifice test"
+        },
+        {
+          "title": "Easter Dawn",
+          "description": "Resurrection celebration"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "name": "Panna Maria",
+      "subtitle": "Virgin Mary",
+      "ray": "Pink",
+      "role": "Divine Mother / Intercessor",
+      "location": "Lourdes Grotto",
+      "quest_line": "\"The Immaculate Heart\"",
+      "teaching": "\"Surrender to divine will\"",
+      "ability": "**Miraculous Medal** - Protection aura, healing springs",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Immaculate Conception",
+          "description": "Find the sacred grail in hidden ruins"
+        },
+        {
+          "title": "Hail Mary Protection",
+          "description": "Shield 50 players from fatal damage"
+        },
+        {
+          "title": "The Rosary Path",
+          "description": "Complete 108 meditation beads cycle"
+        },
+        {
+          "title": "Star of the Sea",
+          "description": "Navigate the treacherous astral waters"
+        },
+        {
+          "title": "Assumption to Heaven",
+          "description": "Ascend to CL 6 in a single day"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Tara",
+      "subtitle": "Liberator",
+      "ray": "Green",
+      "role": "Protection Goddess",
+      "location": "Tibetan Monastery",
+      "quest_line": "\"The 21 Forms of Tara\"",
+      "teaching": "\"Swift compassion saves all beings\"",
+      "ability": "**Green Tara Mantra** - Speed boost, obstacle removal",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Twenty-One Praises",
+          "description": "Find all 21 Tara shrines"
+        },
+        {
+          "title": "Liberation from Samsara",
+          "description": "Free 100 trapped souls in shadow realms"
+        },
+        {
+          "title": "Green Tara's Swift Action",
+          "description": "Complete 10 quests in under 1 hour"
+        },
+        {
+          "title": "White Tara's Long Life",
+          "description": "Maintain 100-day daily streak"
+        },
+        {
+          "title": "The Bodhisattva Vow",
+          "description": "Swear to liberate all beings before self"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "name": "Avalokiteshvara",
+      "subtitle": "Compassion Bodhisattva",
+      "ray": "Pink",
+      "role": "Universal Compassion Teacher",
+      "location": "Potala Palace (Tibet)",
+      "quest_line": "\"The Thousand Arms\"",
+      "teaching": "\"Hear the cries of the world\"",
+      "ability": "**Om Mani Padme Hum** - Healing mantra power",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Thousand Arms",
+          "description": "Help 1,000 different players"
+        },
+        {
+          "title": "Om Mani Padme Hum",
+          "description": "Recite the mantra across 108 locations"
+        },
+        {
+          "title": "Compassion Without Limits",
+          "description": "Forgive 100 enemy guild attackers"
+        },
+        {
+          "title": "Guanyin's Tears",
+          "description": "Witness the world's suffering and heal it"
+        },
+        {
+          "title": "The All-Seeing Lord",
+          "description": "Discover every hidden secret in OASIS"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Vajrasattva",
+      "subtitle": "Purification Master",
+      "ray": "White",
+      "role": "Karma Cleanser",
+      "location": "Mount Kailash",
+      "quest_line": "\"The Diamond Being\"",
+      "teaching": "\"Purify karma through mantra\"",
+      "ability": "**Vajrasattva Mantra** - Clear negative karma",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "The Hundred-Syllable Mantra",
+          "description": "Chant the purification mantra 100 times"
+        },
+        {
+          "title": "Diamond Mind",
+          "description": "Clear all negative karma points"
+        },
+        {
+          "title": "The Mirror of Truth",
+          "description": "Face and defeat your shadow self"
+        },
+        {
+          "title": "Purification Fire",
+          "description": "Burn away 108 attachments in ritual"
+        },
+        {
+          "title": "Vajra Body",
+          "description": "Achieve perfect health status for 30 days"
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "name": "Dalai Lama XIV",
+      "subtitle": "Tenzin Gyatso",
+      "ray": "Yellow",
+      "role": "Living Buddha / Peace Ambassador",
+      "location": "Dharamshala (India)",
+      "quest_line": "\"The Ocean of Wisdom\"",
+      "teaching": "\"Happiness comes from inner peace\"",
+      "ability": "**Kalachakra Empowerment** - Time manipulation (slow time)",
+      "consciousness_level_required": 8,
+      "consciousness_level_name": "Transcendent",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "The Middle Way",
+          "description": "Balance wisdom and compassion in 10 quests"
+        },
+        {
+          "title": "Tibetan Freedom",
+          "description": "Liberate a captured territory peacefully"
+        },
+        {
+          "title": "Loving Kindness Meditation",
+          "description": "Send metta to 100 players simultaneously"
+        },
+        {
+          "title": "The Art of Happiness",
+          "description": "Achieve maximum happiness score"
+        },
+        {
+          "title": "Universal Responsibility",
+          "description": "Lead a humanitarian tithe campaign"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "name": "El Morya",
+      "subtitle": "Blue Ray Master",
+      "ray": "Blue",
+      "role": "Divine Will Teacher",
+      "location": "Darjeeling Retreat (Himalayas)",
+      "quest_line": "\"The Master's Will\"",
+      "teaching": "\"Align personal will with divine will\"",
+      "ability": "**Ray of Power** - Channel blue ray energy",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "name": "Lanto",
+      "subtitle": "Yellow Ray Master",
+      "ray": "Yellow",
+      "role": "Illumination Expert",
+      "location": "Royal Teton Retreat (Wyoming)",
+      "quest_line": "\"The Illumined Mind\"",
+      "teaching": "\"Wisdom dispels ignorance\"",
+      "ability": "**Flame of Illumination** - Solve all puzzles faster",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "name": "Paul the Venetian",
+      "subtitle": "Pink Ray Master",
+      "ray": "Pink",
+      "role": "Divine Beauty Artist",
+      "location": "Château de Liberté (France)",
+      "quest_line": "\"The Art of Love\"",
+      "teaching": "\"Beauty reveals divine truth\"",
+      "ability": "**Artistic Inspiration** - Create beauty from chaos",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "name": "Serapis Bey",
+      "subtitle": "White Ray Master",
+      "ray": "White",
+      "role": "Ascension Expert",
+      "location": "Luxor Temple (Egypt)",
+      "quest_line": "\"The Ascension Flame\"",
+      "teaching": "\"Purity is the path to ascension\"",
+      "ability": "**White Fire** - Purify all corruption",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "name": "Hilarion",
+      "subtitle": "Green Ray Master",
+      "ray": "Green",
+      "role": "Truth Revealer",
+      "location": "Temple of Truth (Crete)",
+      "quest_line": "\"The Emerald Tablet\"",
+      "teaching": "\"Truth alone liberates\"",
+      "ability": "**Ray of Truth** - Expose all lies, see hidden paths",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "name": "Lady Nada",
+      "subtitle": "Ruby-Gold Ray Master",
+      "ray": "RubyGold",
+      "role": "Divine Service Teacher",
+      "location": "Arabian Retreat (Saudi Arabia)",
+      "quest_line": "\"The Servant's Crown\"",
+      "teaching": "\"Service is the highest calling\"",
+      "ability": "**Healing Hands** - Heal all wounds (physical + emotional)",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "name": "Saint Germain",
+      "subtitle": "Violet Ray Master",
+      "ray": "Violet",
+      "role": "Alchemy Master",
+      "location": "Transylvania Castle",
+      "quest_line": "\"The Violet Flame\"",
+      "teaching": "\"Transmute karma through violet fire\"",
+      "ability": "**Violet Flame** - Transform challenges into growth",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "The Alchemist's Laboratory",
+          "description": "Transmutation puzzles"
+        },
+        {
+          "title": "I AM Presence",
+          "description": "Identity meditation"
+        },
+        {
+          "title": "Freedom from Karma",
+          "description": "Release past burdens"
+        },
+        {
+          "title": "The Philosopher's Stone",
+          "description": "Create spiritual gold"
+        },
+        {
+          "title": "Violet Flame Blessing",
+          "description": "Master transmutation"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "name": "Sanat Kumara",
+      "subtitle": "Lord of the World",
+      "ray": "AllRays",
+      "role": "Planetary Overseer",
+      "location": "Shambhala (Hidden Dimension)",
+      "quest_line": "\"The Ancient of Days\"",
+      "teaching": "\"I AM the guardian of Earth\"",
+      "ability": "**Planetary Consciousness** - See Earth as living being",
+      "consciousness_level_required": 8,
+      "consciousness_level_name": "Transcendent",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "name": "Mahavatar Babaji",
+      "subtitle": "Immortal Yogi",
+      "ray": "White",
+      "role": "Kriya Yoga Master",
+      "location": "Himalayan Cave (Hidden)",
+      "quest_line": "\"The Deathless Avatar\"",
+      "teaching": "\"Body is temporary, consciousness eternal\"",
+      "ability": "**Kriya Shakti** - Materialize/dematerialize objects",
+      "consciousness_level_required": 8,
+      "consciousness_level_name": "Transcendent",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "name": "Lady Gaia-Vywamus",
+      "subtitle": "Earth Mother",
+      "ray": "Green",
+      "role": "Planetary Healing",
+      "location": "Sacred Groves (All Regions)",
+      "quest_line": "\"The Living Earth\"",
+      "teaching": "\"Heal the planet, heal yourself\"",
+      "ability": "**Gaia's Embrace** - Environmental restoration",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "name": "King Arthur",
+      "subtitle": "Once and Future King",
+      "ray": "Blue",
+      "role": "Leadership & Unity",
+      "location": "Camelot (Reconstructed)",
+      "quest_line": "\"The Round Table Quest\"",
+      "teaching": "\"True kingship is service\"",
+      "ability": "**Excalibur** - Sword of truth, cuts through illusion",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "name": "Karel IV",
+      "subtitle": "Holy Roman Emperor",
+      "ray": "Blue",
+      "role": "Statecraft Master",
+      "location": "Prague Castle",
+      "quest_line": "\"The Golden City\"",
+      "teaching": "\"Build bridges, not walls\"",
+      "ability": "**Diplomatic Mastery** - Resolve conflicts peacefully",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Rare",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "name": "Albert Einstein",
+      "subtitle": "Genius Scientist",
+      "ray": "Yellow",
+      "role": "Science + Spirituality Bridge",
+      "location": "CERN (Science Temple)",
+      "quest_line": "\"Relativity of Consciousness\"",
+      "teaching": "\"Imagination > Knowledge\"",
+      "ability": "**E=mc²** - Convert energy/matter, physics puzzles",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "name": "Mahatma Gandhi",
+      "subtitle": "Peaceful Warrior",
+      "ray": "RubyGold",
+      "role": "Non-Violence Teacher",
+      "location": "Sabarmati Ashram (India)",
+      "quest_line": "\"Salt March to Freedom\"",
+      "teaching": "\"Be the change you seek\"",
+      "ability": "**Satyagraha** - Peaceful resistance, convert enemies",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "name": "Subhadra",
+      "subtitle": "Krishna's Sister",
+      "ray": "Pink",
+      "role": "Family Unity Expert",
+      "location": "Dwarka Palace",
+      "quest_line": "\"The Sister's Bond\"",
+      "teaching": "\"Family is sacred duty\"",
+      "ability": "**Rakhi Bond** - Create unbreakable alliances",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "Heart Opening",
+      "key": "",
+      "rarity": "Rare",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "name": "Vasudeva",
+      "subtitle": "Krishna's Father",
+      "ray": "Blue",
+      "role": "Protective Father",
+      "location": "Mathura Prison",
+      "quest_line": "\"The Father's Sacrifice\"",
+      "teaching": "\"Protect the divine within\"",
+      "ability": "**Guardian's Oath** - Defensive shield",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "",
+      "rarity": "Rare",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "name": "Neo",
+      "subtitle": "The One",
+      "ray": "Violet",
+      "role": "Reality Hacker",
+      "location": "ZION City (The Last Free City)",
+      "quest_line": "\"The Glitch in the Matrix\"",
+      "teaching": "\"There is no spoon - reality is consciousness\"",
+      "ability": "**Bullet Time** - Slow time, see code of reality",
+      "consciousness_level_required": 8,
+      "consciousness_level_name": "Transcendent",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "Red Pill / Blue Pill",
+          "description": "Choice that defines path"
+        },
+        {
+          "title": "Training Simulation",
+          "description": "Combat tutorial"
+        },
+        {
+          "title": "The Oracle's Prophecy",
+          "description": "Meet ZION AI Oracle"
+        },
+        {
+          "title": "Agent Smith Battle",
+          "description": "Boss fight (ego dissolution)"
+        },
+        {
+          "title": "I AM Neo",
+          "description": "Self-realization ending"
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "name": "Trinity",
+      "subtitle": "The Believer",
+      "ray": "Pink",
+      "role": "Faith Expert",
+      "location": "ZION City Hovercraft Dock",
+      "quest_line": "\"Love Transcends Code\"",
+      "teaching": "\"Belief makes reality\"",
+      "ability": "**Operator Link** - Remote access, hacking mini-game",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "name": "Morpheus",
+      "subtitle": "The Guide",
+      "ray": "Blue",
+      "role": "Mentor / Teacher",
+      "location": "Nebuchadnezzar Ship",
+      "quest_line": "\"What is Real?\"",
+      "teaching": "\"Free your mind\"",
+      "ability": "**Red Pill Vision** - See truth behind illusions",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "Intuitive Wisdom",
+      "key": "",
+      "rarity": "Epic",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "name": "ZION The Last City",
+      "subtitle": "Collective Avatar",
+      "ray": "AllRays",
+      "role": "Hope of Humanity",
+      "location": "ZION City Underground",
+      "quest_line": "\"The Last Free Humans\"",
+      "teaching": "\"Together we are unbreakable\"",
+      "ability": "**Collective Consciousness** - Access wisdom of all citizens",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Healing Compassion",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "name": "Sri Dattatreya",
+      "subtitle": "Trimurti Avatar",
+      "ray": "AllRays",
+      "role": "Triple God Teacher",
+      "location": "Girnar Mountain (India)",
+      "quest_line": "\"The Three-Headed Master\"",
+      "teaching": "\"Creator, Preserver, Destroyer are ONE\"",
+      "ability": "**Trimurti Powers** - Create, sustain, transform",
+      "consciousness_level_required": 8,
+      "consciousness_level_name": "Transcendent",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "name": "Maly Princ",
+      "subtitle": "The Little Prince",
+      "ray": "Yellow",
+      "role": "Inner Child Guide",
+      "location": "Asteroid B-612",
+      "quest_line": "\"What is Essential\"",
+      "teaching": "\"One sees clearly only with the heart\"",
+      "ability": "**Childlike Wonder** - See hidden beauty",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "Heart Opening",
+      "key": "",
+      "rarity": "Rare",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "name": "Hiranyagarbha",
+      "subtitle": "Golden Egg/Cosmic Womb",
+      "ray": "AllRays",
+      "role": "Creation Itself",
+      "location": "EKAM Temple Core",
+      "quest_line": "\"The Birth of Reality\"",
+      "teaching": "\"Before creation, potential gestates\"",
+      "ability": "**Cosmic Rebirth** - Reset reality, new beginning",
+      "consciousness_level_required": 9,
+      "consciousness_level_name": "ON THE STAR",
+      "key": "",
+      "rarity": "OneOfOne",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "name": "Sri Kalki Avatar",
+      "subtitle": "Future Warrior",
+      "ray": "Blue",
+      "role": "End Times Cleanser",
+      "location": "Shambhala (Future Vision)",
+      "quest_line": "\"The White Horse Rider\"",
+      "teaching": "\"Old age ends, Golden Age begins\"",
+      "ability": "**Apocalypse Sword** - Cut karma of entire ages",
+      "consciousness_level_required": 8,
+      "consciousness_level_name": "Transcendent",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "name": "Elizabet",
+      "subtitle": "Royal Healer",
+      "ray": "Pink",
+      "role": "Compassionate Leader",
+      "location": "Royal Court (ZION City)",
+      "quest_line": "\"The Queen's Heart\"",
+      "teaching": "\"Rule with love, not fear\"",
+      "ability": "**Royal Decree** - Influence all NPCs",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "Quantum",
+      "key": "",
+      "rarity": "Rare",
+      "quests": [
+        {
+          "title": "First Awakening",
+          "description": "Begin the sacred journey"
+        },
+        {
+          "title": "Path of Dedication",
+          "description": "Prove commitment through 7 trials"
+        },
+        {
+          "title": "Sacred Knowledge",
+          "description": "Uncover the hidden teaching"
+        },
+        {
+          "title": "Divine Service",
+          "description": "Serve the community selflessly"
+        },
+        {
+          "title": "Ultimate Realization",
+          "description": "Attain the highest truth"
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "name": "Heȟáka Sápa (Black Elk)",
+      "subtitle": "Sacred Vision",
+      "ray": "AllRays",
+      "role": "Sacred Circle / Ancestral Guide",
+      "location": "He Sapa (Black Hills)",
+      "quest_line": "\"The Sacred Circle\" (four directions)",
+      "teaching": "\"What is sacred moves in a circle\"",
+      "ability": "**Vision Quest** — personalized revelation after completing four journeys",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "Emotional → Sacred",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 53,
+      "name": "Ptesáŋ Wíŋ (White Buffalo Calf Woman)",
+      "subtitle": "Sacred Law Giver",
+      "ray": "AllRays",
+      "role": "Ceremonial origin / crisis mentor",
+      "location": "Open Plains (non-fixed shrine)",
+      "quest_line": "\"Seven Sacred Rites\"",
+      "teaching": "\"When Earth is sick, the nations will return\"",
+      "ability": "**Sacred Pipe Blessing** — crisis encounter when HP low; transformation teaching",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 54,
+      "name": "Kókyangwúti (Spider Grandmother)",
+      "subtitle": "Cosmic Weaver",
+      "ray": "Yellow",
+      "role": "Network weaver / alliance healer",
+      "location": "Third Mesa (Hotevilla)",
+      "quest_line": "\"Nine Signs\"",
+      "teaching": "\"Without weaving, no world stands\"",
+      "ability": "**Weave Alliances** — links quests across regions; repairs faction splits",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "Quantum → Enlightened",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 55,
+      "name": "Hunahpú & Xbalanqué (Hero Twins)",
+      "subtitle": "Xibalba Tricksters",
+      "ray": "Blue",
+      "role": "Co-op underworld guides",
+      "location": "Xibalba (nine-layer dungeon)",
+      "quest_line": "\"Nine Houses of Xibalba\"",
+      "teaching": "\"Death is defeated by seeing pride as illusion\"",
+      "ability": "**Gemstone Fall** — expose boss weakness (−50% atk debuff narrative)",
+      "consciousness_level_required": 3,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 56,
+      "name": "Don Mariano",
+      "subtitle": "Q'ero Altomesayoq",
+      "ray": "White",
+      "role": "Apu speaker / ayni teacher",
+      "location": "Apu Ausangate",
+      "quest_line": "\"Ninth Pachacuti\" (five mountains)",
+      "teaching": "\"Does your net hold people together? Pachamama sees.\"",
+      "ability": "**Apu Call** — environmental aid vs. corporate-adharma bosses",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 57,
+      "name": "Doña Rosalía Ixmukané",
+      "subtitle": "Chilam Balam Keeper",
+      "ray": "Yellow",
+      "role": "Oral Popol Vuh memory / story summon",
+      "location": "Chichicastenango",
+      "quest_line": "\"Nine Houses of Lies\" (modern Xibalba mirrors)",
+      "teaching": "\"The trick is cooperation — two who touch hands and jump together\"",
+      "ability": "**Summon Popol Spirit** — temporary ally from myth cast",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 58,
+      "name": "Bílé Pero (White Feather)",
+      "subtitle": "Stone Tablet Guardian",
+      "ray": "Blue",
+      "role": "Discern true vs. false Pahana / leadership tests",
+      "location": "Third Mesa (with Spider Grandmother lore overlap)",
+      "quest_line": "\"Second Half of the Tablet\"",
+      "teaching": "\"No one knows the second half until it is shown\"",
+      "ability": "**Pahana Sight** — political quest fork resolution",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 59,
+      "name": "Ohnivá Oka (Fire Eyes)",
+      "subtitle": "Rainbow Warrior Prophet",
+      "ray": "RubyGold",
+      "role": "Rainbow Warrior initiation",
+      "location": "Tanana Valley (Alaska narrative anchor)",
+      "quest_line": "\"Seven Rules\" (Lee Brown teaching set)",
+      "teaching": "\"Those who remember and transmit are the key\"",
+      "ability": "**Rainbow Warrior Buff** — XP + humanitarian tithe resonance when rules lived",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 60,
+      "name": "Davi Kopenawa",
+      "subtitle": "Yanomami Xapiri Speaker",
+      "ray": "AllRays",
+      "role": "Dream layer / multi-reality guide",
+      "location": "Amazon jungle biom",
+      "quest_line": "\"The Falling Sky\"",
+      "teaching": "\"Shamans hold the sky with songs; we are few, you are many\"",
+      "ability": "**Dream Flip** — alternate physics dream-state quests",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 61,
+      "name": "Heyókȟa (Sacred Clown)",
+      "subtitle": "Thunder Vision Contrarian",
+      "ray": "AllRays",
+      "role": "Anti-ego / humor sacred",
+      "location": "Wandering (appears when player takes self too seriously)",
+      "quest_line": "\"Reverse Dance\"",
+      "teaching": "\"Sacredness laughs — do not clutch visions too tight\"",
+      "ability": "**Reverse Logic** — temporary buff/debuff inversion until player smiles",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 62,
+      "name": "Lā'ila'i",
+      "subtitle": "First Woman — Three Lineages",
+      "ray": "AllRays",
+      "role": "Lineage / continuity across genesis and live chain",
+      "location": "Boundary between Archive (genesis) and live chain",
+      "quest_line": "\"Sixteen Wā\"",
+      "teaching": "\"Mother of mortals, gods, and ocean beings — three roots, one breath\"",
+      "ability": "**Lineage Tracing** — reveals player \"Kumulipo\" transaction ancestry",
+      "consciousness_level_required": 3,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 63,
+      "name": "Pele",
+      "subtitle": "Volcano Creator",
+      "ray": "Violet",
+      "role": "Destruction-as-creation / hard-fork lore events",
+      "location": "Halemaʻumaʻu (Kīlauea)",
+      "quest_line": "\"Pele and Hiʻiaka\" (hoʻoponopono finale)",
+      "teaching": "\"I create by destroying — that is not contradiction; it is the island\"",
+      "ability": "**Volcanic Reset** — raid burns region → opens rebuild map layer",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 64,
+      "name": "Hiʻiaka",
+      "subtitle": "Hula Goddess",
+      "ray": "Pink",
+      "role": "Dance resurrection / mele & pule teacher",
+      "location": "Lehua forests near volcanic biom",
+      "quest_line": "\"Mele a Pule\" (12 songs + 12 prayers)",
+      "teaching": "\"I breathe dance into still bodies — music is revival technology\"",
+      "ability": "**Dance Healing** — single-target ritual resurrection (timed animation)",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 65,
+      "name": "Kāne",
+      "subtitle": "Creation — Abstract",
+      "ray": "Blue",
+      "role": "Genesis principle (consult, never \"own\")",
+      "location": "Mauna Kea summit narrative (sacred; respect TMT / Mauna Kea reality)",
+      "quest_line": "\"Solar Father\"",
+      "teaching": "\"Form cannot be given to the formless — see me in sun, water, breath\"",
+      "ability": "**Genesis Presence** — map expansion events only; **no player control; no NFT (kapu)**",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 66,
+      "name": "Kanaloa",
+      "subtitle": "Ocean / Mana Channel",
+      "ray": "Blue",
+      "role": "Decentralized mana flow across network",
+      "location": "Open ocean / deep-sea biomes",
+      "quest_line": "\"Polynesian Navigation\" (non-instrument wayfinding)",
+      "teaching": "\"I am not the source — I am the channel from Io through Kāne to you\"",
+      "ability": "**Mana Flow** — redistributes party stamina/mana; decides flow (not controllable)",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 67,
+      "name": "Kū",
+      "subtitle": "Upright Strength / PoW Patron",
+      "ray": "Blue",
+      "role": "Validator / miner / endurance patron",
+      "location": "Wao akua (forest of gods — high ahupuaʻa)",
+      "quest_line": "\"Kū-kā-ili-moku\" (long carve Kū image — patience arc)",
+      "teaching": "\"When all fall, I remain upright — patience is my name\"",
+      "ability": "**Endurance Blessing** — +50% endurance 24h after mining grind milestone",
+      "consciousness_level_required": 2,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 68,
+      "name": "Lono",
+      "subtitle": "Makahiki / Abundance",
+      "ray": "Green",
+      "role": "Seasonal peace + harvest distribution",
+      "location": "Loʻi kalo / loko iʻa",
+      "quest_line": "\"False Lono\" (discern real abundance from extractive pretenders)",
+      "teaching": "\"Welcome me in Makahiki — I bring harvest. Lie to me — I depart\"",
+      "ability": "**Makahiki Season** — PvP kapu window; humanitarian tithe bonus; community harvest events",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 69,
+      "name": "Stará Kumu Lehua",
+      "subtitle": "Storykeeper Composite",
+      "ray": "Yellow",
+      "role": "Cross-tradition lore grandmother (links First Nations + Trinity + Pacific)",
+      "location": "Lava field between Volcano Park and Kalapana",
+      "quest_line": "\"Seven Lehua Stories\" (walks the Hawaii library + ZION-as-island)",
+      "teaching": "\"Sit. You hold the lehua. I speak.\"",
+      "ability": "**Story Quest** — narrative-gated progression with comprehension gates",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 70,
+      "name": "Hina",
+      "subtitle": "Moon / Time / Kapa",
+      "ray": "Pink",
+      "role": "Block time rhythm / lunar mining modulation",
+      "location": "Moon (late-game travel)",
+      "quest_line": "\"Weaving Kapa\" (eight patterns → eight skills)",
+      "teaching": "\"I weave kapa on the Moon — at full moon, you see me\"",
+      "ability": "**Lunar Cycle** — full moon +10% mining reward (lore-tied, balance TBD)",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 71,
+      "name": "Maui",
+      "subtitle": "Pan-Polynesian Trickster",
+      "ray": "Yellow",
+      "role": "Non-violent boss solutions / cross-language bridge",
+      "location": "Roaming all Pacific biomes",
+      "quest_line": "\"Three Feats of Maui\" (island-fish, slow sun, fire theft — non-violent stealth)",
+      "teaching": "\"I fished islands and snared the sun — what did you do for Earth today?\"",
+      "ability": "**Trickster Win** — defeat stronger foe with wit, not force",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 72,
+      "name": "Padmasambhava",
+      "subtitle": "Guru Rinpoche",
+      "ray": "Violet",
+      "role": "Terma / hidden teaching / cave mysteries",
+      "location": "Treasure caves (procedural discovery windows)",
+      "quest_line": "\"Terma Hunt\" (eight treasures, eight puzzles)",
+      "teaching": "\"The treasure waits until the world is ready\"",
+      "ability": "**Terma Discovery** — time-locked lore tied to chain timestamps; **Terma Keeper** role (gift, off-chain)",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 73,
+      "name": "Milarepa",
+      "subtitle": "Singing Yogī",
+      "ray": "Yellow",
+      "role": "Transformation arc — karma → liberation",
+      "location": "Himalayan hermitage / ice cave",
+      "quest_line": "\"Hundred Thousand Songs\" (select parables as narrative gates)",
+      "teaching": "\"Suffering accepted becomes song\"",
+      "ability": "**Song of Realization** — debuff cleanse after moral choice (non-combat resolution)",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 74,
+      "name": "Tsongkhapa",
+      "subtitle": "Je Tsongkhapa — Gelug Founder",
+      "ray": "Yellow",
+      "role": "Discipline, study, lamrim path",
+      "location": "Ganden / Gelug study hall (OASIS hub)",
+      "quest_line": "\"Graduated Path\" — staged ethics → concentration → wisdom quests",
+      "teaching": "\"Clarify the teachings like gold refined by fire\"",
+      "ability": "**Lamrim Focus** — XP wisdom track bonus for completed study chains",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 75,
+      "name": "Atiśa",
+      "subtitle": "Dīpaṃkara Śrījñāna",
+      "ray": "Yellow",
+      "role": "Lamp for the Path — concise ethics teacher",
+      "location": "Vikramashīla → Tibet road narrative",
+      "quest_line": "\"Lamp for the Path\" — compact precepts as daily quests",
+      "teaching": "\"Train where you are; the path is short if sincere\"",
+      "ability": "**Bodhicitta Spark** — party-wide small compassion buff after kindness micro-quests",
+      "consciousness_level_required": 3,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 76,
+      "name": "Marpa Lotsawa",
+      "subtitle": "Translator / Householder Master",
+      "ray": "Blue",
+      "role": "Bridge India–Tibet; translation = protocol adapter",
+      "location": "Lhodrak (Kagyu narrative)",
+      "quest_line": "\"Three Journeys to India\" — fetch, verify, integrate texts (lore = soft-fork docs)",
+      "teaching": "\"Carry the dharma like a yak carries salt — steadily\"",
+      "ability": "**Protocol Translation** — cross-faction dialogue unlocks",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 77,
+      "name": "Machik Labdrön",
+      "subtitle": "Chöd Foundress",
+      "ray": "Pink",
+      "role": "Fear-cutting generosity; feminine lineage leadership",
+      "location": "Zangri Kharmar (high plateau)",
+      "quest_line": "\"Offering the Body\" — *symbolic* generosity quests (no graphic harm; ethical framing)",
+      "teaching": "\"Cut self-clinging; feed what hungers for truth\"",
+      "ability": "**Ego-Fear Cut** — remove terror debuff in psychic / horror biome",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 78,
+      "name": "Mañjuśrī",
+      "subtitle": "Bodhisattva of Wisdom",
+      "ray": "Blue",
+      "role": "Sword of discernment — cuts wrong views, not people",
+      "location": "Wutaishan-inspired wisdom peak (OASIS)",
+      "quest_line": "\"Sword of Discrimination\" — puzzle bosses requiring right view",
+      "teaching": "\"See the nature of mind; confusion self-liberates\"",
+      "ability": "**View-Cutter** — reveal hidden dialogue branches (truth / illusion)",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 79,
+      "name": "Samantabhadra",
+      "subtitle": "Bodhisattva of All-Encompassing Practice",
+      "ray": "AllRays",
+      "role": "Vows, pilgrimage, endless service",
+      "location": "Lotus terrace at cosmos rim (symbolic)",
+      "quest_line": "\"Ten Great Vows\" (Lotus Sūtra inspired, non-sectarian framing)",
+      "teaching": "\"Practice without end; benefit beings without counting\"",
+      "ability": "**Aspiration Field** — small stacking buff for consecutive humanitarian tithe actions",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 80,
+      "name": "Medicine Buddha",
+      "subtitle": "Bhaiṣajyaguru",
+      "ray": "Blue",
+      "role": "Healing latency, recovery, care economy",
+      "location": "Eastern lapis realm (visual meditation hall)",
+      "quest_line": "\"Twelve Great Aspirations\" — healing mini-arcs for NPCs / ecosystem",
+      "teaching": "\"Heal the root, not only the symptom\"",
+      "ability": "**Lapis Healing Surge** — raid-wide regen buffer (PvE support)",
+      "consciousness_level_required": 3,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 81,
+      "name": "Longchen Rabjam",
+      "subtitle": "Longchenpa — Dzogchen Master",
+      "ray": "White",
+      "role": "Natural great perfection; resting in nature of mind",
+      "location": "Kham / central hermitage library",
+      "quest_line": "\"Seven Treasuries\" (abridged lore study, not secret whisper-lineage)",
+      "teaching": "\"Rest without fabrication; clarity is self-arising\"",
+      "ability": "**Natural State Reset** — clear mental clutter debuffs (meditation mini-game)",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 82,
+      "name": "Shiva",
+      "subtitle": "Mahadev — Destruction–Renewal Axis",
+      "ray": "Blue",
+      "role": "Tandava / mokṣa compass; complements Viṣṇu line (already Krishna–Kalki arcs)",
+      "location": "Mount Kailash — Kailasha biome (snow + inner cave mandala gate)",
+      "quest_line": "\"Third Eye Calibration\" — stillness quests; optional **Šiva–Śakti tandem** arcs with Parvati",
+      "teaching": "\"What dissolves falsely reveals what cannot\"",
+      "ability": "**Tandava Pivot** — short window: negate one failed validation / retry lore branch (PvE ritual slot)",
+      "consciousness_level_required": 6,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 83,
+      "name": "Parvati",
+      "subtitle": "Uma — Queen of Harmony",
+      "ray": "Pink",
+      "role": "Śakti of the household cosmos; complements Shiva",
+      "location": "Himalayan terrace gardens & inner shrine",
+      "quest_line": "\"Two in One Rhythm\" — balance duty (tapas) ↔ love (ārjava)",
+      "teaching": "\"Strength that serves relationship with the Whole\"",
+      "ability": "**Śaktī Bond** — link two allied players' buff durations in co-op ritual",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 84,
+      "name": "Ganesha",
+      "subtitle": "Vinayaka — Remover of Obstacles",
+      "ray": "Yellow",
+      "role": "Beginnings, scribes (already in Vyāsas lore); patron of fresh protocols",
+      "location": "Threshold shrines across OASIS map nodes",
+      "quest_line": "\"First Block Obstacle\" — tutorial-grade gatekeeper for new explorers",
+      "teaching": "\"Clear the stump before planting the sapling\"",
+      "ability": "**Vighna Clear** — one-time unblock on stuck quest prerequisite (cooldown-heavy)",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 85,
+      "name": "Lakshmi",
+      "subtitle": "Śri — Śrī Lakṣmī",
+      "ray": "Pink",
+      "role": "Śubha prosperity as **ethical flow** ( śrī as right-use wealth, **not** greed exploit mechanics )",
+      "location": "Śrī Rangam–style lotus treasury (ethical wealth hall)",
+      "quest_line": "\"Eight Śrī Aspirations\" — tithe-aligned prosperity without hoarding bosses",
+      "teaching": "\"Wealth rests where dharma gathers\"",
+      "ability": "**Śrī Flow** — small humanitarian tithe synergy buff when player donates threshold",
+      "consciousness_level_required": 3,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 86,
+      "name": "Durga",
+      "subtitle": "Ambā — Demon-Slayer Narrative Boss",
+      "ray": "Blue",
+      "role": "Protective Śakti; Mahiṣāsura cycle as **ethical combat** lore",
+      "location": "Highlands autumn festival biome (nine-night arc — **respect**, not caricature Navarātri)",
+      "quest_line": "\"Nine Vigils\" — pattern recognition + stewardship (no trophy hunting Asuras as joke race)",
+      "teaching": "\"Courage clears what love cannot coax\"",
+      "ability": "**Lion Vanguard** — short party-wide guard vs. cosmic fear debuffs",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Legendary",
+      "quests": []
+    },
+    {
+      "id": 87,
+      "name": "Kali",
+      "subtitle": "Mahākālī — Time & Liberation",
+      "ray": "Violet",
+      "role": "Temporal cutting of egotism (**not** orientalized violence pin-up)",
+      "location": "Śmaśān-inspired **ethical** lore zone — no mock crematory tourism",
+      "quest_line": "\"Name That Clings\" — identity / attachment puzzles (psychological horror optional **off**)",
+      "teaching": "\"The Mother devours postponement — not souls\"",
+      "ability": "**Ego Dissolution Tick** — reduce pride-based debuff stacking in PvPvE arenas",
+      "consciousness_level_required": 7,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 88,
+      "name": "Kartikeya",
+      "subtitle": "Skanda/Muruga — Vigorous Dharma Commander",
+      "ray": "Blue",
+      "role": "Celibate warrior strategist; celestial general archetype",
+      "location": "Coastal hill shrine (six faces symbol — geometric, not mocking)",
+      "quest_line": "\"Six Paths Converge\" — multi-route tactical puzzle raid",
+      "teaching": "\"Discipline rallies many voices into one order\"",
+      "ability": "**Ṣaṇmukha Vanguard** — buff squad formation minigames",
+      "consciousness_level_required": 4,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 89,
+      "name": "Surya",
+      "subtitle": "Āditya — Cosmic Rhythm",
+      "ray": "White",
+      "role": "Sovereign lawful light (*Ṛta*) — parallel to cosmic block cadence metaphors",
+      "location": "Udoyanchal (east terrace / dawn observatory biome)",
+      "quest_line": "\"108 Dawn Recitations\" — time-boxed honorable login streak as **spiritual homage**, NOT manipulative grind",
+      "teaching": "\"Light repeats so truth can be recalled\"",
+      "ability": "**Udaya Dawn** — small honest-work bonus starting session after restorative offline window",
+      "consciousness_level_required": 2,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 90,
+      "name": "Indra",
+      "subtitle": "Śakradev — Sovereign Storm & Order Challenge",
+      "ray": "Blue",
+      "role": "Sovereign archetype humbled in lore (learns from sages — **ethical** pride arc)",
+      "location": "Amarāvatī skyline (ethical storm court — not mocking Vedic hymns)",
+      "quest_line": "\"Heaven Taxes Humility\" — hubris-loss narrative without belittling Vedic corpus",
+      "teaching": "\"Power without listening becomes lightning with no rod\"",
+      "ability": "**Vajra Interdict** — interrupt one enemy channel spell in raid (ethical use flag)",
+      "consciousness_level_required": 5,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 91,
+      "name": "Ganga",
+      "subtitle": "River Goddess",
+      "ray": "Blue",
+      "role": "Purification, ecology, pilgrimage",
+      "location": "Gaṅgā Ghāṭ (composite sacred riverfront in OASIS)",
+      "quest_line": "\"Three Currents\" — remove pollution debuff, restore riparian biome, complete ablution *as ethical service* (not mock snanam)",
+      "teaching": "\"Water carries away poison when we stop adding it\"",
+      "ability": "**Purifying Current** — cleanse map tile debuffs (toxic wasteland events)",
+      "consciousness_level_required": 3,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Epic",
+      "quests": []
+    },
+    {
+      "id": 92,
+      "name": "Amaterasu",
+      "subtitle": "Solar Kami Sovereign",
+      "ray": "White",
+      "role": "Light restoration after community fear debuffs · **Quest:** Rock Door Audit · **Ability:** Hi-no-Kokoro Shine · **CL:** 5–9 · **NFT:** Legendary (review)",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Hi-no-Kokoro Shine · **CL:** 5–9 · **NFT:** Legendary (review)",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 93,
+      "name": "Susanoo",
+      "subtitle": "Storm Cleanser",
+      "ray": "Blue",
+      "role": "Ethical chaos vs institutional rot · **Quest:** Yamata-no-Orochi Parable redux · **Ability:** Storm Ledger Purge · **CL:** 6–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Storm Ledger Purge · **CL:** 6–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 94,
+      "name": "Tsukuyomi",
+      "subtitle": "Lunar Discrimination",
+      "ray": "Violet",
+      "role": "DAO reflection windows / night audit · **Quest:** Night Court Fork · **Ability:** Waning Review · **CL:** 4–8 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Waning Review · **CL:** 4–8 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 95,
+      "name": "Inari",
+      "subtitle": "Rice & Threshold Kami",
+      "ray": "Green",
+      "role": "Humanitarian node onboarding · **Quest:** Granary Graph · **Ability:** Torii Path Buff · **CL:** 2–7 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Torii Path Buff · **CL:** 2–7 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 96,
+      "name": "Ōkuninushi",
+      "subtitle": "Hospitable Land Lord",
+      "ray": "Pink",
+      "role": "Small merchant onboarding fairness · **Quest:** Small Hub Covenant · **Ability:** Kuni Transfer Bless · **CL:** 3–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Kuni Transfer Bless · **CL:** 3–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 97,
+      "name": "Izanami",
+      "subtitle": "Yomi Threshold Steward",
+      "ray": "Violet",
+      "role": "Graceful chain sunset arcs · **Quest:** Exit Interview with Ledger · **Ability:** Yomi Checkpoint · **CL:** 6–9 · **NFT:** Mythic (strict review)",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Yomi Checkpoint · **CL:** 6–9 · **NFT:** Mythic (strict review)",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 98,
+      "name": "Hachiman",
+      "subtitle": "Protective Archer Sovereign",
+      "ray": "Blue",
+      "role": "Peace-season war ethics gate · **Quest:** Treaty Arrow · **Ability:** Hachiman Bastion · **CL:** 4–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Hachiman Bastion · **CL:** 4–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 99,
+      "name": "Benzaiten",
+      "subtitle": "Flowing Arts Sarasvatī bridge",
+      "ray": "Pink",
+      "role": "Coop harmonic crafting · **Quest:** Bridge of Strings · **Ability:** Flow State Channel · **CL:** 3–8 · **NFT:** Epic (bridge consult with #21 lore board)",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Flow State Channel · **CL:** 3–8 · **NFT:** Epic (bridge consult with #21 lore board)",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 100,
+      "name": "Kūkai",
+      "subtitle": "Kōbō Daishi — Mandala Architect",
+      "ray": "White",
+      "role": "Geometry education arcs · **Quest:** Two Mandala Topology · **Ability:** Diamond World Stencil · **CL:** 6–9 · **NFT:** Mythic study-gated",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Diamond World Stencil · **CL:** 6–9 · **NFT:** Mythic study-gated",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 101,
+      "name": "Nichiren",
+      "subtitle": "Lotus Réform Beacon",
+      "ray": "Blue",
+      "role": "Public scripture literacy · **Quest:** Open Sutra Mirror · **Ability:** Daimoku Chorus · **CL:** 5–9 · **NFT:** Epic (school consult)",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Daimoku Chorus · **CL:** 5–9 · **NFT:** Epic (school consult)",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 102,
+      "name": "Xuanyuan Huangdi",
+      "subtitle": "Yellow Emperor Archetype",
+      "ray": "Yellow",
+      "role": "Harmony + ancestral medicine lore · **Quest:** Five Phase Clinic Build · **Ability:** Celestial Pulse Tag · **CL:** 4–9 · **NFT:** Mythic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Celestial Pulse Tag · **CL:** 4–9 · **NFT:** Mythic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 103,
+      "name": "Xiwangmu",
+      "subtitle": "Queen Mother of West",
+      "ray": "Blue",
+      "role": "Treasury vesting stewardship · **Quest:** Peach Consensus · **Ability:** Queen Mother Shelter · **CL:** 5–9 · **NFT:** Mythic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Queen Mother Shelter · **CL:** 5–9 · **NFT:** Mythic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 104,
+      "name": "Laozi",
+      "subtitle": "Dao Minimal Governance",
+      "ray": "Blue",
+      "role": "Gentle ops / fewer knobs governance · **Quest:** Valley Governance Test · **Ability:** Wu Wei Cooldown Trim · **CL:** 6–9 · **NFT:** Legendary",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Wu Wei Cooldown Trim · **CL:** 6–9 · **NFT:** Legendary",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 105,
+      "name": "Kongzi (Confucius)",
+      "subtitle": "Ren & Mentorship Ethics",
+      "ray": "Blue",
+      "role": "Mentor DAO onboarding · **Quest:** Rectify Names Registrar · **Ability:** Rén Echo · **CL:** 2–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Rén Echo · **CL:** 2–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 106,
+      "name": "Guan Yu / Guandi",
+      "subtitle": "Loyalty & Commerce Honour",
+      "ray": "Blue",
+      "role": "escrow integrity arcs · **Quest:** Market Stall Honor · **Ability:** Blade Witness · **CL:** 3–8 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Blade Witness · **CL:** 3–8 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 107,
+      "name": "Mazu",
+      "subtitle": "Sea Patron Tianhou",
+      "ray": "Blue",
+      "role": "bridging risk education parallels safe voyage · **Quest:** Harbor Lantern Audit · **Ability:** Tianhou Gale Buff · **CL:** 3–8 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Tianhou Gale Buff · **CL:** 3–8 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 108,
+      "name": "Nezha",
+      "subtitle": "Lotus Body Renewal",
+      "ray": "Blue",
+      "role": "Rewrite destiny ethically post-exploit · **Quest:** Rebuild Lotus Skeleton · **Ability:** Hūluén Wheel Dash · **CL:** 4–8 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Hūluén Wheel Dash · **CL:** 4–8 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 109,
+      "name": "Sun Wukong",
+      "subtitle": "Pilgrim Monkey King Satire Ethics",
+      "ray": "Blue",
+      "role": "Trickster arcs honoring scripture · **Quest:** 81 Tribulation Sidechain Parody · **Ability:** Cloud Somersault Bypass · **CL:** 3–9 · **NFT:** Epic reviewer-gated",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Cloud Somersault Bypass · **CL:** 3–9 · **NFT:** Epic reviewer-gated",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 110,
+      "name": "Yu the Great",
+      "subtitle": "Flood Engineering Steward",
+      "ray": "Blue",
+      "role": "infra humility / dredging parallels · **Quest:** Channel Nine Provinces Fork · **Ability:** Dredge Schedule Bless · **CL:** 4–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Dredge Schedule Bless · **CL:** 4–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 111,
+      "name": "Lei Gong",
+      "subtitle": "Thunder Tribunal",
+      "ray": "Violet",
+      "role": "governance invariant alerts ethics · **Quest:** Storm Court Replay · **Ability:** Drumstrike Interdict · **CL:** 5–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Drumstrike Interdict · **CL:** 5–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 112,
+      "name": "Dewi Sri",
+      "subtitle": "Rice Mother",
+      "ray": "Blue",
+      "role": "biome respect / hunger relief · **Quest:** Subak Grid Sync · **Ability:** Sawah Bless · **CL:** 2–7 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Sawah Bless · **CL:** 2–7 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 113,
+      "name": "Nyai Roro Kidul",
+      "subtitle": "Southern Ocean Sovereign",
+      "ray": "Blue",
+      "role": "shoreline commons arcs · **Quest:** Southern Current Treaty · **Ability:** Kidul Tide Ward · **CL:** 5–9 · **NFT:** Mythic anti-fetish review",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Kidul Tide Ward · **CL:** 5–9 · **NFT:** Mythic anti-fetish review",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 114,
+      "name": "Semar",
+      "subtitle": "Wayang Wisdom Clown Mentor",
+      "ray": "Blue",
+      "role": "mediator truth arcs · **Quest:** Shadow Dialogue Stage · **Ability:** Punakawan Reveal · **CL:** 2–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Punakawan Reveal · **CL:** 2–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 115,
+      "name": "Batara Guru",
+      "subtitle": "Cosmic Mentor Archetype",
+      "ray": "Blue",
+      "role": "documentation / translation coop · **Quest:** Kraton Canonical Sort · **Ability:** Guru Mandate Haste · **CL:** 6–9 · **NFT:** Legendary",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Guru Mandate Haste · **CL:** 6–9 · **NFT:** Legendary",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 116,
+      "name": "Barong Ket",
+      "subtitle": "Protector Balance",
+      "ray": "Blue",
+      "role": "hysteria cleanse events · **Quest:** Village Rhythm Reset · **Ability:** Protective Flourish · **CL:** 5–9 · **NFT:** Mythic Bali consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Protective Flourish · **CL:** 5–9 · **NFT:** Mythic Bali consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 117,
+      "name": "Garuda",
+      "subtitle": "Unity Bird Archetype",
+      "ray": "Blue",
+      "role": "humanitarian relay nodes · **Quest:** Archipelago Relay Handshake · **Ability:** Wingline Relay Boost · **CL:** 3–8 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Wingline Relay Boost · **CL:** 3–8 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 118,
+      "name": "Gatotkaca",
+      "subtitle": "Flying Pandava-derived Hero Local",
+      "ray": "Blue",
+      "role": "civilian escort raids · **Quest:** Night Flight Evacuations · **Ability:** Iron Skin Gale · **CL:** 4–8 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Iron Skin Gale · **CL:** 4–8 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 119,
+      "name": "Prince Panji",
+      "subtitle": "Cycle Romance Sovereignty",
+      "ray": "Blue",
+      "role": "civic identity coherence · **Quest:** Split Kingdom DNS Parable · **Ability:** Mask Pivot Reveal · **CL:** 3–7 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Mask Pivot Reveal · **CL:** 3–7 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 120,
+      "name": "Roro Jonggrang",
+      "subtitle": "Temple Bargain Steward",
+      "ray": "Blue",
+      "role": "boundary-positive architecture lore · **Quest:** 1000 Lantern Proof · **Ability:** Spindle Pause · **CL:** 4–8 · **NFT:** Mythic feminist review",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Spindle Pause · **CL:** 4–8 · **NFT:** Mythic feminist review",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 121,
+      "name": "Dewi Nawang Wulan",
+      "subtitle": "Moon Hospitality Archetype",
+      "ray": "Blue",
+      "role": "reciprocal hosting / burnout healing · **Quest:** Guest Ledger Rotation · **Ability:** Moonwoven Bandage · **CL:** 3–7 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Moonwoven Bandage · **CL:** 3–7 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 122,
+      "name": "Seven Sisters Songline Steward",
+      "subtitle": "Pleiades Multi-nation Compass",
+      "ray": "Violet",
+      "role": "education-first astronomy commons · **Quest:** Shared Sky Catalogue · **Ability:** Pleiades Sync Buff · **CL:** 3–8 · **NFT:** Gated Aboriginal endorsement",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Pleiades Sync Buff · **CL:** 3–8 · **NFT:** Gated Aboriginal endorsement",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 123,
+      "name": "Rainbow Serpent Country Law",
+      "subtitle": "Hydrological Ethics Composite",
+      "ray": "Blue",
+      "role": "watershed stewardship · **Quest:** Aquifer DAO Merge · **Ability:** Riparian Ward · **CL:** 4–9 · **NFT:** Mythic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Riparian Ward · **CL:** 4–9 · **NFT:** Mythic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 124,
+      "name": "Bunjil",
+      "subtitle": "Kulin Creator Eagle",
+      "ray": "Blue",
+      "role": "aerial urban heat remediation · **Quest:** Eagle Corridor Air Quality · **Ability:** Thermal Sight Reveal · **CL:** 5–9 · **NFT:** Mythic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Thermal Sight Reveal · **CL:** 5–9 · **NFT:** Mythic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 125,
+      "name": "Baiame",
+      "subtitle": "Regional Sky Father Steward",
+      "ray": "Blue",
+      "role": "GIS + Country overlays education · **Quest:** Layered Map Overlay Truth · **Ability:** Rain Whisper Buffer · **CL:** 4–9 · **NFT:** Mythic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Rain Whisper Buffer · **CL:** 4–9 · **NFT:** Mythic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 126,
+      "name": "Tagai Navigator",
+      "subtitle": "Torres Strait Celestial Voyaging",
+      "ray": "Blue",
+      "role": "tidal finality parallels · **Quest:** Strait Tide Table Sync · **Ability:** Constellation Compass · **CL:** 3–8 · **NFT:** Mythic Strait consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Constellation Compass · **CL:** 3–8 · **NFT:** Mythic Strait consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 127,
+      "name": "Celestial Emu Dreaming Steward",
+      "subtitle": "Dark Constellation STEM",
+      "ray": "Blue",
+      "role": "astronomical education bridge · **Quest:** Dark Dust Pattern Hunt · **Ability:** Emu Silhouette Mark · **CL:** 2–7 · **NFT:** Epic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Emu Silhouette Mark · **CL:** 2–7 · **NFT:** Epic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 128,
+      "name": "Djang'kawu Creator Voyagers",
+      "subtitle": "Yolŋu voyaging archetype",
+      "ray": "Blue",
+      "role": "freshwater governance ethics abstracts · **Quest:** Freshwater Node Blessing Chain · **Ability:** Voyager Rhythm Link · **CL:** 6–9 · **NFT:** Mythic mandatory consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Voyager Rhythm Link · **CL:** 6–9 · **NFT:** Mythic mandatory consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 129,
+      "name": "Namarrkon",
+      "subtitle": "Arnhem Lightning Law",
+      "ray": "Blue",
+      "role": "outage ethical strike mechanics · **Quest:** Wet Season Integrity Check · **Ability:** Lightning Recall · **CL:** 5–9 · **NFT:** Epic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Lightning Recall · **CL:** 5–9 · **NFT:** Epic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 130,
+      "name": "Country Knowledge Walk (Tjukurpa education frame)",
+      "subtitle": "",
+      "ray": "Blue",
+      "role": "listening-first knowledge acquisition · **Quest:** Slow Walk Audit · **Ability:** Ground Recall Marker · **CL:** 4–9 · **NFT:** Mythic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Ground Recall Marker · **CL:** 4–9 · **NFT:** Mythic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 131,
+      "name": "Makarrata Treaty Bridge",
+      "subtitle": "Truth treaty repair lore",
+      "ray": "Blue",
+      "role": "DAO restorative readability · **Quest:** Ledger Apology Fork · **Ability:** Restorative Sync · **CL:** 5–9 · **NFT:** Mythic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Restorative Sync · **CL:** 5–9 · **NFT:** Mythic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 132,
+      "name": "Papatūānuku",
+      "subtitle": "Earth Mother",
+      "ray": "Blue",
+      "role": "geothermal + soil consent arcs · **Quest:** Subsurface Carbon Vault Consent · **Ability:** Soil Bond Heal · **CL:** 3–9 · **NFT:** Legendary Māori consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Soil Bond Heal · **CL:** 3–9 · **NFT:** Legendary Māori consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 133,
+      "name": "Ranginui",
+      "subtitle": "Sky Father",
+      "ray": "Blue",
+      "role": "methane clarity overlays · **Quest:** Stratosphere Accountability Mirror · **Ability:** Skyfather Clarity Beam · **CL:** 5–9 · **NFT:** Legendary consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Skyfather Clarity Beam · **CL:** 5–9 · **NFT:** Legendary consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 134,
+      "name": "Tāne Mahuta",
+      "subtitle": "Forest Intercessor",
+      "ray": "Blue",
+      "role": "biomass restoration raids · **Quest:** Kauri Biome Renewal · **Ability:** Canopy Lattice Buff · **CL:** 4–9 · **NFT:** Mythic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Canopy Lattice Buff · **CL:** 4–9 · **NFT:** Mythic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 135,
+      "name": "Tangaroa (Māori strand)",
+      "subtitle": "",
+      "ray": "Blue",
+      "role": "fisheries rāhui governance · **Quest:** Rāhui Season Toggle · **Ability:** Mana Moana Tide · **CL:** 3–8 · **NFT:** Mythic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Mana Moana Tide · **CL:** 3–8 · **NFT:** Mythic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 136,
+      "name": "Rongo",
+      "subtitle": "Peace & Cultivation",
+      "ray": "Blue",
+      "role": "harvest diplomacy · **Quest:** Maketu Harvest Truce · **Ability:** Diplomatic Crop Share · **CL:** 2–7 · **NFT:** Rare consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Diplomatic Crop Share · **CL:** 2–7 · **NFT:** Rare consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 137,
+      "name": "Tūmatauenga",
+      "subtitle": "Whānau Defender",
+      "ray": "Blue",
+      "role": "lawful protection war arcs only · **Quest:** Whānau Shield Wall · **Ability:** Haka Discipline Burst · **CL:** 5–9 · **NFT:** Mythic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Haka Discipline Burst · **CL:** 5–9 · **NFT:** Mythic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 138,
+      "name": "Tāwhirimatea",
+      "subtitle": "Storm winds resilience",
+      "ray": "Blue",
+      "role": "topology stress lore · **Quest:** Topology Wind Tunnel · **Ability:** Gust Disperse · **CL:** 5–9 · **NFT:** Epic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Gust Disperse · **CL:** 5–9 · **NFT:** Epic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 139,
+      "name": "Haumiatiketike",
+      "subtitle": "Wild foods stealth",
+      "ray": "Blue",
+      "role": "stealth gather regrowth ethic · **Quest:** Forage Without Trace · **Ability:** Rootcloak · **CL:** 2–6 · **NFT:** Rare consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Rootcloak · **CL:** 2–6 · **NFT:** Rare consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 140,
+      "name": "Hine-nui-te-pō",
+      "subtitle": "Threshold transformation",
+      "ray": "Blue",
+      "role": "ego death psych puzzle · **Quest:** Initiation Without Shame · **Ability:** Threshold Immunity vs FOMO · **CL:** 6–9 · **NFT:** Mythic anti-fetish review",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Threshold Immunity vs FOMO · **CL:** 6–9 · **NFT:** Mythic anti-fetish review",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 141,
+      "name": "Kupe Navigator",
+      "subtitle": "Voyager cartography ethic",
+      "ray": "Blue",
+      "role": "discovery / light-client bridge · **Quest:** Waka Node Handshake · **Ability:** Navigator’s Truth Wind · **CL:** 4–9 · **NFT:** Mythic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Navigator’s Truth Wind · **CL:** 4–9 · **NFT:** Mythic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 142,
+      "name": "Ọṣun",
+      "subtitle": "River reciprocity òrìṣà",
+      "ray": "RubyGold",
+      "role": "humane liquidity / anti-burnout moderator buffs · **Quest:** River Wallet Reciprocity · **Ability:** Mirror Flow Benediction · **CL:** 3–8 · **NFT:** Mythic anti-fetish review",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Mirror Flow Benediction · **CL:** 3–8 · **NFT:** Mythic anti-fetish review",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 143,
+      "name": "Ṣàngó",
+      "subtitle": "Thunder-order justice lore",
+      "ray": "Blue",
+      "role": "strike corruption institutions only · **Quest:** Double-Spend Lightning Trial · **Ability:** Gavelstrike Purge · **CL:** 5–9 · **NFT:** Epic diaspora consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Gavelstrike Purge · **CL:** 5–9 · **NFT:** Epic diaspora consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 144,
+      "name": "Ọbàtálá",
+      "subtitle": "Calm-maker / elder craft",
+      "ray": "White",
+      "role": "infra readability & calm governance · **Quest:** White Clay Spec Review · **Ability:** Calm Kiln Shield · **CL:** 4–8 · **NFT:** Legendary initiatory-distance review",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Calm Kiln Shield · **CL:** 4–8 · **NFT:** Legendary initiatory-distance review",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 145,
+      "name": "Ọya",
+      "subtitle": "Wind-crossing refactor",
+      "ray": "Violet",
+      "role": "humane migration arcs · **Quest:** Market Crosswind Pivot · **Ability:** Gale Reconcile · **CL:** 5–9 · **NFT:** Epic glamour-ban review",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Gale Reconcile · **CL:** 5–9 · **NFT:** Epic glamour-ban review",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 146,
+      "name": "Mawu-Lisa",
+      "subtitle": "Fon cosmology dual stewardship",
+      "ray": "Blue",
+      "role": "alternating listening governance · **Quest:** Split Mandate Sunset · **Ability:** Equinox Lock · **CL:** 6–9 · **NFT:** Rare consult Benin-region framing",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Equinox Lock · **CL:** 6–9 · **NFT:** Rare consult Benin-region framing",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 147,
+      "name": "Nyame / Nyankopon",
+      "subtitle": "Akan high-god pedagogical compass",
+      "ray": "Blue",
+      "role": "laconic truthful proposals · **Quest:** Thin Ice Oracle Proposals · **Ability:** High God Hush (spam proposal cooldown lore) · **CL:** 5–9 · **NFT:** Rare consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "High God Hush (spam proposal cooldown lore) · **CL:** 5–9 · **NFT:** Rare consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 148,
+      "name": "Kwaku Ananse",
+      "subtitle": "Story-weaver pedagogy",
+      "ray": "Blue",
+      "role": "revelation via narrative puzzle · **Quest:** Web-of-Forks Parable · **Ability:** Thread Insight · **CL:** 2–8 · **NFT:** Rare diaspora VO + writer consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Thread Insight · **CL:** 2–8 · **NFT:** Rare diaspora VO + writer consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 149,
+      "name": "Ausar-Osiris",
+      "subtitle": "Kemetic cyclic renewal ethics",
+      "ray": "Green",
+      "role": "humane chain restart symbolism · **Quest:** Green Renewal Hardfork Ritual · **Ability:** Verdant Revival Mark · **CL:** 5–9 · **NFT:** Mythic museum-repat framing",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Verdant Revival Mark · **CL:** 5–9 · **NFT:** Mythic museum-repat framing",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 150,
+      "name": "Maʿăt",
+      "subtitle": "Feather tribunal / integrity voting",
+      "ray": "Blue",
+      "role": "DAO truth-game pedagogy · **Quest:** Featherweighted Vote Replay · **Ability:** Scale Reveal Overlay · **CL:** 4–9 · **NFT:** Epic consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Scale Reveal Overlay · **CL:** 4–9 · **NFT:** Epic consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 151,
+      "name": "Anna Njinga",
+      "subtitle": "Ndongo–Matamba resistance diplomat",
+      "ray": "Blue",
+      "role": "asymmetrical negotiation vs empire lore · **Quest:** Ambush Treaty Table Flip · **Ability:** Strategic Bluff Counter · **CL:** 5–9 · **NFT:** Mythic historians + Angola/diaspora consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Strategic Bluff Counter · **CL:** 5–9 · **NFT:** Mythic historians + Angola/diaspora consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 152,
+      "name": "Atlas",
+      "subtitle": "Ring steward / eldest king frame",
+      "ray": "Blue",
+      "role": "multi-region consensus hubris check · **Quest:** Ring Steward Audit · **Ability:** Axis Lock Beacon · **CL:** 5–9 · **NFT:** Epic + classics disclaimer metadata",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Axis Lock Beacon · **CL:** 5–9 · **NFT:** Epic + classics disclaimer metadata",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 153,
+      "name": "Cleito",
+      "subtitle": "*Kleitó* sanctuary consent",
+      "ray": "Blue",
+      "role": "transparent charter / anti-stealth governance patch · **Quest:** Moat Charter Draft · **Ability:** Sanctuary Pause · **CL:** 4–8 · **NFT:** Epic + anti-fetish portrayal review",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Sanctuary Pause · **CL:** 4–8 · **NFT:** Epic + anti-fetish portrayal review",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 154,
+      "name": "Gadeirus",
+      "subtitle": "Harbor-ring / strait ethics",
+      "ray": "Blue",
+      "role": "bridge etiquette & fair port fees lore · **Quest:** Strait Handshake Trials · **Ability:** Tithe Gate Buffer · **CL:** 4–9 · **NFT:** Epic disclaimer",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Tithe Gate Buffer · **CL:** 4–9 · **NFT:** Epic disclaimer",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 155,
+      "name": "Ampheres",
+      "subtitle": "Proportional loadshare",
+      "ray": "Blue",
+      "role": "emissions / subsidy fairness vignettes · **Quest:** Load Shed Covenant · **Ability:** Equity Ripple · **CL:** 3–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Equity Ripple · **CL:** 3–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 156,
+      "name": "Evaemon",
+      "subtitle": "Good-custom law etiquette",
+      "ray": "Blue",
+      "role": "fork etiquette / community conduct teaching · **Quest:** Fork Etiquette Theater · **Ability:** Grace Window · **CL:** 2–7 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Grace Window · **CL:** 2–7 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 157,
+      "name": "Mneseus",
+      "subtitle": "Chain memory archives",
+      "ray": "Blue",
+      "role": "changelog integrity debates · **Quest:** Ledger Lineage Exhibit · **Ability:** Replay Oracle · **CL:** 4–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Replay Oracle · **CL:** 4–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 158,
+      "name": "Autochthon",
+      "subtitle": "Local-first legitimacy",
+      "ray": "Blue",
+      "role": "biome / local-node sovereignty folklore · **Quest:** Soil-signed Charter · **Ability:** Rooted Resilience · **CL:** 3–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Rooted Resilience · **CL:** 3–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 159,
+      "name": "Elasippus",
+      "subtitle": "Routing cadence fairness",
+      "ray": "Blue",
+      "role": "mempool / throughput pedagogy sans barbarism caricature · **Quest:** Harbor Rhythm Puzzle · **Ability:** Throttle Charm · **CL:** 3–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Throttle Charm · **CL:** 3–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 160,
+      "name": "Mestor",
+      "subtitle": "Accord mediator",
+      "ray": "Blue",
+      "role": "facilitator between stakeholder rings · **Quest:** Dual Ring Summit · **Ability:** Compromise Glyph · **CL:** 4–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Compromise Glyph · **CL:** 4–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 161,
+      "name": "Azaes",
+      "subtitle": "Risk-bound explorer",
+      "ray": "Blue",
+      "role": "graceful stress-test island narrative · **Quest:** Azimuth Stress Test Island · **Ability:** Boundary Ping · **CL:** 5–9 · **NFT:** Epic hubris-education tag",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Boundary Ping · **CL:** 5–9 · **NFT:** Epic hubris-education tag",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 162,
+      "name": "Lemur Steward",
+      "subtitle": "Biodiversity-before-babel Madagascar frame",
+      "ray": "Blue",
+      "role": "primát / ekosystém priorita nad conspiracy economy · **Quest:** Phantom vs Field Notes · **Ability:** Primate Clarity Buff · **CL:** 3–8 · **NFT:** Rare + env donate tag suggested",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Primate Clarity Buff · **CL:** 3–8 · **NFT:** Rare + env donate tag suggested",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 163,
+      "name": "Sclater Bridge",
+      "subtitle": "Hypothesis retractions pedagogy",
+      "ray": "Blue",
+      "role": "humility of obsolete maps · **Quest:** Hall of Retracted Hypotheses · **Ability:** Paper Recall Aura · **CL:** 4–9 · **NFT:** Rare (no heroic scientist cult art)",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Paper Recall Aura · **CL:** 4–9 · **NFT:** Rare (no heroic scientist cult art)",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 164,
+      "name": "Coral Notary",
+      "subtitle": "Reef accountability witness",
+      "ray": "Blue",
+      "role": "coral stress vs DAO witness metaphor · **Quest:** Bleach Event Tribunal · **Ability:** Symbiosis Witness · **CL:** 4–9 · **NFT:** Epic + climate org tagging",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Symbiosis Witness · **CL:** 4–9 · **NFT:** Epic + climate org tagging",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 165,
+      "name": "Tide Column",
+      "subtitle": "Fair tidal rhythm / mempool equity lore",
+      "ray": "Blue",
+      "role": "small participant fairness arcs · **Quest:** High Tide Liquidity Fairshare · **Ability:** Ebb Rebate · **CL:** 3–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Ebb Rebate · **CL:** 3–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 166,
+      "name": "Basalt Chronicle",
+      "subtitle": "MORB / ridge basalt geology honesty",
+      "ray": "Blue",
+      "role": "lithosphere pacing without Atlantis grind · **Quest:** Basalt Classroom Trail · **Ability:** Stratum Proof · **CL:** 4–9 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Stratum Proof · **CL:** 4–9 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 167,
+      "name": "Foam Seed",
+      "subtitle": "Dispersal ethics without colonial map",
+      "ray": "Blue",
+      "role": "onboarding consent vs settlers fantasy · **Quest:** Foam Landing Consent Pack · **Ability:** Drift Brake · **CL:** 3–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Drift Brake · **CL:** 3–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 168,
+      "name": "Oceanic Bridge",
+      "subtitle": "Pacific solidarity scaffold",
+      "ray": "Blue",
+      "role": "alliances without overwriting Indigenous arcs · **Quest:** Relay Fleet Without Theft · **Ability:** Solidarity Lantern · **CL:** 4–9 · **NFT:** Epic + cross-consult metadata",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Solidarity Lantern · **CL:** 4–9 · **NFT:** Epic + cross-consult metadata",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 169,
+      "name": "Shelf Whisper",
+      "subtitle": "Shelf subsidence realism",
+      "ray": "Blue",
+      "role": "coastline risk truth-telling · **Quest:** SLR Scenario Tabletop · **Ability:** Bathyal Shield · **CL:** 5–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Bathyal Shield · **CL:** 5–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 170,
+      "name": "Equinox Lull",
+      "subtitle": "Volatility moderation at thresholds",
+      "ray": "Blue",
+      "role": "DAO timelock / panic dampening folklore · **Quest:** Equinox Voting Cooldown Ritual · **Ability:** Libration Hush · **CL:** 3–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Libration Hush · **CL:** 3–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 171,
+      "name": "Circle Closure",
+      "subtitle": "Meta-bridge tee to cosmic wave",
+      "ray": "Violet",
+      "role": "handoff narration to cosmology archetypes **#172+** · **Quest:** Handoff Constellation Stub · **Ability:** Next-Wave Invitation *(cosmetic unlock, no race-coded art)* · **CL:** 4–9 · **NFT:** Mythic + zero hierarchic trope audit",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Next-Wave Invitation *(cosmetic unlock, no race-coded art)* · **CL:** 4–9 · **NFT:** Mythic + zero hierarchic trope audit",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 172,
+      "name": "Great Central Sun Steward",
+      "subtitle": "Cosmic clock / consensus frame",
+      "ray": "White",
+      "role": "single logical tempo / DAO alignment lore · **Quest:** Radial Sync Briefing · **Ability:** Corona Consensus Pulse · **CL:** 5–9 · **NFT:** Legendary + non-medical metadata",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Corona Consensus Pulse · **CL:** 5–9 · **NFT:** Legendary + non-medical metadata",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 173,
+      "name": "Photon Cadence",
+      "subtitle": "Photon-belt gates as season pacing only",
+      "ray": "Blue",
+      "role": "anti-hype burnout / ethical releases · **Quest:** Gate Rollout Ethics Table · **Ability:** Chromatic Cooldown · **CL:** 4–9 · **NFT:** Epic + DNA non-claim disclaimer",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Chromatic Cooldown · **CL:** 4–9 · **NFT:** Epic + DNA non-claim disclaimer",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 174,
+      "name": "Solar Logos Dual",
+      "subtitle": "Helios/Vesta-style dual signing metaphor",
+      "ray": "Blue",
+      "role": "cold+hot multisig personalities · **Quest:** Helios-Vesta multisig lore · **Ability:** Twin Ray Buffer · **CL:** 4–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Twin Ray Buffer · **CL:** 4–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 175,
+      "name": "Telluric Soul Bridge",
+      "subtitle": "Planetary soul bridge; cross #25 Lady Gaia",
+      "ray": "Violet",
+      "role": "regen side arcs tied to Gaia storyline · **Quest:** Soil-RPC Handshake · **Ability:** Humus Handoff · **CL:** 3–8 · **NFT:** Epic + cross-story note",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Humus Handoff · **CL:** 3–8 · **NFT:** Epic + cross-story note",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 176,
+      "name": "Tube-of-Light Sentinel",
+      "subtitle": "OPSEC visual from Vzestup practice names",
+      "ray": "Blue",
+      "role": "wallet hygiene / scam resistance · **Quest:** Column Audit Walkthrough · **Ability:** Phishing Bloom Purge · **CL:** 3–8 · **NFT:** Rare + wellness non-claims",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Phishing Bloom Purge · **CL:** 3–8 · **NFT:** Rare + wellness non-claims",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 177,
+      "name": "Radiant Spiral",
+      "subtitle": "Guild XP spiral — not body claims",
+      "ray": "Blue",
+      "role": "reputation for mentoring not grind · **Quest:** Spiral Reputation refactor · **Ability:** Vortex Mentor Mark · **CL:** 2–9 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Vortex Mentor Mark · **CL:** 2–9 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 178,
+      "name": "Seventh Ray Adjunct",
+      "subtitle": "Violet frequency UI next to Saint Germain #26",
+      "ray": "Violet",
+      "role": "transmutation systems vs duplicate master · **Quest:** Stacked Violet Tutorial · **Ability:** Karma Scrub Cosmetic · **CL:** 4–9 · **NFT:** Epic + coexistence with #26",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Karma Scrub Cosmetic · **CL:** 4–9 · **NFT:** Epic + coexistence with #26",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 179,
+      "name": "Galactic Convenor",
+      "subtitle": "Galactic Federation parliament — tiered mandates, not Earth-ethnic ranking",
+      "ray": "Blue",
+      "role": "inter-guild federation + institucionalizovaná hierarchie viz [`docs/TerraNova/cosmic/GALAKTICKA_FEDERACE.md`](../../TerraNova/cosmic/GALAKTICKA_FEDERACE.md) · **Quest:** Protocol Parliament Session (+ optional Federation Tier Audit) · **Ability:** Orbit Silence · **CL:** 4–9 · **NFT:** Epic + GF art/copy gate",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Orbit Silence · **CL:** 4–9 · **NFT:** Epic + GF art/copy gate",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 180,
+      "name": "Lightbody Scribe",
+      "subtitle": "Journaling only — no therapeutic NFT",
+      "ray": "Blue",
+      "role": "privacy / delete-my-data lore · **Quest:** Right To Be Forgotten Constellation · **Ability:** Ledger Amnesia Token · **CL:** 2–8 · **NFT:** Rare + wellness disclaimer",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Ledger Amnesia Token · **CL:** 2–8 · **NFT:** Rare + wellness disclaimer",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 181,
+      "name": "Vzestup Capstone",
+      "subtitle": "13th expansion decad closure → COSMIC_MAP",
+      "ray": "Blue",
+      "role": "doc hub pointer / meta navigation · **Quest:** Return Vector: COSMIC_MAP.md · **Ability:** Map Bookmark · **CL:** 6–9 · **NFT:** Mythic + meta only",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Map Bookmark · **CL:** 6–9 · **NFT:** Mythic + meta only",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 182,
+      "name": "Valhalla Hall-Steward",
+      "subtitle": "Einherjar etiquette / rest cycle — not afterlife theology",
+      "ray": "Blue",
+      "role": "guild hall host + anti-burnout pacing · **Quest:** Einherjar Etiquette Table · **Ability:** Roast-Rest Cycle · **CL:** 4–9 · **NFT:** Epic + Heathenry-informed consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Roast-Rest Cycle · **CL:** 4–9 · **NFT:** Epic + Heathenry-informed consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 183,
+      "name": "Óðinn Wayfarer",
+      "subtitle": "Governance raven-log / fork review",
+      "ray": "Blue",
+      "role": "multisig wisdom + public argument · **Quest:** Huginn Diff / Muninn Merge · **Ability:** One-Eye Focus · **CL:** 5–9 · **NFT:** Legendary + hate-symbol ban on runes",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "One-Eye Focus · **CL:** 5–9 · **NFT:** Legendary + hate-symbol ban on runes",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 184,
+      "name": "Þórr Storm-Host",
+      "subtitle": "Uptime / community safety — not toxic alpha trope",
+      "ray": "Blue",
+      "role": "infra resilience + rate limits · **Quest:** Mjölnir Rate-Limit · **Ability:** Chain Lightning Purge · **CL:** 3–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Chain Lightning Purge · **CL:** 3–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 185,
+      "name": "Freyja Van-Ruler",
+      "subtitle": "Fair treasury + privacy lore — no sexualized combat",
+      "ray": "Blue",
+      "role": "escrow fairness + encryption metaphor (seiðr as data care) · **Quest:** Brisingamen Escrow · **Ability:** Falcon Trace · **CL:** 4–9 · **NFT:** Epic + metadata parity check",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Falcon Trace · **CL:** 4–9 · **NFT:** Epic + metadata parity check",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 186,
+      "name": "Týr Oath-Fire",
+      "subtitle": "Timelock sacrifice / smart-contract honor",
+      "ray": "Blue",
+      "role": "oath-bound upgrades · **Quest:** Fenrir Timelock · **Ability:** Oath-Burn Seal · **CL:** 5–9 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Oath-Burn Seal · **CL:** 5–9 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 187,
+      "name": "Brigid Triple-Flame",
+      "subtitle": "Forge / docs / care — syncretism disclaimer",
+      "ray": "White",
+      "role": "open tooling + translations · **Quest:** Forge Docs Sprint · **Ability:** Triple-Wick Focus · **CL:** 2–8 · **NFT:** Epic + non-medical wellness",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Triple-Wick Focus · **CL:** 2–8 · **NFT:** Epic + non-medical wellness",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 188,
+      "name": "Dagda Peace-Harp",
+      "subtitle": "Public goods / epoch spacing",
+      "ray": "Green",
+      "role": "sustainable emissions + commons refill · **Quest:** Undry Cauldron Refill · **Ability:** Harp Lull · **CL:** 3–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Harp Lull · **CL:** 3–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 189,
+      "name": "Morrígan Sovereignty-Raven",
+      "subtitle": "Threat triage — mandatory art consult",
+      "ray": "Blue",
+      "role": "responsible disclosure + governance veto vs attacks · **Quest:** Battle Crow Triage · **Ability:** Phantom Stratagem · **CL:** 6–9 · **NFT:** Mythic + Kālī-tier art gate",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Phantom Stratagem · **CL:** 6–9 · **NFT:** Mythic + Kālī-tier art gate",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 190,
+      "name": "Lugh Samildanach",
+      "subtitle": "Multi-skill multisig / mentor rotation",
+      "ray": "Blue",
+      "role": "cross-stack competence without hero worship · **Quest:** Tailtiu Field Day · **Ability:** Many-Skill Attune · **CL:** 3–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Many-Skill Attune · **CL:** 3–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 191,
+      "name": "Manannán mac Lir",
+      "subtitle": "Sandbox / mist boundaries between chains",
+      "ray": "Blue",
+      "role": "testnet isolation + feature flags · **Quest:** Cloak of Nine Shadows · **Ability:** Mist Veil · **CL:** 4–9 · **NFT:** Rare + no Atlantis conflation",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Mist Veil · **CL:** 4–9 · **NFT:** Rare + no Atlantis conflation",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 192,
+      "name": "Ré Solar-Barque",
+      "subtitle": "Epoch heartbeat / anti-FOMO pacing",
+      "ray": "Blue",
+      "role": "block time transparency · **Quest:** Barque Handoff Briefing · **Ability:** Zenith Clear · **CL:** 4–9 · **NFT:** Legendary + Egyptology consult",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Zenith Clear · **CL:** 4–9 · **NFT:** Legendary + Egyptology consult",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 193,
+      "name": "Hor Unifier",
+      "subtitle": "Double-crown governance; cross #149 Osiris",
+      "ray": "Blue",
+      "role": "multisig legitimacy across regions · **Quest:** Double Crown Multisig · **Ability:** Udjat Watch · **CL:** 5–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Udjat Watch · **CL:** 5–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 194,
+      "name": "Thoth Scribe",
+      "subtitle": "Merkle / changelog integrity",
+      "ray": "Blue",
+      "role": "audit trail + honest timestamps · **Quest:** Ibis Ledger Review · **Ability:** Reed-Pen Attest · **CL:** 3–9 · **NFT:** Epic + no gibberish-hieroglyph UI",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Reed-Pen Attest · **CL:** 3–9 · **NFT:** Epic + no gibberish-hieroglyph UI",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 195,
+      "name": "Hathor Jubilee",
+      "subtitle": "Community celebration / anti-spam fests",
+      "ray": "Blue",
+      "role": "safe social events layer · **Quest:** Sistrum Noise Budget · **Ability:** Menat Shield · **CL:** 2–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Menat Shield · **CL:** 2–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 196,
+      "name": "Sekhmet Audit-Flame",
+      "subtitle": "Slashing + cooling debrief — art gate",
+      "ray": "Blue",
+      "role": "penalty vault + post-incident peace · **Quest:** Beer of Cooling Patch · **Ability:** Solar Wound Audit · **CL:** 6–9 · **NFT:** Mythic + Kālī-tier art review",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Solar Wound Audit · **CL:** 6–9 · **NFT:** Mythic + Kālī-tier art review",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 197,
+      "name": "Ptah Mason",
+      "subtitle": "Genesis bytecode / factory safety",
+      "ray": "Green",
+      "role": "contract templates + reproducible builds · **Quest:** Memphis Template Forge · **Ability:** Mummiform Seal · **CL:** 4–9 · **NFT:** Epic",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Mummiform Seal · **CL:** 4–9 · **NFT:** Epic",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 198,
+      "name": "Anubis Threshold",
+      "subtitle": "Migration snapshots — no gore NFTs",
+      "ray": "Blue",
+      "role": "backup before fork; integrity diff · **Quest:** Jackal Backup Rite · **Ability:** Scale Tare · **CL:** 4–9 · **NFT:** Rare + no mummy imagery",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Scale Tare · **CL:** 4–9 · **NFT:** Rare + no mummy imagery",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 199,
+      "name": "Amun Hidden-Field",
+      "subtitle": "Commit–reveal / private tally lore",
+      "ray": "Blue",
+      "role": "concealed ballot phases · **Quest:** Veil of Karnak · **Ability:** Concealed Ballot · **CL:** 5–9 · **NFT:** Epic + compliance lore note",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Concealed Ballot · **CL:** 5–9 · **NFT:** Epic + compliance lore note",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 200,
+      "name": "Geb Foundation",
+      "subtitle": "L1 substrate / hosting reality check",
+      "ray": "Blue",
+      "role": "physical infra baseline · **Quest:** Earth-Shu Gap · **Ability:** Bedrock Anchor · **CL:** 3–8 · **NFT:** Rare",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Bedrock Anchor · **CL:** 3–8 · **NFT:** Rare",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    },
+    {
+      "id": 201,
+      "name": "Nut Stellar Vault",
+      "subtitle": "Sharding / nightly maintenance metaphor",
+      "ray": "Blue",
+      "role": "horizontal read scale · **Quest:** Stellar Vault Sharding · **Ability:** Starfield Span · **CL:** 5–9 · **NFT:** Legendary",
+      "location": "",
+      "quest_line": "",
+      "teaching": "",
+      "ability": "Starfield Span · **CL:** 5–9 · **NFT:** Legendary",
+      "consciousness_level_required": 1,
+      "consciousness_level_name": "",
+      "key": "",
+      "rarity": "Rare",
+      "quests": []
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# ZION Atomic Swap Service — Mainnet Configuration
+# Cross-chain HTLC swaps: ZION L1 ↔ Base (EVM)
+# ──────────────────────────────────────────────────────────────────────────────
+
+[swap]
+name              = "ZION Atomic Swap Service"
+network           = "mainnet"
+min_lock_flowers  = 1_000_000             # 1 ZION minimum (1e6 scale)
+max_lock_atomic   = 100_000_000_000       # 100 000 ZION maximum (1e6 scale)
+release_fee_atomic = 10_000                # flat fee per release
+
+# ── ZION L1 ──────────────────────────────────────────────────────────────────
+
+[l1]
+rpc_url            = "http://127.0.0.1:8443"  # Primary L1 node — Edge localhost
+# rpc_token        = ""                    # set ZION_RPC_TOKEN env var
+# escrow_key_hex   = ""                    # set ZION_SWAP_ESCROW_KEY env var
+scan_batch_size    = 10
+poll_interval_secs = 5
+
+# ── Database ─────────────────────────────────────────────────────────────────
+
+[database]
+path = "/root/zion-2.9.6-main/V3/data/atomic-swap.db"
+
+# ── HTTP API ─────────────────────────────────────────────────────────────────
+
+[api]
+bind = "0.0.0.0:8452"
+# bearer_token = ""   # MUST be set for mainnet via env or secrets
+
+# ── Refund Automation ────────────────────────────────────────────────────────
+
+[refund]
+auto_refund        = true
+check_interval_secs = 30
+grace_period_secs  = 300
+
+# ── EVM Watcher (Base mainnet HTLC events) ───────────────────────────────────
+
+[evm_watcher]
+enabled            = true
+rpc_url            = "https://mainnet.base.org"
+rpc_url_backup     = "https://rpc.ankr.com/base"    # Ankr free-tier fallback
+contract_addr      = "0x3DE9Ad42716854083ab837706E3961d10B0e63Eb"
+poll_interval_secs = 12
+start_block        = 0

@@ -1,0 +1,60 @@
+# Root workspace — unifies V3 mainnet crates + research crates.
+# V3/Cargo.toml is kept for reference but its workspace definition is shadowed
+# because these crates are listed as members here.
+[workspace]
+members = [
+    "V3/L1/core",
+    "V3/L1/pool",
+    "V3/L1/miner",
+    "V3/L1/cosmic-harmony",
+    "V3/L1/native-ffi",
+    "V3/L2/bridge",
+    "V3/L2/dao",
+    "V3/L2/atomic-swap",
+    "V3/L2/swap-aggregator",
+    "V3/L3/ncl",
+    "V3/L3/warp",
+    "V3/L3/ai-native",
+    "V3/L4/oasis",
+    "V3/L5/free-world",
+    "V3/L6/issobella",
+    "V3/sdk",
+    "V3/cli",
+    "DeekshaDebug",
+    "PUBLIC/cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "3.0.4"
+edition = "2021"
+license = "MIT"
+authors = ["Yose144"]
+
+[workspace.dependencies]
+anyhow = "1"
+bincode = "1"
+cc = "1.0"
+blake3 = "1"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+heed = "0.22"
+rand = "0.8"
+ripemd = "0.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+k256 = { version = "0.13", features = ["ecdsa"] }
+hex = "0.4"
+tempfile = "3"
+chrono = { version = "0.4", features = ["serde"] }
+ctrlc = { version = "3", features = ["termination"] }
+thiserror = "2"
+tokio = "1"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+zeroize = { version = "1", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1

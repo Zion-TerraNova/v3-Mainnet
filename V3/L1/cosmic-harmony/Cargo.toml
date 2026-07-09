@@ -1,0 +1,27 @@
+[package]
+name = "zion-cosmic-harmony"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = []
+native-npu = ["dep:ort"]
+testnet = []
+# Local/docker hard-fork rehearsal only — sets TX/BODY v2 gates to the same low height.
+testnet_fork_rehearsal = []
+
+[dependencies]
+serde.workspace = true
+aes = "0.8"
+blake3 = "1"
+chrono = { version = "0.4", features = ["serde"] }
+libc = "0.2"
+serde_json.workspace = true
+log = "0.4"
+ort = { version = "2.0.0-rc.10", optional = true, default-features = false, features = ["load-dynamic"] }
+sha3 = "0.10"

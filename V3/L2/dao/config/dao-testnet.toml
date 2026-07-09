@@ -1,0 +1,53 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# ZION DAO — Testnet Configuration (post-3.0.3 decimal fork)
+# On-chain governance: proposals, voting (1 ZION = 1 vote), treasury multisig
+# All flower values are in NEW 6-decimal scale (FLOWERS_PER_ZION = 1_000_000)
+# ──────────────────────────────────────────────────────────────────────────────
+
+name    = "ZION DAO"
+version = "1.0.0"
+
+# ── HTTP API ─────────────────────────────────────────────────────────────────
+
+api_port = 8450           # 8080 occupied by pool API on Edge
+api_key  = ""     # set ZION_DAO_API_KEY env var for production
+
+# ── Database ─────────────────────────────────────────────────────────────────
+
+db_path = "/data/dao/dao.db"
+
+# ── L1 Connection ────────────────────────────────────────────────────────────
+
+l1_rpc_url    = "127.0.0.1:8443"           # colocated with Core node
+l1_rpc_backup = "<LEGACY_TAILSCALE>:8443"       # Edge fallback (Tailscale VPN)
+
+# ── L1 Scanner ───────────────────────────────────────────────────────────────
+
+scan_interval_secs = 10
+min_vote_weight    = 1_000_000             # 1 ZION in flowers (1e6 scale)
+finality_blocks    = 6
+
+# ── Governance ───────────────────────────────────────────────────────────────
+
+proposal_threshold  = 1_000_000_000_000    # 1M ZION in flowers (1M × 1e6 = 1e12)
+quorum_percent      = 10.0
+voting_period_days  = 7
+timelock_hours      = 48
+
+# ── Treasury ─────────────────────────────────────────────────────────────────
+
+treasury_addresses = [
+    "zion1t4l2f5j737989828v295n7z4r3v5j8k895m56n4",  # Community Governance (main) — 2.5B ZION
+    "zion1r5j0j7y444a8j402n8t8u2n8y323u6x4r2aw7l6",  # Grants & Bounties — 1.0B ZION
+    "zion1932843t398t095g4h3x2f3a5l0q40490k4fm2w8",  # Ecosystem Bootstrap — 0.5B ZION
+]
+daily_spend_limit   = 100_000_000    # 100 M ZION (whole coins)
+multisig_threshold  = 5
+multisig_total      = 7
+
+# ── Guardians ────────────────────────────────────────────────────────────────
+# Add guardian entries when provisioned:
+# [[guardians]]
+# name       = "guardian-1"
+# address    = "zion1..."
+# public_key = "ed25519hex..."

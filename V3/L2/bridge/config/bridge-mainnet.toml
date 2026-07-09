@@ -1,0 +1,155 @@
+# ──────────────────────────────────────────────────────────────
+#  ZION Bridge Relay Configuration — V3 Mainnet (Base)
+# ──────────────────────────────────────────────────────────────
+#
+#  Mainnet contracts DEPLOYED (2026-06-30) with 5/5 validator multisig.
+#  Canonical config: also mirrored in V3/config/bridge-mainnet.toml.
+#  Bridge vault: zion1j53677g5k83030x3s2z2z644e7h07792q0u02t7
+#  (from seed "ZION Bridge Vault V3 Mainnet v2 2026-07-06-HARD-RESET")
+#
+#  Usage: ZION_BRIDGE_CONFIG=V3/L2/bridge/config/bridge-mainnet.toml cargo run -p zion-bridge
+
+[bridge]
+name    = "ZION Bridge Relay V3"
+version = "3.0.2"
+network = "mainnet"
+
+# ── ZION L1 Connection ──────────────────────────────────────
+[l1]
+rpc_url        = "http://127.0.0.1:8443"
+rpc_url_backup = "http://<ZION_SEED_PEER>:8443"
+bridge_address = "zion1j53677g5k83030x3s2z2z644e7h07792q0u02t7"
+finality_blocks     = 60
+poll_interval_secs  = 15
+start_block_height  = 11300
+default_evm_recipient = "0x9b5b9a6c4ce4bcd4479d8ea6d12cd7bfeb61085f"
+
+# ── EVM Chains ──────────────────────────────────────────────
+
+# -- Base Mainnet — 5/5 ZIONBridge deployed and wZION BRIDGE_ROLE migrated.
+[[evm_chains]]
+chain_id                = "base"
+name                    = "Base (Mainnet)"
+evm_chain_id            = 8453
+rpc_url                 = "https://mainnet.base.org"
+rpc_url_backup          = "https://base-rpc.publicnode.com"
+wzion_address           = "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6"
+bridge_contract_address = "0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467"
+finality_blocks         = 64
+enabled                 = true
+gas_strategy            = "eip1559"
+max_gas_gwei            = 100
+start_block             = 47687000  # Set to ~current block at new 5/5 bridge deployment
+
+# -- Arbitrum One (Mainnet) — DEPLOYED 2026-06-30 --
+[[evm_chains]]
+chain_id                = "arbitrum"
+name                    = "Arbitrum One (Mainnet)"
+evm_chain_id            = 42161
+rpc_url                 = "https://arb1.arbitrum.io/rpc"
+rpc_url_backup          = "wss://arb-mainnet.g.alchemy.com/v2/YOUR_KEY"
+wzion_address           = "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6"
+bridge_contract_address = "0xa5a09b2C09A7182BBA9623A2D2cd46cD7D041721"
+finality_blocks         = 10
+enabled                 = true
+gas_strategy            = "eip1559"
+max_gas_gwei            = 20
+start_block             = 478916300
+
+# -- BNB Smart Chain (Mainnet) — DEPLOYED 2026-06-30 --
+[[evm_chains]]
+chain_id                = "bsc"
+name                    = "BNB Smart Chain (Mainnet)"
+evm_chain_id            = 56
+rpc_url                 = "https://bsc-dataseed.binance.org"
+rpc_url_backup          = "wss://bsc-ws-node.nariox.org"
+wzion_address           = "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6"
+bridge_contract_address = "0xa5a09b2C09A7182BBA9623A2D2cd46cD7D041721"
+finality_blocks         = 15
+enabled                 = true
+gas_strategy            = "legacy"
+max_gas_gwei            = 5
+start_block             = 107248530
+
+# -- Polygon PoS (Mainnet) — DEPLOYED 2026-06-30 --
+[[evm_chains]]
+chain_id                = "polygon"
+name                    = "Polygon PoS (Mainnet)"
+evm_chain_id            = 137
+rpc_url                 = "https://polygon-bor-rpc.publicnode.com"
+rpc_url_backup          = "wss://ws-mainnet.matic.network"
+wzion_address           = "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6"
+bridge_contract_address = "0xa5a09b2C09A7182BBA9623A2D2cd46cD7D041721"
+finality_blocks         = 128
+enabled                 = true
+gas_strategy            = "legacy"
+max_gas_gwei            = 250
+start_block             = 89409648
+
+# -- Optimism (Mainnet) — DEPLOYED 2026-06-30 --
+[[evm_chains]]
+chain_id                = "optimism"
+name                    = "Optimism (Mainnet)"
+evm_chain_id            = 10
+rpc_url                 = "https://mainnet.optimism.io"
+rpc_url_backup          = "wss://ws-mainnet.optimism.io"
+wzion_address           = "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6"
+bridge_contract_address = "0xa5a09b2C09A7182BBA9623A2D2cd46cD7D041721"
+finality_blocks         = 10
+enabled                 = true
+gas_strategy            = "eip1559"
+max_gas_gwei            = 20
+start_block             = 153610095
+
+# -- Avalanche C-Chain (Mainnet) — DEPLOYED 2026-06-30 --
+[[evm_chains]]
+chain_id                = "avalanche"
+name                    = "Avalanche C-Chain (Mainnet)"
+evm_chain_id            = 43114
+rpc_url                 = "https://api.avax.network/ext/bc/C/rpc"
+rpc_url_backup          = "wss://api.avax.network/ext/bc/C/ws"
+wzion_address           = "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6"
+bridge_contract_address = "0xa5a09b2C09A7182BBA9623A2D2cd46cD7D041721"
+finality_blocks         = 12
+enabled                 = true
+gas_strategy            = "eip1559"
+max_gas_gwei            = 50
+start_block             = 89126556
+
+# ── Validator Config ────────────────────────────────────────
+[validator]
+# 5/5 Guardian multisig — see V3/docs/BRIDGE_MULTISIG.md
+# After BridgeValidator.sol deploy, replace the five placeholder addresses
+# with real operator addresses and distribute one key per host.
+private_key_file = "keys/validator.key"
+validator_id     = "validator-1"
+threshold        = 5
+total_validators = 5
+validator_addresses = [
+    "0x9b5b9a6c4ce4bcd4479d8ea6d12cd7bfeb61085f",  # validator-1 (new — hard reset 2026-07-06)
+    "0x8a804afd4c200e95f415df6907da111a0258a578",  # validator-2 (new — hard reset 2026-07-06)
+    "0x694f3b43f4bf77dfbef53224791272d102449218",  # validator-3 (new — hard reset 2026-07-06)
+    "0x64c85af40143484c12316723192a0d71c10e82b8",  # validator-4 (new — hard reset 2026-07-06)
+    "0xe093ff26da65079df435a89834497abc380b59ae",  # validator-5 (new — hard reset 2026-07-06)
+]
+
+# ── Security ──────────────────────────────────────────────
+[security]
+max_single_amount   = "1000000000000000000000000000"
+daily_limit         = "5000000000000000000000000000"
+min_bridge_amount   = "100000000000000000000"
+timelock_threshold  = "1000000000000000000000000"
+max_ops_per_hour    = 100
+l1_block_timeout_secs = 300
+auto_pause_on_anomaly = true
+
+# ── Database ──────────────────────────────────────────────
+[database]
+path = "data/bridge-mainnet.db"
+backup_interval_secs = 1800
+
+# ── Metrics ───────────────────────────────────────────────
+[metrics]
+enabled   = true
+port      = 9101
+log_level = "info"

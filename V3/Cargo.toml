@@ -1,0 +1,73 @@
+[workspace]
+members = [
+    "L1/cosmic-harmony",
+    "L1/core",
+    "L1/pool",
+    "L1/miner",
+    "L1/native-ffi",
+    "L2/bridge",
+    "L2/dao",
+    "L2/atomic-swap",
+    "L2/swap-aggregator",
+    "L3/ncl",
+    "L3/warp",
+    "L3/ai-native",
+    "L4/oasis",
+    "L5/free-world",
+    "L6/issobella",
+    "sdk",
+    "cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "3.0.4"
+edition = "2021"
+license = "MIT"
+authors = ["Yose144"]
+
+[workspace.dependencies]
+anyhow = "1"
+cc = "1.0"
+blake3 = "1"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+heed = { version = "0.22", default-features = false, features = ["serde", "serde-json"] }
+rand = "0.8"
+ripemd = "0.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+k256 = { version = "0.13", features = ["ecdsa"] }
+hex = "0.4"
+bip39 = "2.0"
+hmac = "0.12"
+pbkdf2 = "0.12"
+tempfile = "3"
+chrono = { version = "0.4", features = ["serde"] }
+ctrlc = { version = "3", features = ["termination"] }
+thiserror = "2"
+tokio = "1"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+zeroize = { version = "1", features = ["derive"] }
+
+# ── Release profile: maximum performance ──
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+
+# Optimize PoW-heavy crates in dev/test builds so mining tests finish
+# in reasonable time (Ekam Deeksha v2 scratchpad ops are painfully slow at opt0).
+[profile.dev.package.zion-cosmic-harmony]
+opt-level = 2
+
+[profile.dev.package.zion-core]
+opt-level = 1
+
+[profile.test.package.zion-cosmic-harmony]
+opt-level = 2
+
+[profile.test.package.zion-core]
+opt-level = 1

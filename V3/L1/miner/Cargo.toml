@@ -1,0 +1,71 @@
+[package]
+name = "zion-miner"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "zion-miner"
+path = "src/main.rs"
+
+[[bin]]
+name = "b3_verify"
+path = "src/b3_verify.rs"
+
+[[bin]]
+name = "sha3_debug"
+path = "src/sha3_debug.rs"
+
+[[bin]]
+name = "gpu_kat_bench"
+path = "src/bin/gpu_kat_bench.rs"
+required-features = ["gpu-opencl"]
+
+[features]
+default = []
+
+# GPU backends (feature-gated)
+gpu         = ["gpu-opencl"]                           # alias → OpenCL
+gpu-opencl  = ["dep:ocl"]                              # Ekam Deeksha + DCR Blake3
+gpu-cuda    = ["dep:cudarc"]                            # NVIDIA CUDA via cudarc
+gpu-metal   = ["dep:metal", "dep:block", "dep:objc"]                  # Apple Silicon Metal GPU (macOS only)
+gpu-all     = ["gpu-opencl", "gpu-cuda", "gpu-metal"]
+
+# Native algorithm acceleration (optional, requires C toolchain)
+native-etchash        = ["dep:zion-native-ffi", "zion-native-ffi/native-etchash"]
+native-kawpow         = ["dep:zion-native-ffi", "zion-native-ffi/native-kawpow"]
+native-autolykos      = ["dep:zion-native-ffi", "zion-native-ffi/native-autolykos"]
+native-kheavyhash     = ["dep:zion-native-ffi", "zion-native-ffi/native-kheavyhash"]
+native-blake3-algo    = ["dep:zion-native-ffi", "zion-native-ffi/native-blake3-algo"]
+native-cosmic-harmony = ["dep:zion-native-ffi", "zion-native-ffi/native-cosmic-harmony"]
+native-verushash      = ["dep:zion-native-ffi", "zion-native-ffi/native-verushash"]
+native-randomx        = ["dep:zion-native-ffi", "zion-native-ffi/native-randomx"]
+native-all = [
+    "native-etchash", "native-kawpow", "native-autolykos", "native-kheavyhash",
+    "native-blake3-algo", "native-cosmic-harmony", "native-verushash", "native-randomx",
+]
+
+# Hard-fork rehearsal: same consensus gates as node/pool (`V3/docs/operational/AUDIT_CLOSEOUT_1_THROUGH_6.md`).
+testnet_fork_rehearsal = ["zion-core/testnet_fork_rehearsal", "zion-pool/testnet_fork_rehearsal"]
+
+[dependencies]
+anyhow.workspace = true
+blake3.workspace = true
+num_cpus = "1"
+rayon = "1"
+hex = "0.4"
+ocl = { version = "0.19", optional = true }
+serde_json.workspace = true
+zion-core = { path = "../core" }
+zion-pool = { path = "../pool" }
+zion-cosmic-harmony = { path = "../cosmic-harmony" }
+zion-native-ffi = { path = "../native-ffi", optional = true }
+cudarc = { version = "0.12", optional = true, features = ["cuda-12040"] }
+crossterm = "0.28"
+
+# Apple Silicon Metal GPU backend (macOS only — keeps `paste` transitive out of Linux/Windows lockfiles)
+[target.'cfg(target_os = "macos")'.dependencies]
+metal = { version = "0.33", optional = true }
+block = { version = "0.1", optional = true }
+objc = { version = "0.2", optional = true }

@@ -1,0 +1,77 @@
+[package]
+name = "zion-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "node"
+path = "src/bin/node.rs"
+
+[[bin]]
+name = "canonical-mainnet-operator-env"
+path = "src/bin/canonical-mainnet-operator-env.rs"
+
+[[bin]]
+name = "gen-keys"
+path = "src/bin/gen-keys.rs"
+
+[[bin]]
+name = "core-util"
+path = "src/bin/core-util.rs"
+
+[[bin]]
+name = "gen-premine-wallets"
+path = "src/bin/gen-premine-wallets.rs"
+
+[[bin]]
+name = "get-bridge-vault-address"
+path = "src/bin/get-bridge-vault-address.rs"
+
+[[bin]]
+name = "get-canonical-addresses"
+path = "src/bin/get-canonical-addresses.rs"
+
+[[bin]]
+name = "get-genesis-hash"
+path = "src/bin/get-genesis-hash.rs"
+
+[[bin]]
+name = "gen-all-keys-mnemonic"
+path = "src/bin/gen-all-keys-mnemonic.rs"
+
+[dependencies]
+anyhow.workspace = true
+blake3.workspace = true
+ed25519-dalek.workspace = true
+heed.workspace = true
+rand.workspace = true
+ripemd.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+k256.workspace = true
+hex.workspace = true
+zeroize.workspace = true
+bip39.workspace = true
+hmac.workspace = true
+pbkdf2.workspace = true
+zion-cosmic-harmony = { path = "../cosmic-harmony" }
+tokio = { version = "1", features = ["full"] }
+tokio-tungstenite = "0.20"
+futures-util = "0.3"
+chrono = "0.4"
+clap = { version = "4", features = ["derive", "color"] }
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[features]
+default = []
+testnet = []
+testnet_fork_rehearsal = ["zion-cosmic-harmony/testnet_fork_rehearsal"]

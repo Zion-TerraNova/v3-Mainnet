@@ -1,0 +1,34 @@
+# Build artifacts
+target/
+node_modules/
+dist/
+cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment files (NEVER commit secrets)
+.env
+.env.local
+.env.production
+.env.mainnet
+*.pem
+*.key
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cargo
+**/*.rs.bk
+
+# Foundry
+foundry.lock
+broadcast/
+
+# Temporary
+*.log
+*.tmp

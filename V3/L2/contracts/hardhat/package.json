@@ -1,0 +1,37 @@
+{
+  "name": "zion-bridge-contracts",
+  "version": "0.1.0",
+  "description": "ZION L2 wZION bridge — Solidity smart contracts (ERC-20 + Bridge)",
+  "author": "ZION TerraNova Core Team <contact@zionterranova.com>",
+  "license": "MIT",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "deploy:base-sepolia": "npx hardhat run scripts/deploy.ts --network base-sepolia",
+    "deploy:arb-sepolia": "npx hardhat run scripts/deploy.ts --network arbitrum-sepolia",
+    "deploy:bsc-testnet": "npx hardhat run scripts/deploy.ts --network bsc-testnet",
+    "dex:pool:sepolia": "npx hardhat run scripts/deploy-pool.ts --network base-sepolia",
+    "dex:pool:mainnet": "npx hardhat run scripts/deploy-pool.ts --network base",
+    "dex:seed:sepolia": "npx hardhat run scripts/seed-liquidity.ts --network base-sepolia",
+    "dex:seed:mainnet": "npx hardhat run scripts/seed-liquidity.ts --network base",
+    "verify": "npx hardhat verify --network",
+    "flatten:wzion": "npx hardhat flatten contracts/wZION.sol > flat/wZION_flat.sol",
+    "flatten:bridge": "npx hardhat flatten contracts/ZIONBridge.sol > flat/ZIONBridge_flat.sol",
+    "size": "npx hardhat size-contracts",
+    "defi:deploy:sepolia": "npx hardhat run scripts/deploy-defi.ts --network base-sepolia",
+    "defi:deploy:mainnet": "npx hardhat run scripts/deploy-defi.ts --network base",
+    "swap:deploy:sepolia": "npx hardhat run scripts/deploy-atomic-swap.ts --network base-sepolia",
+    "swap:deploy:mainnet": "npx hardhat run scripts/deploy-atomic-swap.ts --network base",
+    "farm:deploy:sepolia": "npx hardhat run scripts/deploy-farm.ts --network base-sepolia",
+    "farm:deploy:mainnet": "npx hardhat run scripts/deploy-farm.ts --network base",
+    "test:swap": "npx hardhat test test/ZIONAtomicSwap.test.ts",
+    "test:farm": "npx hardhat test test/ZIONFarm.test.ts",
+    "test:all": "npx hardhat test"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.1.0",
+    "hardhat": "^2.22.0",
+    "dotenv": "^16.4.0"
+  }
+}

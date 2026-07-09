@@ -1,0 +1,27 @@
+[package]
+name = "zion-core-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.zion-core]
+path = ".."
+
+[[bin]]
+name = "fuzz_merkle_root"
+path = "fuzz_targets/fuzz_merkle_root.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_validate_header"
+path = "fuzz_targets/fuzz_validate_header.rs"
+doc = false
+
+[workspace]
+members = ["."]

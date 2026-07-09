@@ -1,0 +1,184 @@
+{
+  "_comment": "Blueprint definitions for ZION OASIS. These must be created manually in UE5 Editor. This file serves as reference.",
+  "blueprints": [
+    {
+      "name": "BP_ZionOasisGameMode",
+      "path": "/Game/Blueprints/Game/BP_ZionOasisGameMode",
+      "parent_class": "/Script/ZionOasis.ZionOasisGameMode",
+      "description": "Main GameMode — sets default pawn, player controller, HUD",
+      "properties": {
+        "DefaultPawnClass": "BP_ZionCharacter",
+        "PlayerControllerClass": "BP_ZionPlayerController",
+        "HUDClass": "BP_ZionHUD",
+        "MaxPlayersPerRealm": 10000
+      }
+    },
+    {
+      "name": "BP_ZionCharacter",
+      "path": "/Game/Blueprints/Player/BP_ZionCharacter",
+      "parent_class": "/Script/ZionOasis.ZionCharacter",
+      "description": "Player pawn with MetaHuman-compatible skeleton",
+      "properties": {
+        "DefaultMappingContext": "IMC_ZionDefault",
+        "MoveAction": "IA_Move",
+        "LookAction": "IA_Look",
+        "JumpAction": "IA_Jump",
+        "MeditateAction": "IA_Meditate",
+        "InteractAction": "IA_Interact",
+        "CameraBoom.TargetArmLength": 400.0,
+        "CameraBoom.bUsePawnControlRotation": true,
+        "FollowCamera.bUsePawnControlRotation": false,
+        "GetCharacterMovement().MaxWalkSpeed": 400.0,
+        "GetCharacterMovement().JumpZVelocity": 700.0
+      },
+      "components": [
+        "USkeletalMeshComponent (Mesh) — assign MetaHuman or default mannequin",
+        "USpringArmComponent (CameraBoom)",
+        "UCameraComponent (FollowCamera)",
+        "UConsciousnessComponent",
+        "UGuildComponent"
+      ]
+    },
+    {
+      "name": "BP_ZionPlayerController",
+      "path": "/Game/Blueprints/Player/BP_ZionPlayerController",
+      "parent_class": "/Script/ZionOasis.ZionPlayerController",
+      "description": "Player controller with wallet login UI"
+    },
+    {
+      "name": "BP_ZionHUD",
+      "path": "/Game/Blueprints/UI/BP_ZionHUD",
+      "parent_class": "/Script/ZionOasis.ZionHUD",
+      "description": "HUD with widget assignments",
+      "properties": {
+        "HudOverlayWidgetClass": "WBP_HudOverlay",
+        "ConsciousnessBarWidgetClass": "WBP_ConsciousnessBar",
+        "WalletLoginWidgetClass": "WBP_WalletLogin",
+        "GuildPanelWidgetClass": "WBP_GuildPanel",
+        "TerritoryMapWidgetClass": "WBP_TerritoryMap",
+        "GoldenEggTrackerWidgetClass": "WBP_GoldenEggTracker",
+        "AvatarQuestDialogWidgetClass": "WBP_AvatarQuestDialog"
+      }
+    },
+    {
+      "name": "BP_GoldenEggManager",
+      "path": "/Game/Blueprints/Game/BP_GoldenEggManager",
+      "parent_class": "/Script/ZionOasis.GoldenEggManager",
+      "description": "Golden Egg treasure hunt manager (place in level)"
+    },
+    {
+      "name": "BP_TerritoryManager",
+      "path": "/Game/Blueprints/Game/BP_TerritoryManager",
+      "parent_class": "/Script/ZionOasis.TerritoryManager",
+      "description": "Territory control manager (place in level)"
+    }
+  ],
+  "umg_widgets": [
+    {
+      "name": "WBP_HudOverlay",
+      "description": "Main HUD overlay — minimap, health, XP bar, wallet display",
+      "widgets": [
+        "TextBlock: WalletAddress",
+        "TextBlock: ConsciousnessLevel",
+        "ProgressBar: XpBar",
+        "TextBlock: DailyXpCap",
+        "Image: Minimap",
+        "Button: MenuButton"
+      ]
+    },
+    {
+      "name": "WBP_WalletLogin",
+      "description": "Login screen — wallet address input, connect button",
+      "widgets": [
+        "EditableTextBox: WalletInput",
+        "Button: ConnectButton",
+        "TextBlock: StatusText",
+        "Image: ZionLogo"
+      ]
+    },
+    {
+      "name": "WBP_ConsciousnessBar",
+      "description": "Floating consciousness indicator above player",
+      "widgets": [
+        "TextBlock: LevelName",
+        "ProgressBar: LevelProgress",
+        "TextBlock: SefiraName"
+      ]
+    },
+    {
+      "name": "WBP_GuildPanel",
+      "description": "Guild management UI — members, quests, territories",
+      "widgets": [
+        "ListView: MemberList",
+        "Button: CreateGuildButton",
+        "Button: JoinGuildButton",
+        "Button: LeaveGuildButton",
+        "TextBlock: GuildName",
+        "TextBlock: GuildLevel"
+      ]
+    },
+    {
+      "name": "WBP_TerritoryMap",
+      "description": "World map with territory control overlay",
+      "widgets": [
+        "Image: WorldMap",
+        "Overlay: TerritoryMarkers",
+        "TextBlock: SelectedTerritoryInfo",
+        "Button: ClaimButton",
+        "Button: CloseButton"
+      ]
+    },
+    {
+      "name": "WBP_GoldenEggTracker",
+      "description": "Golden Egg hunt progress tracker",
+      "widgets": [
+        "TextBlock: CluesSolved",
+        "TextBlock: TotalClues",
+        "ProgressBar: MasterKeyProgress",
+        "Button: RevealClueButton",
+        "Button: PurchaseHintButton"
+      ]
+    },
+    {
+      "name": "WBP_AvatarQuestDialog",
+      "description": "NPC quest dialog for 51 sacred avatars",
+      "widgets": [
+        "Image: AvatarPortrait",
+        "TextBlock: AvatarName",
+        "TextBlock: QuestTitle",
+        "TextBlock: QuestDescription",
+        "Button: AcceptButton",
+        "Button: DeclineButton",
+        "Button: HintButton"
+      ]
+    }
+  ],
+  "maps": [
+    {
+      "name": "LV_MainMenu",
+      "description": "Main menu level — Zion logo, login, server select",
+      "actors": [
+        "SkyLight",
+        "DirectionalLight",
+        "Camera (MenuCamera)",
+        "BP_WalletLoginWidget (spawned in Viewport)"
+      ]
+    },
+    {
+      "name": "LV_World",
+      "description": "Main open world — 8 territories, avatars, Golden Egg locations",
+      "actors": [
+        "SkyAtmosphere",
+        "VolumetricCloud",
+        "DirectionalLight (sun)",
+        "BP_ZionOasisGameMode",
+        "BP_GoldenEggManager",
+        "BP_TerritoryManager",
+        "PlayerStart",
+        "Landscape (8 territories)",
+        "NPC spawners (51 avatars)",
+        "Point lights (sacred sites)"
+      ]
+    }
+  ]
+}

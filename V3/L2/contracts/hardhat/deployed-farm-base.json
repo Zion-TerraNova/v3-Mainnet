@@ -1,0 +1,18 @@
+{
+  "network": "base",
+  "deployedAt": "2026-06-29T21:05:15.587Z",
+  "deployer": "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186",
+  "ZIONFarm": "0x167B2753F5D8D9F8e62875cc9e379d7804308B08",
+  "rewardToken": "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6",
+  "rewardPerSecond": "1000000000000000000",
+  "halvingInterval": 7776000,
+  "pools": [
+    {
+      "pid": 0,
+      "name": "wZION Single",
+      "lpToken": "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6",
+      "allocPoints": 100
+    }
+  ],
+  "nextStep": "After Uniswap V3 pool deploy: call farm.addPool(200, <poolAddr>, 'wZION/WETH Uni V3', true)"
+}

@@ -1,0 +1,27 @@
+[package]
+name = "zion-pool-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.zion-pool]
+path = ".."
+
+[[bin]]
+name = "fuzz_decode_message"
+path = "fuzz_targets/fuzz_decode_message.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_parse_hex"
+path = "fuzz_targets/fuzz_parse_hex.rs"
+doc = false
+
+[workspace]
+members = ["."]

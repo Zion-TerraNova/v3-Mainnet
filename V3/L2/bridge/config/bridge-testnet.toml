@@ -1,0 +1,84 @@
+# ──────────────────────────────────────────────────────────────
+#  ZION Bridge Relay Configuration — V3 TestNet (Base Sepolia)
+# ──────────────────────────────────────────────────────────────
+#
+#  Canonical config: also mirrored in V3/config/bridge-testnet.toml.
+#  Base Sepolia deploy: 21.2.2026 (wZION), 23.2.2026 (ZIONBridge)
+#
+#  Usage: ZION_BRIDGE_CONFIG=V3/L2/bridge/config/bridge-testnet.toml cargo run -p zion-bridge
+
+[bridge]
+name    = "ZION Bridge Relay V3"
+version = "3.0.2"
+network = "testnet"
+
+# ── ZION L1 Connection ──────────────────────────────────────
+[l1]
+rpc_url        = "http://127.0.0.1:8443"
+rpc_url_backup = "http://<ZION_SEED_PEER>:8443"
+bridge_address = "zion1s6y6h7k6l033f2n7e0y0r8t6a8h474t0x5398d0"
+finality_blocks     = 60
+poll_interval_secs  = 15
+
+# ── EVM Chains ──────────────────────────────────────────────
+
+# -- Base Sepolia (Testnet) — LIVE --
+[[evm_chains]]
+chain_id                = "base_sepolia"
+name                    = "Base Sepolia (TestNet)"
+evm_chain_id            = 84532
+rpc_url                 = "https://sepolia.base.org"
+rpc_url_backup          = "https://base-sepolia.g.alchemy.com/v2/YOUR_KEY"
+wzion_address           = "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6"
+bridge_contract_address = "0xF4BF85443ad6c9b88f3a5314cC3Fb59C32Cedca1"
+finality_blocks         = 12
+enabled                 = true
+gas_strategy            = "eip1559"
+max_gas_gwei            = 5
+start_block             = 43197000  # Updated to current Base Sepolia block; old start was 5M blocks behind
+
+# -- Arbitrum Sepolia (Testnet) — NOT DEPLOYED --
+[[evm_chains]]
+chain_id                = "arbitrum_sepolia"
+name                    = "Arbitrum Sepolia (TestNet)"
+evm_chain_id            = 421614
+rpc_url                 = "wss://arb-sepolia.g.alchemy.com/v2/YOUR_KEY"
+wzion_address           = "0x0000000000000000000000000000000000000000"
+bridge_contract_address = "0x0000000000000000000000000000000000000000"
+finality_blocks         = 10
+enabled                 = false
+gas_strategy            = "eip1559"
+max_gas_gwei            = 2
+
+# ── Validator Config ────────────────────────────────────────
+[validator]
+private_key_file = "keys/validator.key"
+validator_id     = "validator-1"
+# Testnet: 2-of-2 (deployer + server relay). Mainnet: upgrade to 5-of-5.
+threshold        = 2
+total_validators = 2
+validator_addresses = [
+    "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186",  # validator-1 (deployer)
+    "0x8cc6F931edDAf5F14D0071727Ed1640752B5c787",  # validator-2 (server relay)
+]
+
+# ── Security ──────────────────────────────────────────────
+[security]
+max_single_amount   = "5000000000000000000000000"
+daily_limit         = "10000000000000000000000000"
+min_bridge_amount   = "100000000000000000000"
+timelock_threshold  = "1000000000000000000000000"
+max_ops_per_hour    = 100
+l1_block_timeout_secs = 300
+auto_pause_on_anomaly = true
+
+# ── Database ──────────────────────────────────────────────
+[database]
+path = "data/bridge-testnet.db"
+backup_interval_secs = 3600
+
+# ── Metrics ───────────────────────────────────────────────
+[metrics]
+enabled   = true
+port      = 9101
+log_level = "info"

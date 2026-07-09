@@ -1,0 +1,95 @@
+{
+  "_comment": "Enhanced Input Action definitions for ZION OASIS. Import into UE5 Editor via Content Browser → Import.",
+  "input_actions": [
+    {
+      "name": "IA_Move",
+      "description": "WASD / Left Stick movement",
+      "value_type": "Axis2D",
+      "mappings": [
+        { "key": "W", "modifier": "None", "scale": [0, 1] },
+        { "key": "S", "modifier": "None", "scale": [0, -1] },
+        { "key": "A", "modifier": "None", "scale": [-1, 0] },
+        { "key": "D", "modifier": "None", "scale": [1, 0] },
+        { "key": "Gamepad_LeftStick", "modifier": "None", "scale": [1, 1] }
+      ]
+    },
+    {
+      "name": "IA_Look",
+      "description": "Mouse / Right Stick camera",
+      "value_type": "Axis2D",
+      "mappings": [
+        { "key": "Mouse2D", "modifier": "None", "scale": [1, 1] },
+        { "key": "Gamepad_RightStick", "modifier": "None", "scale": [1, 1] }
+      ]
+    },
+    {
+      "name": "IA_Jump",
+      "description": "Jump action",
+      "value_type": "Digital",
+      "mappings": [
+        { "key": "SpaceBar", "modifier": "None" },
+        { "key": "Gamepad_FaceButton_Bottom", "modifier": "None" }
+      ]
+    },
+    {
+      "name": "IA_Meditate",
+      "description": "Meditation / special ability",
+      "value_type": "Digital",
+      "mappings": [
+        { "key": "E", "modifier": "None" },
+        { "key": "Gamepad_FaceButton_Left", "modifier": "None" }
+      ]
+    },
+    {
+      "name": "IA_Interact",
+      "description": "Interact with NPCs / objects",
+      "value_type": "Digital",
+      "mappings": [
+        { "key": "F", "modifier": "None" },
+        { "key": "Gamepad_FaceButton_Right", "modifier": "None" }
+      ]
+    },
+    {
+      "name": "IA_Sprint",
+      "description": "Sprint / walk toggle",
+      "value_type": "Digital",
+      "mappings": [
+        { "key": "LeftShift", "modifier": "None" },
+        { "key": "Gamepad_LeftTrigger", "modifier": "None" }
+      ]
+    },
+    {
+      "name": "IA_ToggleMap",
+      "description": "Open territory map",
+      "value_type": "Digital",
+      "mappings": [
+        { "key": "M", "modifier": "None" },
+        { "key": "Gamepad_Special_Right", "modifier": "None" }
+      ]
+    },
+    {
+      "name": "IA_ToggleQuestLog",
+      "description": "Open quest journal",
+      "value_type": "Digital",
+      "mappings": [
+        { "key": "J", "modifier": "None" },
+        { "key": "Gamepad_DPad_Down", "modifier": "None" }
+      ]
+    }
+  ],
+  "mapping_context": {
+    "name": "IMC_ZionDefault",
+    "description": "Default input mapping context for ZION OASIS",
+    "priority": 0,
+    "mappings": [
+      { "action": "IA_Move", "trigger": "None", "modifiers": [] },
+      { "action": "IA_Look", "trigger": "None", "modifiers": [] },
+      { "action": "IA_Jump", "trigger": "None", "modifiers": [] },
+      { "action": "IA_Meditate", "trigger": "None", "modifiers": [] },
+      { "action": "IA_Interact", "trigger": "None", "modifiers": [] },
+      { "action": "IA_Sprint", "trigger": "None", "modifiers": [] },
+      { "action": "IA_ToggleMap", "trigger": "None", "modifiers": [] },
+      { "action": "IA_ToggleQuestLog", "trigger": "None", "modifiers": [] }
+    ]
+  }
+}

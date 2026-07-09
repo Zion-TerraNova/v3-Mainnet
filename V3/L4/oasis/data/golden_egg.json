@@ -1,0 +1,133 @@
+{
+  "_comment": "Golden Egg Treasure Hunt - 108 Clues, 3 Master Keys, Hiranyagarbha",
+  "treasure_name": "Hiranyagarbha - The Golden Cosmic Egg",
+  "total_prize_zion": 1000000000,
+  "total_prize_flowers": 1000000000000000000000,
+  "clue_count": 108,
+  "sacred_number": 108,
+  "master_keys": [
+    {
+      "id": "ramayana_key",
+      "name": "Ramayana Key",
+      "sanskrit_name": "Rama Kuñjī",
+      "theme": "Dharma Path - Devotion, Loyalty, Service, Moral Purity",
+      "characters": ["Rama", "Sita", "Hanuman", "Radha"],
+      "clue_count": 30,
+      "min_cl": 4,
+      "min_cl_name": "Heart Opening",
+      "estimated_time": "3-6 months",
+      "tests": [
+        "Moral dilemmas",
+        "Devotional puzzles",
+        "Service challenges"
+      ],
+      "description": "The Key of Righteousness. External dharma - how to act in the world."
+    },
+    {
+      "id": "mahabharata_key",
+      "name": "Mahabharata Key",
+      "sanskrit_name": "Karma Kuñjī",
+      "theme": "Karma Path - Duty, War, Strategy, Cosmic Justice",
+      "characters": ["Krishna", "Arjuna", "Bhima", "Vyasa", "Yashoda", "Vishwakarma"],
+      "clue_count": 35,
+      "min_cl": 6,
+      "min_cl_name": "Intuitive Wisdom",
+      "estimated_time": "6-12 months",
+      "tests": [
+        "Strategic puzzles",
+        "Battlefield decisions",
+        "Architectural mysteries",
+        "Sacred geometry (Fibonacci)"
+      ],
+      "description": "The Key of Action. Internal dharma - how to think and feel about action."
+    },
+    {
+      "id": "unity_key",
+      "name": "Unity Key",
+      "sanskrit_name": "Mokṣa Kuñjī",
+      "theme": "Moksha Path - Integration, Transcendence, Cosmic Unity",
+      "characters": ["ALL 17 Sacred Trinity Members"],
+      "clue_count": 43,
+      "min_cl": 7,
+      "min_cl_name": "Healing Compassion",
+      "estimated_time": "12-24 months",
+      "tests": [
+        "Cross-references between all texts",
+        "Consciousness level challenges",
+        "Ultimate paradox resolution",
+        "108th clue - self-realization"
+      ],
+      "description": "The Key of Liberation. Integration of all paths. The 108th clue is inside you."
+    }
+  ],
+  "clue_sources": [
+    {
+      "source": "Sacred Trinity Profiles",
+      "clue_count": 30,
+      "location": "/docs/SACRED_TRINITY/",
+      "description": "17 character documents with hidden clues in mythological stories, modern roles, and mantras"
+    },
+    {
+      "source": "Sacred Knowledge Levels",
+      "clue_count": 20,
+      "location": "9 Consciousness Level documents",
+      "description": "Fibonacci multipliers, behavioral requirements, karma tracking"
+    },
+    {
+      "source": "ZION Whitepaper",
+      "clue_count": 18,
+      "location": "Tokenomics and protocol docs",
+      "description": "Humanitarian tithe percentages, genesis calculations, Fibonacci patterns in section numbers"
+    },
+    {
+      "source": "Source Code",
+      "clue_count": 15,
+      "location": "/src/ files",
+      "description": "Comments, variable names (Sanskrit terms), sacred geometry implementations (Golden Ratio phi = 1.618...)"
+    },
+    {
+      "source": "Blockchain Data",
+      "clue_count": 10,
+      "location": "On-chain",
+      "description": "Genesis block metadata, special transactions, block heights (Fibonacci sequence), wallet address patterns"
+    },
+    {
+      "source": "Community Events",
+      "clue_count": 8,
+      "location": "AMAs, Discord, Forums, Social Media",
+      "description": "Community collaboration clues revealed through events"
+    },
+    {
+      "source": "EKAM Temple Pilgrimage",
+      "clue_count": 7,
+      "location": "Varadaiahpalem, Andhra Pradesh, India",
+      "description": "CRITICAL: Clue #108 can ONLY be found by physically visiting EKAM Temple. 8 sacred chambers, 108-minute meditation."
+    }
+  ],
+  "final_test": {
+    "name": "Consciousness Ultimatum",
+    "question": "What will you do with the 1 Billion ZION?",
+    "choices": [
+      { "answer": "Keep it all!", "result": "FAIL - greed, game over" },
+      { "answer": "Donate 10%", "result": "FAIL - still mostly selfish" },
+      { "answer": "Donate 50%", "result": "FAIL - better, but not enough" },
+      { "answer": "Donate 90%", "result": "CLOSE - very good, almost there" },
+      { "answer": "Donate 100% to ZION community!", "result": "CORRECT - unlocks full title and DAO approval" }
+    ],
+    "dao_approval_required": true,
+    "dao_threshold_percent": 67,
+    "treasure_distribution_on_win": {
+      "humanitarian_projects": 1000000000,
+      "winner_nft": "Golden Egg Solver (eternal honor)",
+      "hall_of_fame": "Immortalized name in ZION Hall of Fame",
+      "dao_elder_status": "Voting power and advisory role"
+    }
+  },
+  "timeline": {
+    "2025_2030": "Egg Forms - Testnet, early adoption, community gestates",
+    "2030_2035": "Gestation - Mainnet growth, 108 clues revealed, keys assembled",
+    "2035": "Cracking Begins - Someone solves! Winner faces choice: Keep or give?",
+    "2035_2045": "Birth - Full community ownership, DAO unlocks, humanitarian projects funded ($10B+)",
+    "2070": "Maturity - Golden Age global, old economy dead, new reality born"
+  }
+}

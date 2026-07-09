@@ -1,0 +1,100 @@
+{
+  "_comment": "Golden Egg Prize Distribution - Hiranyagarbha Treasure (post-3.0.3 6-decimal scale)",
+  "total_pool_zion": 1000000000,
+  "total_pool_flowers": 1000000000000000,
+  "tiers": [
+    {
+      "rank": 1,
+      "title": "Hiranyagarbha Sovereign",
+      "zion": 1000000000,
+      "flowers": 1000000000000000,
+      "percentage": 100.0,
+      "nft_reward": "Legendary Golden Egg Solver",
+      "unlock_condition": "All 3 Master Keys + CL 9 + DAO 67% approval"
+    },
+    {
+      "rank": 2,
+      "title": "Cosmic Guardian",
+      "zion": 500000000,
+      "flowers": 500000000000000,
+      "percentage": 50.0,
+      "nft_reward": "Epic Cosmic Guardian",
+      "unlock_condition": "2 Master Keys + CL 8 + Top 2 raid completion"
+    },
+    {
+      "rank": 3,
+      "title": "Divine Strategist",
+      "zion": 250000000,
+      "flowers": 250000000000000,
+      "percentage": 25.0,
+      "nft_reward": "Epic Divine Strategist",
+      "unlock_condition": "2 Master Keys + CL 7 + Top 3 raid completion"
+    },
+    {
+      "rank": 4,
+      "title": "Star Mystic",
+      "zion": 100000000,
+      "flowers": 100000000000000,
+      "percentage": 10.0,
+      "nft_reward": "Rare Star Mystic",
+      "unlock_condition": "1 Master Key + CL 6 + Top 10 raid completion"
+    },
+    {
+      "rank": 5,
+      "title": "Ascended Sage",
+      "zion": 50000000,
+      "flowers": 50000000000000,
+      "percentage": 5.0,
+      "nft_reward": "Rare Ascended Sage",
+      "unlock_condition": "1 Master Key + CL 5 + Top 20 raid completion"
+    },
+    {
+      "rank": 6,
+      "title": "Spiritual Warrior",
+      "zion": 25000000,
+      "flowers": 25000000000000,
+      "percentage": 2.5,
+      "nft_reward": "Uncommon Spiritual Warrior",
+      "unlock_condition": "CL 4 + Top 50 raid completion"
+    },
+    {
+      "rank": 7,
+      "title": "Intuitional Seeker",
+      "zion": 10000000,
+      "flowers": 10000000000000,
+      "percentage": 1.0,
+      "nft_reward": "Uncommon Intuitional Seeker",
+      "unlock_condition": "CL 3 + Top 100 raid completion"
+    },
+    {
+      "rank": 8,
+      "title": "Mental Adept",
+      "zion": 5000000,
+      "flowers": 5000000000000,
+      "percentage": 0.5,
+      "nft_reward": "Common Mental Adept",
+      "unlock_condition": "CL 2 + Top 500 raid completion"
+    },
+    {
+      "rank": 9,
+      "title": "Emotional Healer",
+      "zion": 1000000,
+      "flowers": 1000000000000,
+      "percentage": 0.1,
+      "nft_reward": "Common Emotional Healer",
+      "unlock_condition": "CL 1 + Top 1000 raid completion"
+    },
+    {
+      "rank": 10,
+      "title": "Physical Initiate",
+      "zion": 100000,
+      "flowers": 100000000000,
+      "percentage": 0.01,
+      "nft_reward": "Common Physical Initiate",
+      "unlock_condition": "CL 1 + Participation reward"
+    }
+  ],
+  "_note": "Prize tiers mirror the 9 consciousness levels + participation. Total distributed from the 8.25B OASIS pool. Flowers use 6-decimal scale (1 ZION = 1e6 flowers).",
+  "dao_approval_required": true,
+  "donation_requirement": "100% of 1st place must be donated to humanitarian projects to unlock full title"
+}

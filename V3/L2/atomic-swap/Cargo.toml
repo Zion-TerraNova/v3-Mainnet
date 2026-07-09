@@ -1,0 +1,59 @@
+[package]
+name = "zion-atomic-swap"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "ZION L2 atomic-swap / HTLC daemon — SHA-256 hash-time-locked contracts for trustless cross-chain swaps"
+
+[[bin]]
+name = "zion-atomic-swap"
+path = "src/main.rs"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# HTTP client (EVM watcher)
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+
+# HTTP server (swap API: /swap/claim, /swap/refund, /swap/:hash)
+axum = { version = "0.7", features = ["macros"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
+# Crypto
+blake3 = "1"
+ripemd = "0.1"
+sha2 = "0.10"
+sha3 = "0.10"
+hex = "0.4"
+ed25519-dalek = { version = "2", features = ["serde"] }
+rand = "0.8"
+
+# Database (HTLC state persistence)
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+zeroize = { version = "1.7", features = ["zeroize_derive"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# TCP socket options (SO_REUSEADDR / SO_REUSEPORT for graceful restarts)
+socket2 = { version = "0.5", features = ["all"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3"

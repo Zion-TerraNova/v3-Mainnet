@@ -1,0 +1,77 @@
+# ZION OASIS — Local Development Stack
+# Usage: docker compose -f docker-compose.yml up -d
+# Services:
+#   oasis          — Rust game server (REST API + WebSocket)
+#   nginx          — Reverse proxy + static file server
+#   prometheus     — Metrics collection
+#
+# UE5 Editor runs locally (outside Docker) and connects to localhost:8094
+
+services:
+  oasis:
+    build:
+      context: ../..
+      dockerfile: V3/L4/oasis/Dockerfile
+    container_name: zion-oasis
+    ports:
+      - "8094:8094"   # REST API
+      - "8095:8095"   # WebSocket
+      - "9101:9101"   # Prometheus metrics
+    environment:
+      - OASIS_PORT=8094
+      - OASIS_BIND=0.0.0.0
+      - OASIS_DB=/data/oasis.db
+      - OASIS_AVATARS_PATH=/data/avatars.json
+      - RUST_LOG=info
+    volumes:
+      - oasis-data:/data
+      - ./data:/data:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8094/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - oasis-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: zion-oasis-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ue5/Content/DataTables:/usr/share/nginx/html/datatables:ro
+    depends_on:
+      - oasis
+    restart: unless-stopped
+    networks:
+      - oasis-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: zion-oasis-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    restart: unless-stopped
+    networks:
+      - oasis-net
+
+volumes:
+  oasis-data:
+  prometheus-data:
+
+networks:
+  oasis-net:
+    driver: bridge

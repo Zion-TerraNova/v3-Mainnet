@@ -1,0 +1,35 @@
+[package]
+name = "zion-pool"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "revenue-proxy"
+path = "src/bin/revenue-proxy.rs"
+
+[dependencies]
+anyhow.workspace = true
+ctrlc.workspace = true
+ed25519-dalek.workspace = true
+hex.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread", "net", "io-util", "time", "sync"] }
+tracing.workspace = true
+tracing-subscriber.workspace = true
+zion-core = { path = "../core" }
+zion-cosmic-harmony = { path = "../cosmic-harmony" }
+
+[features]
+default = []
+testnet = []
+testnet_fork_rehearsal = ["zion-core/testnet_fork_rehearsal"]

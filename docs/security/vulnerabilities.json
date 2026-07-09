@@ -1,0 +1,106 @@
+[
+  {
+    "name": "ForgedAccountTxViaP2P",
+    "uid": "ZION-2026-001",
+    "summary": "Account-model transactions received via P2P were not signature-verified, allowing forged transactions from any address.",
+    "description": "The validate_peer_block() function in peer_block_validation.rs did not call verify_signature() for account-model transactions. An attacker could submit a forged transaction spending any account's balance without possessing the corresponding Ed25519 private key. UTXO transactions were not affected. One forged transaction was observed from IP 109.81.30.165. The chain was rolled back to block 22180.",
+    "links": [
+      "docs/security/SECURITY_DISCLOSURE_2026-07.md",
+      "SecurityFirst.md"
+    ],
+    "introduced": "v3.0.0",
+    "fixed": "v3.0.4",
+    "published": "2026-07-06",
+    "severity": "high",
+    "CVE": null,
+    "check": "zion-v3-node/(3\\.0\\.[0-3])",
+    "commits": ["9341344d"]
+  },
+  {
+    "name": "AccountModelBalanceBypass",
+    "uid": "ZION-2026-002",
+    "summary": "Account-model transaction validation did not check sender balance, enabling unlimited ZION inflation from any Ed25519 keypair.",
+    "description": "Neither the RPC path (insert_transaction) nor the P2P path (validate_peer_block) checked whether the sender had sufficient balance (amount + fee) for account-model transactions. Any Ed25519 key holder could create ZION from nothing by sending a transaction from a zero-balance address. The UTXO model is inherently safe via validate_inputs_exist() and validate_value_conservation(). One accidental exploitation occurred during escrow key rotation: 100,002 ZION created from empty address, subsequently burned to provably-unspendable address. Fix: account_balance_for() helper + balance check on both RPC and P2P paths, height-gated via ZION_BALANCE_CHECK_HEIGHT.",
+    "links": [
+      "docs/security/SECURITY_DISCLOSURE_2026-07.md",
+      "F5_SECURITY_INCIDENT_REPORT_2026-07-02.md",
+      "SecurityFirst.md"
+    ],
+    "introduced": "v3.0.0",
+    "fixed": "v3.0.4",
+    "published": "2026-07-06",
+    "severity": "critical",
+    "CVE": null,
+    "check": "zion-v3-node/(3\\.0\\.[0-3])",
+    "commits": ["69d12c7", "fe8d449", "a5472ec6"]
+  },
+  {
+    "name": "TeamViewerServerCompromise",
+    "uid": "ZION-2026-003",
+    "summary": "Development machine compromised via TeamViewer, granting attacker ~47 minutes of root access to the Edge production server and all cryptographic key material.",
+    "description": "The primary development machine (Windows PC) was compromised through TeamViewer remote access software. The attacker accessed SSH keys providing root access to the Edge production server (Hetzner VPS). Compromised material includes: all premine wallet keypairs, pool payout signing key, bridge escrow key, EVM deployer/admin key, DAO guardian mnemonics, and full source code. No external user funds were at risk (pre-launch network). Remediation: full hard genesis reset with new keys on a fresh server.",
+    "links": [
+      "docs/security/SECURITY_DISCLOSURE_2026-07.md",
+      "HARDRESETOFFICIAL.md",
+      "docs/3.0.4/GENESIS_HARD_RESET_CANONICAL.md"
+    ],
+    "introduced": null,
+    "fixed": "v3.0.4-reset",
+    "published": "2026-07-06",
+    "severity": "critical",
+    "CVE": null,
+    "check": null,
+    "commits": []
+  },
+  {
+    "name": "EdgeServerMisconfiguration",
+    "uid": "ZION-2026-004",
+    "summary": "Edge production server had 8 critical misconfigurations: public port exposure, plaintext secrets in git, world-readable DB files, no Tailscale ACL, stale cron overrides, and EVM keys in .env files.",
+    "description": "The Edge production server (Hetzner VPS, <LEGACY_EDGE>) had multiple security misconfigurations: (C1) UFW allowed 15+ ports from any IP, (C2) active external P2P peer, (C3) pool payout SK in 3 git-tracked scripts, (C4) edge-environment.sh world-readable, (C5) DB files world-readable, (C6) no Tailscale ACL, (C7) stale cron with MEMO_V1_HEIGHT override, (C8) EVM keys in .env files. These collectively enabled the attack surface exploited in ZION-2026-003. All mitigated 2026-07-02; full remediation via new server.",
+    "links": [
+      "docs/security/SECURITY_DISCLOSURE_2026-07.md",
+      "SecurityFirst.md"
+    ],
+    "introduced": null,
+    "fixed": "v3.0.4-reset",
+    "published": "2026-07-06",
+    "severity": "high",
+    "CVE": null,
+    "check": null,
+    "commits": []
+  },
+  {
+    "name": "EVMAdminKeyCompromise",
+    "uid": "ZION-2026-005",
+    "summary": "EVM deployer/admin key compromised, granting potential attacker control over 7 smart contracts on 6 EVM chains (wZION, ZIONBridge, Governance, Treasury, Staking, Farm).",
+    "description": "The EVM deployer key (0xdde17506...) used to deploy all DeFi contracts was stored on the compromised development machine. This key has admin/owner role on wZION token (6 chains), ZIONBridge (6 chains), and 4 DeFi contracts on Base. An attacker could mint wZION, manage bridge validators, pause contracts, or manipulate governance. No external users had funds in these contracts (pre-launch). Remediation: validator revocation, contract pause/abandonment, fresh deployment with multisig admin.",
+    "links": [
+      "docs/security/SECURITY_DISCLOSURE_2026-07.md",
+      "HARDRESETOFFICIAL.md"
+    ],
+    "introduced": null,
+    "fixed": null,
+    "published": "2026-07-06",
+    "severity": "high",
+    "CVE": null,
+    "check": null,
+    "commits": []
+  },
+  {
+    "name": "MaxTxAmountCap",
+    "uid": "ZION-2026-006",
+    "summary": "Defense-in-depth: no upper bound on account-model transaction amount beyond F5 balance check. F4.7 adds a hard cap equal to TOTAL_SUPPLY (144B ZION).",
+    "description": "Prior to F4.7, there was no sanity cap on the amount_zion field in account-model transactions. While F5 prevents inflation from zero-balance addresses, F4.7 adds a second layer: any transaction with amount > emission::TOTAL_SUPPLY is rejected outright. Cap set to TOTAL_SUPPLY (not 100M) to avoid colliding with legitimate premine-scale transfers. Exceptions: genesis and coinbase senders. Height-gated via ZION_MAX_TX_AMOUNT_HEIGHT. Both RPC and P2P paths enforce the cap. 4 unit tests + live smoke test on production (height 81).",
+    "links": [
+      "docs/security/SECURITY_DISCLOSURE_2026-07.md",
+      "SECURITY_PATCH_3.0.4_PLAN.md"
+    ],
+    "introduced": "v3.0.0",
+    "fixed": "v3.0.4",
+    "published": "2026-07-08",
+    "severity": "low",
+    "CVE": null,
+    "check": "zion-v3-node/(3\\.0\\.[0-3])",
+    "commits": ["690b6dfe"]
+  }
+]

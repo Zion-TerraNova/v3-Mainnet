@@ -1,0 +1,21 @@
+{
+  "network": "arbitrum",
+  "chainId": 42161,
+  "chainName": "Arbitrum One",
+  "wzion": "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6",
+  "bridge": "0xa5a09b2C09A7182BBA9623A2D2cd46cD7D041721",
+  "config": {
+    "validators": [
+      "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186",
+      "0x24d986841E56e5571489B25951eE8C1Ae761FA82",
+      "0x665c55eDCF25c2c5A1dfF1B20eE950cBDC58d3d0",
+      "0x8E644b3E9FaBf52eE321DC5B3D5AA06d6e3E66C6",
+      "0x7e0D2eD71d78B9CFB5034A83333e82e304bc4CB2"
+    ],
+    "threshold": 5,
+    "guardian": "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186",
+    "deployer": "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186",
+    "finalityBlocks": 10
+  },
+  "deployedAt": "2026-06-30T10:53:24.851Z"
+}

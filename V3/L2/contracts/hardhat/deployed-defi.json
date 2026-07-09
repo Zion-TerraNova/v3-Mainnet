@@ -1,0 +1,20 @@
+{
+  "network": "base",
+  "chainId": 8453,
+  "wzion": "0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6",
+  "governance": "0xB77eB4ab9468Ce03FBd7eCec70e976EFCfa623E8",
+  "treasury": "0x455f465ac7e14fdA97dC46fdd74bCa78bfC0aEeD",
+  "staking": "0xbd5cEe7878337d22188BFBaF9aa9F39A850Be78B",
+  "config": {
+    "stakingAprBps": 1200,
+    "cooldownSeconds": 604800,
+    "treasurySigners": [
+      "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186",
+      "0x24d986841E56e5571489B25951eE8C1Ae761FA82",
+      "0x665c55eDCF25c2c5A1dfF1B20eE950cBDC58d3d0"
+    ],
+    "treasuryThreshold": 3,
+    "guardian": "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186"
+  },
+  "deployedAt": "2026-06-29T21:04:22.920Z"
+}
