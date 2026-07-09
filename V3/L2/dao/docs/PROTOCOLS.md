@@ -136,7 +136,7 @@ Pravidlo: 5 z 7 pro treasury operace
 | **Development Fund** | 1.0B ZION | Core development, platy, audity | Vishwakarma Dev Team DAO |
 | **Network Infrastructure** | 1.0B ZION | Servery, pooly, validátory | Masculine Council (4) |
 | **Co-Admins Fund** | 1.0B ZION | Strategická rozhodnutí, emergency | Co-Admins (50/50) |
-| **Genesis Community Rent** | 342.857M ZION | Komunitní odměny, early contributors | Creator YeshuaAmonRa |
+| **Genesis Projects Fund** | 342.857M ZION | Dharma Temple, Piko de Ora, DAO iniciativy | Creator YeshuaAmonRa (DAO-gated) |
 
 ### 3.3 Treasury operace
 
@@ -178,7 +178,7 @@ pub const MULTISIG_TOTAL: u32 = 7;
 
 ### 4.4 Pokud Yeshuae (Rama) odchází
 
-1. Genesis Creator Rent pokračuje jeho určenému dědici
+1. Genesis Projects Fund pokračuje určenému dědici (Dharma Temple, Piko de Ora + DAO)
 2. NEBO darováno Children Future Fund (Issobela rozhodne)
 
 ---

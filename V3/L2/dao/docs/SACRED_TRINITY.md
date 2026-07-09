@@ -35,9 +35,9 @@
         RAMA 👑               SÍTA 👸              HANUMAN 🐵
    (Yeshuae Amon Ra)        (Issobela)       (Environmental Guardian)
    
-   Genesis Creator      Guardian of Humanity    Guardian of Nature
+   Genesis Projects     Guardian of Humanity    Guardian of Nature
    Innovation Dharma     Compassion Dharma       Service Dharma
-   0.33% rent           60% humanitarian         40% humanitarian
+   0.33% projects       60% humanitarian         40% humanitarian
    
    Technology ──────────── Humanity ──────────── Environment
         └──────────────────┼──────────────────┘
@@ -45,12 +45,12 @@
                      (Complete balance)
 ```
 
-### 2.1 Rama (Yeshuae Amon Ra) — Genesis Creator
+### 2.1 Rama (Yeshuae Amon Ra) — Genesis Projects Steward
 
 **Archetyp:** Lord Rama z Rámájany — spravedlivý král, ideální syn a partner
 **Role:** Technologická inovace, blockchain architektura, smart contracts
 **Dharma:** Innovation (Oheň)
-**Kompenzace:** 0.33 % Genesis Creator Rent
+**Kompenzace:** 0.33 % Genesis Projects (Dharma Temple, Piko de Ora + DAO)
 
 **Co dělá:**
 - Vytváří blockchain tech (consciousness mining)

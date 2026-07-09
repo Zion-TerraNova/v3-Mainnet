@@ -196,7 +196,7 @@ pub const PREMINE_OUTPUTS: &[PremineOutput] = &[
     },
     PremineOutput {
         address: "zion1s2j5s2a6f5k740k4d8s2k3y8v0t8d4k0u6my2k0",
-        purpose: "Genesis Creator — Lifetime Rent",
+        purpose: "Genesis Projects — Dharma Temple, Piko de Ora + DAO",
         amount_zion: 590_000_000,
         amount_flowers: 590_000_000_000_000_000_000,
         category: "infrastructure",

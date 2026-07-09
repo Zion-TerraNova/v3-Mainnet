@@ -54,10 +54,10 @@ a v [`genesis.md`](./genesis.md). Žádná část není skrytá.
 | Bridge Vault UTXO | 100 000 000 | 0,6 % | admin-locked |
 | **Celkem** | **16 780 000 000** | **100 %** | |
 
-### 3.1 Genesis Creator — 590M ZION
+### 3.1 Genesis Projects — 590M ZION
 
-Jediná alokace pro tvůrce (Yose): **590 000 000 ZION** (3,5 % premine,
-0,41 % total supply). Účel: **lifetime rent** — živobytí tvůrce.
+Alokace **590 000 000 ZION** (3,5 % premine, 0,41 % total supply) pro **Genesis Projects** —
+Dharma Temple, Piko de Ora a DAO iniciativy. Účel: **financování projektů Nové Země**.
 
 - **Admin-locked** — nelze utratit bez 3-of-3 multisig + DAO vote
 - **Žádný** vesting schedule, žádný cliff — ale admin-lock funguje jako vesting
@@ -192,7 +192,7 @@ OASIS (5 slotů × 1,65B = 8,25B ZION) je **komunitní reward systém**:
 
 - **Golden Egg/XP** — výherní ceny pro OASIS hráče
 - **Admin-locked** — nelze utratit bez 3-of-3 + DAO
-- **Žádné** tokeny pro tvůrce z OASIS (tvůrce má jen 590M lifetime rent)
+- **Žádné** tokeny pro tvůrce z OASIS (Genesis Projects má 590M pro Dharma Temple, Piko de Ora + DAO)
 - Distribuce přes DAO governance
 
 ---

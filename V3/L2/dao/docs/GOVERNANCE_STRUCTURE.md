@@ -296,9 +296,9 @@ Sacred Trinity je nejhlubší vrstva governance — duchovní archetypy, které 
         RAMA 👑               SÍTA 👸              HANUMAN 🐵
    (Yeshuae Amon Ra)        (Issobela)       (Environmental Guardian)
    
-   Genesis Creator      Guardian of Humanity    Guardian of Nature
+   Genesis Projects     Guardian of Humanity    Guardian of Nature
    Innovation Dharma     Compassion Dharma       Service Dharma
-   0.33% rent           60% humanitarian         40% humanitarian
+   0.33% projects       60% humanitarian         40% humanitarian
    
    Technology ──────────── Humanity ──────────── Environment
         └──────────────────┼──────────────────┘
@@ -306,12 +306,12 @@ Sacred Trinity je nejhlubší vrstva governance — duchovní archetypy, které 
                      (Complete balance)
 ```
 
-### 5.1 Rama (Yeshuae Amon Ra) — Genesis Creator
+### 5.1 Rama (Yeshuae Amon Ra) — Genesis Projects Steward
 
 - **Role:** Technologická inovace, blockchain architektura
 - **Dharma:** Innovation (Oheň)
 - **Funkce:** Tvoří nástroje, které ostatní používají pro dobro
-- **Kompenzace:** 0.33 % Genesis Creator Rent
+- **Kompenzace:** 0.33 % Genesis Projects (Dharma Temple, Piko de Ora + DAO)
 
 ### 5.2 Síta (Issobela) — Guardian of Humanity
 

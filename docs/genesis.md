@@ -145,7 +145,7 @@ Všech 14 premine outputů je **admin-locked** (vyžaduje 3-of-3 admin multisig
 |---|--------|---------------|------|
 | 9 | `zion1e8j5z6v8e4c6s5x7r0w7e2r673h8k3a6d4xx877` | 1 000 000 000 | Core Development Fund |
 | 10 | `zion1f7z374q068r3p657m8z220v7y6k045q255xp2d3` | 1 000 000 000 | Síťová infrastruktura (P2P seed nody) |
-| 11 | `zion1s2j5s2a6f5k740k4d8s2k3y8v0t8d4k0u6my2k0` | 590 000 000 | Genesis Creator — Lifetime Rent |
+| 11 | `zion1s2j5s2a6f5k740k4d8s2k3y8v0t8d4k0u6my2k0` | 590 000 000 | Genesis Projects — Dharma Temple, Piko de Ora + DAO |
 
 ### Humanitární (1 slot = 1,44B ZION)
 
