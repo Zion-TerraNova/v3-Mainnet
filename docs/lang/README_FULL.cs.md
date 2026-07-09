@@ -93,9 +93,9 @@ ZION je vícevrstvá blockchain infrastruktura postavená na proof-of-work konse
 - **L1 Konsenzus** — Rust-based PoW uzel s Ed25519 podpisy, BLAKE3 hashováním, LWMA obtížností, UTXO + account transakčními modely a P2P sítí
 - **L2 DeFi** — Smart kontrakty na Base Mainnet (Governance, Treasury, Staking, Farm) + cross-chain bridge relay + atomic swap + DAO governance
 - **L2 Bridge** — ZION L1 ↔ EVM bridge s validátorským kvórem (5/5 threshold), deploynutý na 6 EVM chainech
-- **L3 WARP** — Cross-chain protokol spojující 12 rodin chainů (EVM, Solana, Aptos, Sui, Cardano, TON, atd.)
+- **L3 WARP** — Cross-chain protokol se 12 registrovanými chain adaptéry (EVM, Solana, Aptos, Sui, Cardano, TON, atd.; 11 plně funkčních, TON aktuálně watch-only)
 - **L3 Hiran** — AI-native agent framework (Hiranyagarbha) s multi-modal language model, Dharma validátorem a enginem vědomí
-- **L4 Oasis** — AAA spiritual MMORPG: consciousness mining hra s 51 posvátnými avatary, 9 úrovněmi vědomí, gildovním válečenictvím a treasure hunt Golden Egg
+- **L4 Oasis** — AAA spiritual MMORPG: consciousness mining hra s 199 posvátnými avatary, 9 úrovněmi vědomí, gildovním válečenictvím a treasure hunt Golden Egg
 - **L5 Komunita** — Free-world komunitní vrstva se sefirot governance sliby
 - **L6 Issobella** — Guardian vrstva pro humanitární a kulturní mise
 - **Stargate** — Oficiální logo ZION a kosmický portál: holografická brána symbolizující most mezi blockchainem a Oasis herním metaverse
@@ -139,7 +139,7 @@ ZION je vícevrstvá blockchain infrastruktura postavená na proof-of-work konse
 ┌───────────────────────┴─────────────────────────┐
 │              L4 Oasis (Gaming)                   │
 │  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
-│  │ 51 Avat. │  │ 9 Levels │  │ Golden Egg    │  │
+│  │ 199 Avat.│  │ 9 Levels │  │ Golden Egg    │  │
 │  │ (NFTs)   │  │ (Sefirot)│  │ (Treasure)    │  │
 │  └──────────┘  └──────────┘  └───────────────┘  │
 │  ┌──────────────────────────────────────────┐   │
@@ -183,10 +183,10 @@ ZION je vícevrstvá blockchain infrastruktura postavená na proof-of-work konse
 - L1 RPC: `getBridgeLocks`, `submitBridgeUnlock`, `getBridgeVaultBalance`
 
 ### L3 WARP — Cross-Chain Protocol
-- **12 rodin chainů** — EVM (6 chainů), Solana, Aptos, Sui, Cardano, TON, NEAR, Stellar
+- **12 chain adaptérů registrováno** — EVM (6 chainů), Solana, Aptos, Sui, Cardano, TON, NEAR, Stellar; 11 plně funkčních, TON aktuálně watch-only
 - **Nativní ZION transport** — WARP přenáší nativní L1 ZION napříč chainy (wZION na EVM, ZION na non-EVM)
 - **Pure-Rust serializátory** — BCS (Aptos/Sui), CBOR (Cardano), TL-B Cell+BOC (TON)
-- **499 WARP testů prochází**
+- **WARP test suite** pokrývá chain adaptéry, serializaci a relay logiku
 - **Lightning Network bridge** — BOLT11 parser + LND REST klient (Fáze A pending)
 
 ### L3 Hiran — AI-Native Agent (Hiranyagarbha)
@@ -232,7 +232,7 @@ Stargate je portál, kterým těžaři a členové komunity vstupují do herníh
 | 8 | Jednoty | 2 000 000 | Da'at | 12,0x |
 | 9 | On The Star | 10 000 000 | Keter | 15,0x |
 
-#### 51 posvátných avatarů (NFTs)
+#### 199 posvátných avatarů (NFTs)
 - **Hinduističtí bohové**: Krishna-Maitreya, Rama, Sita, Hanuman, Saraswati
 - **Vzestoupení mistři**: El Morya, Saint Germain, Sanat Kumara
 - **Buddhističtí mistři**: Avalokiteshvara, Dalai Lama XIV
@@ -240,18 +240,19 @@ Stargate je portál, kterým těžaři a členové komunity vstupují do herníh
 - **Historické legendy**: King Arthur, Gandhi, Einstein, Karel IV
 - **Hrdinové Matrixu**: Neo, Trinity, Morpheus, ZION
 - **ZION originály**: Issobela Guardian, Shanti, Sri Kalki Avatar
+- **Domorodé & světové tradice**: Black Elk, White Buffalo Calf Woman, Spider Grandmother, Hero Twins a mnoho dalších
 
-Každý avatar má 5 úkolů = **255 úkolů celkem**.
+Každý avatar má úkoly. Kompletní = **245 úkolů celkem**.
 
 #### Golden Egg — Treasure Hunt (Endgame)
 
 **Golden Egg** je ultimátní treasure hunt v ZION Oasis — kosmická výprava k nalezení Hiranyagarbhy (Zlatého semene).
 
-- **108 stop** napříč 8 kategoriemi (Védy, Bible, Blockchain, Komunita, EkamTemple, atd.)
-- **3 Master Keys**: Ramayana (30 stop), Mahabharata (35 stop), Unity (43 stop)
+- **108 stop** napříč 7 kategoriemi (Sacred Trinity Profiles, Sacred Knowledge Levels, ZION Whitepaper, Source Code, Blockchain Data, Community Events, EKAM Temple Pilgrimage)
+- **3 master keys**: Ramayana (30 stop), Mahabharata (35 stop), Unity (43 stop — vyžaduje obě předchozí)
 - **10 cenových úrovní** s celkovým reward poolem **8,25 miliardy ZION**
 - **Finální boss**: Hiranyagarbha — entita kosmického vědomí
-- **První 3 řešitelé** (CL9 + 108 stop + 3 Master Keys):
+- **První 3 řešitelé** (CL9 + 108 stop + 3 master keys):
   - 1. místo: **1 000 000 000 ZION**
   - 2. místo: **500 000 000 ZION**
   - 3. místo: **250 000 000 ZION**
@@ -276,9 +277,7 @@ Každý avatar má 5 úkolů = **255 úkolů celkem**.
 - **Non-consensus**: Oasis nikdy neovlivňuje L1 těžbu ani validaci blockchainu
 
 #### Reward Pool
-- **5,5 miliardy ZION** alokováno z genesis pro Oasis odměny
-- Rozděleno během 14 let (2026–2040)
-- Odděleno od block mining odměn
+- **8,25 miliardy ZION** celkový reward pool pro treasure hunt Golden Egg
 
 ## Struktura repozitáře
 
@@ -296,7 +295,7 @@ v3-Mainnet/
 │   │   ├── dao/            # DAO governance daemon
 │   │   └── atomic-swap/    # HTLC atomic swap daemon
 │   ├── L3/
-│   │   ├── warp/           # Cross-chain protokol (12 rodin chainů)
+│   │   ├── warp/           # Cross-chain protokol (12 chain adaptérů)
 │   │   └── ncl/            # Neural compute layer (AI úkoly)
 │   ├── L4/
 │   │   └── oasis/          # Hra s těžbou vědomí (UE5 + Rust)
@@ -498,17 +497,23 @@ Klíčové milníky:
 
 ## Vývojová historie
 
-ZION v3 je výsledkem dlouhé iterativní cesty napříč experimentální v2.x linií. Každý release zpevnil konsensusovou vrstvu, vyčistil kódovou základnu a připravil půdu pro veřejnou mainnet.
+ZION v3 je výsledkem dlouhé iterativní cesty napříč experimentální v2.x linií. Historické archivy (`docs/Historie/VERSION_HISTORY_MASTER_INDEX.md`, `docs/2.9.5/`, `docs/2.9.7/`, `docs/2.9.8/`, `docs/2.9.9/`) dokumentují každý krok od prvního RandomX testnetu po kanonický řetězec Ekam Deeksha, který živí v3.
 
 ### Experimentální v2.x linie (2025–2026)
 
-| Verze | Zaměření | Milník |
-|---|---|---|
-| **v2.5** | DesktopApp & rané koncepty | První balená desktop aplikace a rané wallet/UX prototypy. |
-| **v2.6** | Konsolidace workspace | Sjednocený Rust workspace, počáteční GPU těžební backendy a raný pool protokol. |
-| **v2.7** | Produkční disciplína | Build gates, runtime flags, GO/NO-GO review a uzavření interního auditu. |
-| **v2.8** | Ekam Deeksha kanonický | Jediný PoW algoritmus, sjednocení single-host, ~12,5× nárůst GPU výkonu na Metal po opravě Rust dispatch cesty. |
-| **v2.9** | Pure Code freeze | Zero-bug/zero-feature cleanup, odstranění legacy, HugePages allocator a příprava migrace na v3.0. Strom 2.9.x byl zmrazen jako historický archiv. |
+| Verze | Datum | Kódové jméno | Milník |
+|---|---|---|---|
+| **v2.7.0** | Září 2025 | Genesis | První testnet s RandomX PoW, základní blockchain, 144B celková nabídka. |
+| **v2.7.1** | 6. 10. 2025 | Consciousness | DAO framework, 9 úrovní vědomí, Argon2 memory-hard PoW. |
+| **v2.7.2** | 6. 10. 2025 | KRISTUS Quantum | Experimenty s více těžebními algoritmy, consciousness reward multiplikátory. |
+| **v2.8.0** | 21. 10. 2025 | Ad Astra | WARP proof-of-concept, Stratum protokol, Autolykos v2 GPU těžba. |
+| **v2.8.1** | 23. 10. 2025 | Estrella | Multi-algorithm pool (RandomX, Yescrypt, Autolykos v2), WARP vylepšení. |
+| **v2.8.3** | 29. 10. 2025 | Testnet Genesis | Veřejný testnet launch, dual-repo architektura. |
+| **v2.8.4** | 31. 10. 2025 | Cosmic Harmony | 4 ASIC-resistant algoritmy sjednocené v jednom registru, SHA256 odstraněno, nativní Cosmic Harmony kernel. |
+| **v2.9.5** | 20. 1. 2026 | TestNet Ready | 11/11 milníků dokončeno, 108 unit testů prochází, E2E remote smoke-check OK. |
+| **v2.9.7** | 3.–5. 3. 2026 | MainNet Gate | Code freeze, 102-item interní audit uzavřen, NO-GO rozhodnutí kvůli revenue-canary a genesis-ceremony blockerům. |
+| **v2.9.8** | 6.–10. 3. 2026 | Deeksha Canonical | Ekam Deeksha se stává jediným kanonickým PoW od výšky 0, 3-node testnet synchronizován, GO verdikt. |
+| **v2.9.9** | 12. 3. 2026 | Migration Strategy | Řada 2.9.x prohlášena za historický archiv; připraveno čisté v3.0 mainnet repo cherry-pickem auditovaných modulů. |
 
 ### V3.x Mainnet linie
 

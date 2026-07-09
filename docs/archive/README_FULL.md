@@ -93,9 +93,9 @@ ZION is a multi-layer blockchain infrastructure built on proof-of-work consensus
 - **L1 Consensus** — Rust-based PoW node with Ed25519 signatures, BLAKE3 hashing, LWMA difficulty adjustment, UTXO + account transaction models, and P2P networking
 - **L2 DeFi** — Smart contracts on Base Mainnet (Governance, Treasury, Staking, Farm) + cross-chain bridge relay + atomic swap + DAO governance
 - **L2 Bridge** — ZION L1 ↔ EVM bridge with validator quorum (5/5 threshold), deployed on 6 EVM chains
-- **L3 WARP** — Cross-chain protocol connecting 12 chain families (EVM, Solana, Aptos, Sui, Cardano, TON, etc.)
+- **L3 WARP** — Cross-chain protocol with 12 chain adapters registered (EVM, Solana, Aptos, Sui, Cardano, TON, etc.; 11 fully functional, TON currently watch-only)
 - **L3 Hiran** — AI-native agent framework (Hiranyagarbha) with multi-modal language model, Dharma validator, and consciousness engine
-- **L4 Oasis** — AAA spiritual MMORPG: consciousness mining game with 51 sacred avatars, 9 consciousness levels, guild warfare, and the Golden Egg treasure hunt
+- **L4 Oasis** — AAA spiritual MMORPG: consciousness mining game with 199 sacred avatars, 9 consciousness levels, guild warfare, and the Golden Egg treasure hunt
 - **L5 Community** — Free-world community layer with sefirot governance vows
 - **L6 Issobella** — Guardian layer for humanitarian and cultural missions
 - **Stargate** — Official ZION logo and cosmic portal: holographic gateway symbolizing the bridge between blockchain and the Oasis gaming metaverse
@@ -139,7 +139,7 @@ ZION is a multi-layer blockchain infrastructure built on proof-of-work consensus
 ┌───────────────────────┴─────────────────────────┐
 │              L4 Oasis (Gaming)                   │
 │  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
-│  │ 51 Avat. │  │ 9 Levels │  │ Golden Egg    │  │
+│  │ 199 Avat.│  │ 9 Levels │  │ Golden Egg    │  │
 │  │ (NFTs)   │  │ (Sefirot)│  │ (Treasure)    │  │
 │  └──────────┘  └──────────┘  └───────────────┘  │
 │  ┌──────────────────────────────────────────┐   │
@@ -183,10 +183,10 @@ ZION is a multi-layer blockchain infrastructure built on proof-of-work consensus
 - L1 RPC: `getBridgeLocks`, `submitBridgeUnlock`, `getBridgeVaultBalance`
 
 ### L3 WARP — Cross-Chain Protocol
-- **12 chain families** — EVM (6 chains), Solana, Aptos, Sui, Cardano, TON, NEAR, Stellar
+- **12 chain adapters registered** — EVM (6 chains), Solana, Aptos, Sui, Cardano, TON, NEAR, Stellar; 11 fully functional, TON currently watch-only
 - **Native ZION transport** — WARP carries native L1 ZION across chains (wZION on EVM, ZION on non-EVM)
 - **Pure-Rust serializers** — BCS (Aptos/Sui), CBOR (Cardano), TL-B Cell+BOC (TON)
-- **499 WARP tests pass**
+- **WARP test suite** covers chain adapters, serialization, and relay logic
 - **Lightning Network bridge** — BOLT11 parser + LND REST client (Fáze A pending)
 
 ### L3 Hiran — AI-Native Agent (Hiranyagarbha)
@@ -232,7 +232,7 @@ The Stargate is the portal through which miners and community members enter the 
 | 8 | Unity | 2,000,000 | Da'at | 12.0x |
 | 9 | On The Star | 10,000,000 | Keter | 15.0x |
 
-#### 51 Sacred Avatars (NFTs)
+#### 199 Sacred Avatars (NFTs)
 - **Hindu Deities**: Krishna-Maitreya, Rama, Sita, Hanuman, Saraswati
 - **Ascended Masters**: El Morya, Saint Germain, Sanat Kumara
 - **Buddhist Masters**: Avalokiteshvara, Dalai Lama XIV
@@ -240,15 +240,16 @@ The Stargate is the portal through which miners and community members enter the 
 - **Historical Legends**: King Arthur, Gandhi, Einstein, Karel IV
 - **Matrix Heroes**: Neo, Trinity, Morpheus, ZION
 - **ZION Originals**: Issobela Guardian, Shanti, Sri Kalki Avatar
+- **Indigenous & World Traditions**: Black Elk, White Buffalo Calf Woman, Spider Grandmother, Hero Twins, and many more
 
-Each avatar has 5 quests = **255 total quests**.
+Each avatar has quests. Complete all = **245 total quests**.
 
 #### The Golden Egg — Treasure Hunt (Endgame)
 
 The **Golden Egg** is the ultimate treasure hunt in ZION Oasis — a cosmic quest to find the Hiranyagarbha (Golden Seed).
 
-- **108 clues** across 8 categories (Vedas, Bible, Blockchain, Community, EkamTemple, etc.)
-- **3 Master Keys**: Ramayana (30 clues), Mahabharata (35 clues), Unity (43 clues)
+- **108 clues** across 7 categories (Sacred Trinity Profiles, Sacred Knowledge Levels, ZION Whitepaper, Source Code, Blockchain Data, Community Events, EKAM Temple Pilgrimage)
+- **3 Master Keys**: Ramayana Key (30 clues), Mahabharata Key (35 clues), Unity Key (43 clues — requires both previous keys)
 - **10 prize tiers** with **8.25B ZION** total reward pool
 - **Final boss**: Hiranyagarbha — the cosmic consciousness entity
 - **First 3 solvers** (CL9 + 108 clues + 3 Master Keys):
@@ -296,7 +297,7 @@ v3-Mainnet/
 │   │   ├── dao/            # DAO governance daemon
 │   │   └── atomic-swap/    # HTLC atomic swap daemon
 │   ├── L3/
-│   │   ├── warp/           # Cross-chain protocol (12 chain families)
+│   │   ├── warp/           # Cross-chain protocol (12 chain adapters)
 │   │   └── ncl/            # Neural compute layer (AI tasks)
 │   ├── L4/
 │   │   └── oasis/          # Consciousness mining game (UE5 + Rust)

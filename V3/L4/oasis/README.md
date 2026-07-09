@@ -1,6 +1,6 @@
 # ZION OASIS — V3 L4 Consciousness Mining Game
 
-> **AAA Spiritual MMORPG** built on ZION blockchain. Players earn XP through mining, meditation, quests with 51 sacred avatars, guild warfare, and the Golden Egg treasure hunt.
+> **AAA Spiritual MMORPG** built on ZION blockchain. Players earn XP through mining, meditation, quests with 199 sacred avatars, guild warfare, and the Golden Egg treasure hunt.
 
 ## Architecture
 
@@ -91,9 +91,9 @@ See [`ue5/README_UE5.md`](ue5/README_UE5.md) for step-by-step Blueprint creation
 | 8 | Unity | Da'at | 2,000,000 | 12.0x |
 | 9 | On The Star | Keter | 10,000,000 | 15.0x |
 
-### 51 Sacred Avatars
+### 199 Sacred Avatars
 
-51 NFT avatars across 7 spiritual traditions:
+199 NFT avatars across spiritual traditions:
 - Hindu Deities (0-6): Krishna-Maitreya, Rama, Sita, Hanuman, Saraswati...
 - Ascended Masters (7-16): El Morya, Saint Germain, Sanat Kumara...
 - Buddhist Masters (17-20): Avalokiteshvara, Dalai Lama XIV...
@@ -101,13 +101,14 @@ See [`ue5/README_UE5.md`](ue5/README_UE5.md) for step-by-step Blueprint creation
 - Historical Legends (25-30): King Arthur, Gandhi, Einstein, Karel IV...
 - Matrix Heroes (31-34): Neo, Trinity, Morpheus, ZION
 - ZION Originals (35-50): Issobela Guardian, Shanti, Sri Kalki Avatar...
+- Indigenous & World Traditions: Black Elk, White Buffalo Calf Woman, Spider Grandmother, Hero Twins...
 
-Each avatar has 5 quests. Complete all = 255 quests total.
+Each avatar has quests. Complete all = 245 quests total.
 
 ### Golden Egg Treasure Hunt
 
-- **108 clues** across 8 categories
-- **3 master keys** (36 clues each)
+- **108 clues** across 7 categories (Sacred Trinity Profiles, Sacred Knowledge Levels, ZION Whitepaper, Source Code, Blockchain Data, Community Events, EKAM Temple Pilgrimage)
+- **3 master keys**: Ramayana Key (30 clues), Mahabharata Key (35 clues), Unity Key (43 clues — requires both previous keys)
 - **10 prize tiers** (total 8.25B ZION reward pool)
 - First 3 players to CL9 + 108 clues + 3 keys win:
   - 1st: 1,000,000,000 ZION
@@ -180,7 +181,7 @@ oasis/
 │   ├── websocket.rs            # WS broadcast hub
 │   └── error.rs                # Error types
 ├── data/                       # Static game data
-│   ├── avatars.json            # 51 avatar definitions
+│   ├── avatars.json            # 199 avatar definitions
 │   ├── golden_egg.json         # 108 clue definitions
 │   ├── prize_tiers.json        # Reward distribution
 │   └── world.json              # Territory genesis map

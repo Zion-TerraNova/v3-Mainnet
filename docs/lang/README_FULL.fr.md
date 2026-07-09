@@ -93,9 +93,9 @@ ZION est une infrastructure blockchain multicouche construite sur un consensus p
 - **L1 Consensus** — Nœud PoW basé sur Rust avec signatures Ed25519, hachage BLAKE3, ajustement de difficulté LWMA, modèles de transaction UTXO + account et réseau P2P
 - **L2 DeFi** — Smart contracts sur Base Mainnet (Governance, Treasury, Staking, Farm) + relais de pont cross-chain + atomic swap + gouvernance DAO
 - **L2 Bridge** — Pont ZION L1 ↔ EVM avec quorum de validateurs (seuil 5/5), déployé sur 6 chaînes EVM
-- **L3 WARP** — Protocole cross-chain connectant 12 familles de chaînes (EVM, Solana, Aptos, Sui, Cardano, TON, etc.)
+- **L3 WARP** — Protocole cross-chain avec 12 adaptateurs de chaîne enregistrés (EVM, Solana, Aptos, Sui, Cardano, TON, etc.; 11 pleinement fonctionnels, TON actuellement watch-only)
 - **L3 Hiran** — Framework d'agent natif à l'IA (Hiranyagarbha) avec modèle de langage multimodal, validateur Dharma et moteur de conscience
-- **L4 Oasis** — MMORPG spirituel AAA : jeu de minage de conscience avec 51 avatars sacrés, 9 niveaux de conscience, guerre de guildes et chasse au trésor Golden Egg
+- **L4 Oasis** — MMORPG spirituel AAA : jeu de minage de conscience avec 199 avatars sacrés, 9 niveaux de conscience, guerre de guildes et chasse au trésor Golden Egg
 - **L5 Communauté** — Couche communautaire du monde libre avec vœux de gouvernance sefirot
 - **L6 Issobella** — Couche gardienne pour les missions humanitaires et culturelles
 - **Stargate** — Logo officiel de ZION et portail cosmique : porte holographique symbolisant le pont entre la blockchain et le métavers de jeu Oasis
@@ -139,7 +139,7 @@ ZION est une infrastructure blockchain multicouche construite sur un consensus p
 ┌───────────────────────┴─────────────────────────┐
 │              L4 Oasis (Gaming)                   │
 │  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
-│  │ 51 Avat. │  │ 9 Levels │  │ Golden Egg    │  │
+│  │ 199 Avat.│  │ 9 Levels │  │ Golden Egg    │  │
 │  │ (NFTs)   │  │ (Sefirot)│  │ (Trésor)      │  │
 │  └──────────┘  └──────────┘  └───────────────┘  │
 │  ┌──────────────────────────────────────────┐   │
@@ -183,10 +183,10 @@ ZION est une infrastructure blockchain multicouche construite sur un consensus p
 - RPC L1 : `getBridgeLocks`, `submitBridgeUnlock`, `getBridgeVaultBalance`
 
 ### L3 WARP — Protocole Cross-Chain
-- **12 familles de chaînes** — EVM (6 chaînes), Solana, Aptos, Sui, Cardano, TON, NEAR, Stellar
+- **12 adaptateurs de chaîne enregistrés** — EVM (6 chaînes), Solana, Aptos, Sui, Cardano, TON, NEAR, Stellar ; 11 pleinement fonctionnels, TON actuellement watch-only
 - **Transport natif de ZION** — WARP transporte le ZION natif L1 à travers les chaînes (wZION sur EVM, ZION sur non-EVM)
 - **Sérialiseurs pure-Rust** — BCS (Aptos/Sui), CBOR (Cardano), TL-B Cell+BOC (TON)
-- **499 tests WARP passent**
+- **WARP test suite** couvre les adaptateurs de chaîne, la sérialisation et la logique de relay
 - **Pont Lightning Network** — parser BOLT11 + client REST LND (Phase A en attente)
 
 ### L3 Hiran — Agent natif à l'IA (Hiranyagarbha)
@@ -232,7 +232,7 @@ Le Stargate est le portail par lequel les mineurs et les membres de la communaut
 | 8 | Unité | 2 000 000 | Da'at | 12,0x |
 | 9 | On The Star | 10 000 000 | Keter | 15,0x |
 
-#### 51 avatars sacrés (NFTs)
+#### 199 avatars sacrés (NFTs)
 - **Divinités hindoues** : Krishna-Maitreya, Rama, Sita, Hanuman, Saraswati
 - **Maîtres ascensionnés** : El Morya, Saint Germain, Sanat Kumara
 - **Maîtres bouddhistes** : Avalokiteshvara, Dalaï Lama XIV
@@ -240,18 +240,19 @@ Le Stargate est le portail par lequel les mineurs et les membres de la communaut
 - **Légendes historiques** : King Arthur, Gandhi, Einstein, Karel IV
 - **Héros de Matrix** : Neo, Trinity, Morpheus, ZION
 - **Originaux ZION** : Issobela Guardian, Shanti, Sri Kalki Avatar
+- **Traditions autochtones et mondiales** : Black Elk, White Buffalo Calf Woman, Spider Grandmother, Hero Twins et bien d'autres
 
-Chaque avatar a 5 quêtes = **255 quêtes au total**.
+Chaque avatar a des quêtes. Tout compléter = **245 quêtes au total**.
 
 #### Golden Egg — Chasse au trésor (Endgame)
 
 **Golden Egg** est la chasse au trésor ultime dans ZION Oasis — une quête cosmique pour trouver le Hiranyagarbha (Graine Dorée).
 
-- **108 indices** dans 8 catégories (Vedas, Bible, Blockchain, Communauté, EkamTemple, etc.)
-- **3 Master Keys** : Ramayana (30 indices), Mahabharata (35 indices), Unity (43 indices)
+- **108 indices** dans 7 catégories (Sacred Trinity Profiles, Sacred Knowledge Levels, ZION Whitepaper, Source Code, Blockchain Data, Community Events, EKAM Temple Pilgrimage)
+- **3 master keys** : Ramayana (30 indices), Mahabharata (35 indices), Unity (43 indices — nécessite les deux précédentes)
 - **10 niveaux de prix** avec un reward pool total de **8,25 milliards de ZION**
 - **Boss final** : Hiranyagarbha — l'entité de conscience cosmique
-- **3 premiers solveurs** (CL9 + 108 indices + 3 Master Keys) :
+- **3 premiers solveurs** (CL9 + 108 indices + 3 master keys) :
   - 1ère place : **1 000 000 000 ZION**
   - 2ème place : **500 000 000 ZION**
   - 3ème place : **250 000 000 ZION**
@@ -276,9 +277,7 @@ Chaque avatar a 5 quêtes = **255 quêtes au total**.
 - **Non-consensus** : Oasis n'affecte jamais le minage L1 ni la validation de la blockchain
 
 #### Reward Pool
-- **5,5 milliards de ZION** alloués depuis le génesis pour les récompenses Oasis
-- Distribués sur 14 ans (2026–2040)
-- Séparés des récompenses de minage de blocs
+- **8,25 milliards de ZION** reward pool total pour la chasse au trésor Golden Egg
 
 ## Structure du dépôt
 
@@ -296,7 +295,7 @@ v3-Mainnet/
 │   │   ├── dao/            # Daemon de gouvernance DAO
 │   │   └── atomic-swap/    # Daemon d'atomic swap HTLC
 │   ├── L3/
-│   │   ├── warp/           # Protocole cross-chain (12 familles de chaînes)
+│   │   ├── warp/           # Protocole cross-chain (12 adaptateurs de chaîne)
 │   │   └── ncl/            # Neural compute layer (tâches d'IA)
 │   ├── L4/
 │   │   └── oasis/          # Jeu de minage de conscience (UE5 + Rust)
@@ -498,17 +497,23 @@ Jalons clés :
 
 ## Historique de développement
 
-ZION v3 est le résultat d'un long parcours itératif à travers la ligne expérimentale v2.x. Chaque version a renforcé la couche de consensus, nettoyé la base de code et préparé le terrain pour la mainnet publique.
+ZION v3 est le résultat d'un long parcours itératif à travers la ligne expérimentale v2.x. Les archives historiques (`docs/Historie/VERSION_HISTORY_MASTER_INDEX.md`, `docs/2.9.5/`, `docs/2.9.7/`, `docs/2.9.8/`, `docs/2.9.9/`) documentent chaque étape du premier testnet RandomX à la chaîne canonique Ekam Deeksha qui alimente v3.
 
 ### Ligne expérimentale v2.x (2025–2026)
 
-| Version | Focus | Jalons |
-|---------|-------|--------|
-| **v2.5** | DesktopApp et concepts initiaux | Première application de bureau empaquetée et premiers prototypes de wallet/UX. |
-| **v2.6** | Consolidation du workspace | Workspace Rust unifié, backends initiaux de minage GPU et protocole de pool initial. |
-| **v2.7** | Discipline de production | Build gates, runtime flags, revues GO/NO-GO et clôture de l'audit interne. |
-| **v2.8** | Ekam Deeksha canonique | Algorithme PoW unique, unification single-host, gain de performance GPU ~12,5× sur Metal après correction du chemin de dispatch Rust. |
-| **v2.9** | Pure Code freeze | Nettoyage zero-bug/zero-feature, suppression du legacy, allocateur HugePages et préparation de la migration vers v3.0. L'arbre 2.9.x a été gelé comme archive historique. |
+| Version | Date | Nom de code | Jalons |
+|---------|------|-------------|--------|
+| **v2.7.0** | Sep 2025 | Genesis | Premier testnet avec RandomX PoW, blockchain de base, offre totale de 144B. |
+| **v2.7.1** | 2025-10-06 | Consciousness | DAO framework, 9 niveaux de conscience, PoW memory-hard Argon2. |
+| **v2.7.2** | 2025-10-06 | KRISTUS Quantum | Expérimentations avec plusieurs algorithmes de minage, multiplicateurs de conscience. |
+| **v2.8.0** | 2025-10-21 | Ad Astra | WARP proof-of-concept, protocole Stratum, minage GPU Autolykos v2. |
+| **v2.8.1** | 2025-10-23 | Estrella | Pool multi-algorithme (RandomX, Yescrypt, Autolykos v2), affinement WARP. |
+| **v2.8.3** | 2025-10-29 | Testnet Genesis | Lancement du testnet public, architecture dual-repo. |
+| **v2.8.4** | 2025-10-31 | Cosmic Harmony | 4 algorithmes résistants aux ASIC unifiés dans un registre, SHA256 supprimé, kernel natif Cosmic Harmony. |
+| **v2.9.5** | 2026-01-20 | TestNet Ready | 11/11 jalons complétés, 108 tests unitaires passent, E2E remote smoke-check OK. |
+| **v2.9.7** | 2026-03-03 à 2026-03-05 | MainNet Gate | Code freeze, audit interne de 102 items clos, décision NO-GO due aux bloqueurs revenue-canary et genesis-ceremony. |
+| **v2.9.8** | 2026-03-06 à 2026-03-10 | Deeksha Canonical | Ekam Deeksha devient le seul PoW canonique depuis la hauteur 0, testnet 3 nœuds synchronisé, verdict GO. |
+| **v2.9.9** | 2026-03-12 | Migration Strategy | Ligne 2.9.x déclarée archive historique ; nouveau repo propre v3.0 mainnet préparé par cherry-pick des modules audités. |
 
 ### Ligne v3.x Mainnet
 
