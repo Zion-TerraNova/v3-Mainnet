@@ -209,6 +209,7 @@ cargo run --release -p zion-core --bin zion-node
 
 ### Technical
 - [Whitepaper](./docs/whitepaper.md) — Technical whitepaper (consensus, economics, architecture)
+- [evoluZion V2](./evoluZionV2.md) — PoW → Proof-of-Care evolution (10-year hybrid roadmap)
 - [Genesis Block](./docs/genesis.md) — Genesis block, premine allocations, creator signature
 - [Architecture](./V3/docs/) — L1/L2 architecture docs
 - [Mainnet Constants](./V3/docs/MAINNET_CONSTANTS.md) — Canonical chain parameters
