@@ -1,0 +1,24 @@
+[package]
+name = "zion-sdk"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Zion SDK — async JSON-RPC client library for ZION core nodes"
+
+[features]
+default = []
+tracing = ["dep:tracing"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio = { version = "1", default-features = false, features = ["net", "io-util", "rt", "macros", "time"] }
+tracing = { version = "0.1", optional = true }
+zion-core = { path = "../L1/core" }
+ed25519-dalek = { workspace = true }
+bip39 = { version = "2", features = ["rand"] }
+
+[dev-dependencies]
+tokio = { version = "1", default-features = false, features = ["macros", "rt", "rt-multi-thread"] }

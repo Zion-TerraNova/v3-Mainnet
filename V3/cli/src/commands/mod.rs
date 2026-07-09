@@ -1,0 +1,9 @@
+pub mod completions;
+pub mod doctor;
+pub mod mine;
+pub mod node;
+pub mod onboard;
+pub mod pool;
+pub mod status;
+pub mod update;
+pub mod wallet;

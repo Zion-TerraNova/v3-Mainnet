@@ -1,0 +1,38 @@
+[package]
+name = "zion-native-ffi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Feature-gated FFI wrappers for ZION native mining algorithm libraries."
+
+[lib]
+name = "zion_native_ffi"
+
+[features]
+default = []
+
+# Individual algorithm features
+native-etchash        = []
+native-kawpow         = []
+native-autolykos      = []
+native-kheavyhash     = []
+native-blake3-algo    = []
+native-cosmic-harmony = []
+native-verushash      = []
+native-randomx        = []
+
+# Convenience: enable all at once
+native-all = [
+    "native-etchash",
+    "native-kawpow",
+    "native-autolykos",
+    "native-kheavyhash",
+    "native-blake3-algo",
+    "native-cosmic-harmony",
+    "native-verushash",
+    "native-randomx",
+]
+
+[build-dependencies]
+cc = "1.0"
