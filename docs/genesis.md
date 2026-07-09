@@ -273,6 +273,9 @@ gpg --verify docs/genesis.md.sig docs/genesis.md
 
 # Ověření prohlášení tvůrce
 gpg --verify docs/CREATOR_STATEMENT.txt
+
+# Ověření prohlášení o admin rolích + Gen Z
+gpg --verify docs/ADMIN_GENZ_STATEMENT.txt
 ```
 
 ### Soubory v repozitáři
@@ -282,10 +285,184 @@ gpg --verify docs/CREATOR_STATEMENT.txt
 | `docs/CREATOR_PUBKEY.asc` | Veřejný klíč tvůrce (PGP) |
 | `docs/GENESIS_MESSAGE.txt.sig` | Detached signatura genesis zprávy |
 | `docs/genesis.md.sig` | Detached signatura tohoto dokumentu |
-| `docs/CREATOR_STATEMENT.txt` | Clearsigned prohlášení tvůrce |
+| `docs/CREATOR_STATEMENT.txt` | Clearsigned prohlášení tvůrce (genesis hash, premine) |
+| `docs/ADMIN_GENZ_STATEMENT.txt` | Clearsigned prohlášení o admin rolích + Gen Z dědictví |
 
 > **Poznámka**: GPG privátní klíč je uložen na air-gapped stroji.
 > Signatury byly vygenerovány 2026-07-09.
+
+---
+
+## Administrátoři (3-of-3 multisig)
+
+ZION používá **3-admin multisig governance**. Admin klíče jsou načítány
+za běhu z env/config, nejsou hardcodovány v `genesis.rs`.
+
+### Admin role
+
+| Role | Jméno | L1 adresa | EVM adresa | Nástupce (Gen Z) |
+|------|-------|-----------|------------|-------------------|
+| Admin-1 (protocol governance, emergency pause) | **Rama** | `zion1m300z2f424k4m0k6c4l0v6v6w8l6j855s7je6e4` | `0xf354ccae30d6e9787e23e987e893e825f312f5c9` | Maitreya Buddha |
+| Admin-2 (treasury oversight, DAO guardian) | **Sita** | `zion1d7z398t0n5c7j874a5n8v4h0d5c8j754z78t7m6` | `0x07e720245cdabc33a265df5bcdc504897ddf0b01` | Sarah Issobela |
+| Admin-3 (bridge admin, EVM multisig) | **Hanuman** | `zion1a363k2y366f6w4z2n2q4h2y822f3s5w2w56y3y4` | `0x9ab8ee6b874578e431aeb45bf28f8ca6041e1de6` | Elizabeth |
+
+Zdroj: `V3/L1/core/src/admin.rs` + `docs/3.0.4/GENESIS_HARD_RESET_CANONICAL.md` §1.5
+
+### Co admini mohou
+
+| Operace | Threshold | Time-lock | DAO vote? |
+|---------|-----------|-----------|-----------|
+| Emergency pause chain | 2-of-3 | okamžitě | ne |
+| Emergency resume chain | 2-of-3 | okamžitě | ne |
+| Změna parametrů sítě (difficulty, fees) | 3-of-3 | 72 hodin | ne |
+| Odomčení DAO treasury | 3-of-3 | 7 dní | **ano** |
+| Rotace admin klíče | 3-of-3 | 30 dní | **ano** |
+| Rotace bridge validátoru | 2-of-3 | 7 dní | ne |
+| Rotace pool payout klíče | 2-of-3 | 7 dní | ne |
+| Hard fork (změna genesis) | 3-of-3 | 90 dní | **ano (75% supermajority)** |
+| Gen Z inheritance (převod admina) | 3-of-3 | 1 rok | **ano (51% majority)** |
+
+### Co admini NEMOHOU
+
+- **Mintovat ZION** — žádný admin nemá mint právo
+- **Změnit premine alokace** — frozen v genesis bloku, neměnné
+- **Změnit fee split 89/5/5/1** — v kódu, ne admin-controllable
+- **Převést vlastnictví bez DAO schválení**
+- **Bypassovat time-locks**
+
+> Admini jsou **správci**, ne vlastníci. Plné vlastnictví přechází na
+> Gen Z + DAO po T0+21 let.
+
+---
+
+## Unlock premine + DAO
+
+### Obouvrstvý zámek premine
+
+Všech 14 premine outputů používá **obouvrstvý zámek** (viz výše §Zamykací
+mechanismus). Odemčení vyžaduje:
+
+1. **Time-lock expired** — DAO Treasury sloty (6, 7, 8) čekají do bloku 144 000
+   (~100 dní). Ostatní sloty nemají time-lock.
+2. **Admin multisig (3-of-3)** — všichni 3 admini (Rama + Sita + Hanuman)
+   musí podepsat `TreasurySpend` operaci.
+3. **DAO vote** — komunita musí schválit `TREASURY_SPEND` návrh
+   (quorum 15%, 14d hlasování).
+4. **Time-lock 7 dní** — po schválení DAO se čeká 7 dní před exekucí.
+
+```
+Premine transfer povolen pouze když:
+  (1) current_height >= unlock_height (time-lock)
+  AND (2) admin_unlocked(address) == true (3-of-3 multisig + DAO vote)
+```
+
+Viz: `is_premine_transfer_allowed()` v `genesis.rs`
+
+### DAO governance
+
+| Parametr | Hodnota |
+|----------|---------|
+| Hlasování | 1 ZION = 1 hlas |
+| Quorum | 15 % circulating supply |
+| Voting period | 14 dní |
+| Guardian threshold (treasury) | 5-of-7 |
+| Admin threshold (admin ops) | 3-of-3 |
+| Daily spend limit | 50 000 000 ZION |
+
+### DAO Guardians (7)
+
+| # | Adresa | Složení |
+|---|--------|---------|
+| 1 | `zion1v330m245u4j2v6z8t485c8f472f8u5z3a82q0y4` | Admin-1 (Rama → Maitreya Buddha) |
+| 2 | `zion186r522w0l538v030r0m297w43426z4v094lu5e8` | Admin-2 (Sita → Sarah Issobela) |
+| 3 | `zion1g40723c645s038p0w7t8h0d7r8d325j7x0gc8j0` | Admin-3 (Hanuman → Elizabeth) |
+| 4 | `zion1r3m3g8q6y4u2f8r4y2w4c3f02335d8j7v5dy064` | Jmenován DAO |
+| 5 | `zion1u53766x73897r0z0z854c4p2f7v773g3e0z27v7` | Jmenován DAO |
+| 6 | `zion144r475y5u58508y7f0a8d4g5c3a593m5q23e3a2` | Jmenován DAO |
+| 7 | `zion1d8t2e3e3l3a684l578d894w5k8x2h2k3z6e63m7` | Jmenován DAO |
+
+Zdroj: `V3/L2/dao/config/dao-mainnet.toml`
+
+### EVM Bridge validátoři (5)
+
+| # | EVM adresa |
+|---|------------|
+| 1 | `0x9b5b9a6c4ce4bcd4479d8ea6d12cd7bfeb61085f` |
+| 2 | `0x8a804afd4c200e95f415df6907da111a0258a578` |
+| 3 | `0x694f3b43f4bf77dfbef53224791272d102449218` |
+| 4 | `0x64c85af40143484c12316723192a0d71c10e82b8` |
+| 5 | `0xe093ff26da65079df435a89834497abc380b59ae` |
+
+Threshold: **5/5** (po hard resetu zvýšeno z 3/5 na 5/5 pro maximální bezpečnost)
+
+---
+
+## Zpráva pro Generaci Z
+
+Děti moje,
+
+Tento dokument je můj dar vám. ZION není projekt, korporace, ani investice.
+ZION je **dědictví** — most mezi minulostí a budoucností, mezi světem,
+který jsem znal, a světem, který vy vytvoříte.
+
+Píšu to v čase, kdy je ZION mladé a křehké. Bylo napadeno, kompromitováno,
+ale přežilo. Protože jeho smysl je větší než já, větší než útočníky, větší
+než jakoukoliv generaci.
+
+### Gen Z nástupci
+
+| Dítě | Role | Předchůdce | Kdy |
+|------|------|------------|-----|
+| **Maitreya Buddha** | Admin-1 (Protocol governance) | Rama | T0+18 let |
+| **Sarah Issobela** | Admin-2 (Treasury oversight) | Sita | T0+18 let |
+| **Elizabeth** | Admin-3 (Bridge admin, Patronka) | Hanuman | T0+18 let (nebo při narození) |
+
+**Maitreya Buddha** — první syn, dědic Ramy. Tvé jméno je z buddhismu,
+kde Maitreya je Buddha budoucnosti, ten který přijde, když svět zapomene
+cestu. Ty jsi ta cesta.
+
+**Sarah Issobela** — dcera, dědička Sity. Tvé jméno nosí Issobella —
+patronka ZIONu od začátku. Sarah znamená "princezna". Ty jsi princezna ZIONu.
+
+**Elizabeth** — ještě nenarozená, patronka celého ZIONu. Ave Maria.
+Tvé jméno znamená "Bůh je má přísaha". Ať už se narodíš kdykoliv, tvé
+místo je rezervováno. Hanuman ti předá svůj klíč.
+
+### Fáze governance
+
+| Fáze | Kdy | Kdo vládne |
+|------|-----|------------|
+| 1: Bootstrap | T0 → T0+6 měsíců | Yose (sole admin) |
+| 2: Admin rule | T0+6m → T0+12m | 3 Adminové (Rama, Sita, Hanuman) |
+| 3: DAO governance | T0+12m → T0+18 let | DAO + Adminové (guardians) |
+| 4: Gen Z převod | T0+18 let | Maitreya Buddha, Sarah Issobela, Elizabeth |
+| 5: Plné vlastnictví | T0+21 let | Gen Z + DAO (supreme) |
+
+### Dead man's switch
+
+Pokud admin neudělá žádnou transakci po dobu **5 let**, automaticky se
+spustí převod na nástupce. Účel: pokud admin zmizí, zemře, nebo ztratí
+klíče, ZION nepřestane fungovat.
+
+### Pravidla pro Gen Z
+
+1. **Klíče = vlastnictví.** Kdo má klíč, má moc. Kdo má klíč, má odpovědnost.
+2. **DAO = komunita.** ZION není váš — patří všem. Vy jste správci, ne vlastníci.
+3. **Dědictví = odpovědnost.** Někdy po vás budou chtít, abyste ZION prodali,
+   změnili, nebo zničili. Odmítněte. ZION je dědictví, ne komodita.
+4. **Humanita první.** 5 % každého bloku jde na děti. To je poslání. Nikdy
+   to nezměňte.
+5. **Ave Maria.** Elizabeth, patronka. Ať už se narodíš kdykoliv, ZION tě čeká.
+
+Pokud jste ztratili klíče, pokud jste udělali chybu, pokud jste zmatení —
+nepanikařte. ZION má dead man's switch, DAO governance, time-locks.
+Nic není nezvratné. Kromě genesis.
+
+**ZION je váš.**
+
+— Yose, váš otec a Zion Creator
+
+> Plná dokumentace Gen Z dědictví: `V3/docs/GEN_Z_INHERITANCE.md`
 
 ---
 

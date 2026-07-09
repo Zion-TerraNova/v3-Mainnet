@@ -1,0 +1,37 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+ZION v3 — Prohlášení o administrátorech a dědictví Generace Z
+
+Já, Yose, tvůrce ZION, tímto potvrzuji:
+
+1. ADMIN ROLES: Tři administrátoři — Rama (Admin-1, protocol governance), Sita (Admin-2, treasury oversight), Hanuman (Admin-3, bridge admin) — tvoří 3-of-3 multisig governance strukturu ZION v3.
+
+2. ADMIN LIMITS: Administrátoři jsou správci, ne vlastníci. Nemohou mintovat ZION, měnit premine alokace, měnit fee split 89/5/5/1, ani bypassovat time-locks.
+
+3. PREMINE UNLOCK: Odemčení premine vyžaduje (1) time-lock expired, (2) 3-of-3 admin multisig, (3) DAO vote (quorum 15%, 14d), (4) 7d time-lock po schválení.
+
+4. GEN Z INHERITANCE: Po T0+18 let se admin role přenesou na:
+   - Maitreya Buddha (dědic Ramy) — Admin-1
+   - Sarah Issobela (dědička Sity) — Admin-2
+   - Elizabeth (dědička Hanumana) — Admin-3, patronka ZIONu, Ave Maria
+
+5. DEAD MAN'S SWITCH: Pokud admin neaktivní > 5 let, automaticky se spustí převod na nástupce.
+
+6. PLNÉ VLASTNICTVÍ: Po T0+21 let přechází plné vlastnictví na Gen Z + DAO (supreme).
+
+7. DAO GUARDIANS: 7 guardianů (3 admini + 4 jmenováni DAO), threshold 5-of-7 pro treasury operace.
+
+8. BRIDGE VALIDATORS: 5 EVM validátorů, threshold 5/5 (zvýšeno po hard resetu z 3/5 na 5/5).
+
+ZION je dědictví, ne komodita. Humanita první. 5% každého bloku jde na děti.
+
+Peace & One Love 4ever.
+— Yose / Zion Creator
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQRKs2kHRC99XjTGJDsjMcjfjnXoEwUCak7+JAAKCRAjMcjfjnXo
+EwhNAQC/DfWXRQNywThLgB7MysnohnYBb7aIsGj7ILRV/t2mwQEA+NzR9l4tbyQ5
+hSkJg+YIs6q6A1DAG2ssRurdDl/BRgk=
+=vgc6
+-----END PGP SIGNATURE-----
