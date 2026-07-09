@@ -1,4 +1,4 @@
-# ZION v3 — Mainnet
+# ZION v3 — Mainnet Beta
 
 <div align="center">
 
@@ -9,10 +9,43 @@ Blockchain de prueba de trabajo con consenso de algoritmo dual, bridge cross-cha
 [![Licencia: MIT](https://img.shields.io/badge/Licencia-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/Rust-stable-orange.svg)](https://www.rust-lang.org/)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue.svg)](https://soliditylang.org/)
+[![Estado: Mainnet Beta](https://img.shields.io/badge/Status-Mainnet_Beta-orange.svg)](#estado-de-la-red)
 
 [English](../../README.md) · [Čeština](./README.cs.md) · **Español** · [Français](./README.fr.md) · [Português](./README.pt.md)
 
 </div>
+
+---
+
+## Estado de la Red
+
+> **⚠️ MAINNET BETA — Minería bajo su propio riesgo**
+
+ZION v3.0.4 está **activo y funcionando** como Mainnet Beta. La red está operativa, se están produciendo bloques y la cadena génesis está establecida.
+
+**Qué significa esto:**
+- ✅ La red está activa y produciendo bloques
+- ✅ El bloque génesis y el historial de la cadena son **permanentes** — no se reiniciarán
+- ✅ Todas las vulnerabilidades divulgadas (F1–F5, C1–C8) han sido remediadas
+- ✅ Los 7 contratos DeFi verificados en Basescan
+- ⚠️ La red puede contener errores — mina y transacciona bajo tu propio riesgo
+- ⚠️ No se proporciona garantía — ver [Aviso Legal](../LEGAL_DISCLAIMER.md)
+
+**Lanzamiento Público Oficial: 31 de diciembre de 2026**
+
+El período de Mainnet Beta dura hasta el lanzamiento público oficial el **31.12.2026**, según la hoja de ruta original. Durante este período:
+- La red se somete a verificación de seguridad continua
+- Si la red pasa la verificación de seguridad, el bloque génesis y todos los bloques minados **permanecerán permanentemente**
+- Los comentarios de la comunidad y los informes de errores son bienvenidos — ver [Contribuir](../../CONTRIBUTING.md)
+- Las recompensas de minería son reales e irreversibles
+
+| Parámetro | Valor |
+|-----------|-------|
+| Estado | **Mainnet Beta** |
+| Protocolo | 3.0.4 |
+| Hash génesis | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
+| Lanzamiento oficial | 2026-12-31 |
+| Minería | Activa (bajo su propio riesgo) |
 
 ---
 

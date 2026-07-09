@@ -1,4 +1,4 @@
-# ZION v3 — Mainnet
+# ZION v3 — Mainnet Beta
 
 <div align="center">
 
@@ -9,10 +9,43 @@ Blockchain s proof-of-work konsenzem, cross-chain bridge, DeFi vrstvou a DAO gov
 [![License: MIT](https://img.shields.io/badge/Licence-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/Rust-stable-orange.svg)](https://www.rust-lang.org/)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue.svg)](https://soliditylang.org/)
+[![Status: Mainnet Beta](https://img.shields.io/badge/Status-Mainnet_Beta-orange.svg)](#status-sítě)
 
 [English](../../README.md) · **Čeština** · [Español](./README.es.md) · [Français](./README.fr.md) · [Português](./README.pt.md)
 
 </div>
+
+---
+
+## Status sítě
+
+> **⚠️ MAINNET BETA — Těžba na vlastní nebezpečí**
+
+ZION v3.0.4 je **živý a běží** jako Mainnet Beta. Síť je operační, bloky jsou produkovány a genesis řetězec je ustaven.
+
+**Co to znamená:**
+- ✅ Síť je živá a produkuje bloky
+- ✅ Genesis blok a historie řetězce jsou **trvalé** — nebudou resetovány
+- ✅ Všechny zveřejněné zranitelnosti (F1–F5, C1–C8) byly remediovány
+- ✅ Všech 7 DeFi kontraktů verifikováno na Basescan
+- ⚠️ Síť může stále obsahovat chyby — těžte a transakujte na vlastní nebezpečí
+- ⚠️ Není poskytována žádná záruka — viz [Právní upozornění](../LEGAL_DISCLAIMER.md)
+
+**Oficiální veřejný Launch: 31. prosince 2026**
+
+Období Mainnet Beta trvá do oficiálního veřejného spuštění **31.12.2026** podle původního roadmapu. Během tohoto období:
+- Síť prochází kontinuálním bezpečnostním ověřováním
+- Pokud síť projde bezpečnostním ověřením, genesis blok a všechny vytěžené bloky **zůstanou trvale**
+- Feedback komunity a hlášení chyb jsou vítány — viz [Contributing](../../CONTRIBUTING.md)
+- Těžební odměny jsou reálné a nevrátitelné
+
+| Parametr | Hodnota |
+|-----------|---------|
+| Status | **Mainnet Beta** |
+| Protokol | 3.0.4 |
+| Genesis hash | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
+| Oficiální launch | 2026-12-31 |
+| Těžba | Aktivní (na vlastní nebezpečí) |
 
 ---
 

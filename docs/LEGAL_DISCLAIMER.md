@@ -39,6 +39,16 @@ Specificky **není garantováno**:
 - Hodnota ZION tokenů
 - Kompatibilita s budoucími verzemi
 
+### 2.1 Mainnet Beta
+
+ZION v3.0.4 aktuálně běží jako **Mainnet Beta**. To znamená:
+
+- Síť je živá a produkuje bloky, ale **může obsahovat chyby**
+- **Těžba je na vlastní nebezpečí** — odměny jsou reálné, ale síť neprošla plným bezpečnostním auditem
+- Genesis blok a historie řetězce jsou trvalé — pokud síť projde bezpečnostním ověřením, **nebudou resetovány**
+- Oficiální veřejný launch je plánován na **31. prosince 2026**
+- Do té doby může dojít k hard forku, změnám parametrů, nebo dalším úpravám po DAO schválení
+
 ---
 
 ## 3. Rizika

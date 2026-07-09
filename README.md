@@ -1,4 +1,4 @@
-# ZION v3 — Mainnet
+# ZION v3 — Mainnet Beta
 
 <div align="center">
 
@@ -9,10 +9,43 @@ A proof-of-work blockchain with dual-algo consensus, cross-chain bridge, DeFi la
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/Rust-stable-orange.svg)](https://www.rust-lang.org/)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue.svg)](https://soliditylang.org/)
+[![Status: Mainnet Beta](https://img.shields.io/badge/Status-Mainnet_Beta-orange.svg)](#network-status)
 
 **English** · [Čeština](./docs/lang/README.cs.md) · [Español](./docs/lang/README.es.md) · [Français](./docs/lang/README.fr.md) · [Português](./docs/lang/README.pt.md)
 
 </div>
+
+---
+
+## Network Status
+
+> **⚠️ MAINNET BETA — Mining at your own risk**
+
+ZION v3.0.4 is **live and running** as Mainnet Beta. The network is operational, blocks are being produced, and the genesis chain is established.
+
+**What this means:**
+- ✅ The network is live and producing blocks
+- ✅ Genesis block and chain history are **permanent** — they will not be reset
+- ✅ All disclosed vulnerabilities (F1–F5, C1–C8) have been remediated
+- ✅ All 7 DeFi contracts verified on Basescan
+- ⚠️ The network may still contain bugs — mine and transact at your own risk
+- ⚠️ No warranty is provided — see [Legal Disclaimer](./docs/LEGAL_DISCLAIMER.md)
+
+**Official Public Launch: December 31, 2026**
+
+The Mainnet Beta period runs until the official public launch on **31.12.2026**, per the original roadmap. During this period:
+- The network undergoes continuous security verification
+- If the network passes security verification, the genesis block and all mined blocks **will remain permanently**
+- Community feedback and bug reports are welcome — see [Contributing](./CONTRIBUTING.md)
+- Mining rewards are real and non-reversible
+
+| Parameter | Value |
+|-----------|-------|
+| Status | **Mainnet Beta** |
+| Protocol | 3.0.4 |
+| Genesis hash | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
+| Official launch | 2026-12-31 |
+| Mining | Active (at your own risk) |
 
 ---
 
