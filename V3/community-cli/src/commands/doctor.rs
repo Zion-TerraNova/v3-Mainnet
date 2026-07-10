@@ -97,12 +97,23 @@ pub async fn run(cfg: &Config) -> Result<()> {
     ui::print_section("Miner Binary");
     let mut miner_found = false;
 
+    let miner_names: &[&str] = if cfg!(windows) {
+        &["zion-miner.exe", "miner.exe"]
+    } else {
+        &["zion-miner", "miner"]
+    };
+
     if let Ok(path_var) = std::env::var("PATH") {
         for dir in path_var.split(if cfg!(windows) { ';' } else { ':' }) {
-            let candidate = PathBuf::from(dir).join("zion-miner.exe");
-            if candidate.exists() {
-                ui::print_ok(&format!("Miner found: {}", candidate.display()));
-                miner_found = true;
+            for name in miner_names {
+                let candidate = PathBuf::from(dir).join(name);
+                if candidate.exists() {
+                    ui::print_ok(&format!("Miner found: {}", candidate.display()));
+                    miner_found = true;
+                    break;
+                }
+            }
+            if miner_found {
                 break;
             }
         }
@@ -111,7 +122,7 @@ pub async fn run(cfg: &Config) -> Result<()> {
     if !miner_found {
         if let Ok(home) = std::env::var("HOME").or_else(|_| std::env::var("USERPROFILE")) {
             let home = PathBuf::from(home);
-            for name in ["zion-miner.exe", "miner.exe"] {
+            for name in miner_names {
                 let candidate = home.join(".zion").join("bin").join(name);
                 if candidate.exists() {
                     ui::print_ok(&format!("Miner found: {}", candidate.display()));

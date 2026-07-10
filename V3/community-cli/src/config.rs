@@ -78,7 +78,7 @@ fn default_pool_bind() -> String {
 impl Default for PoolConfig {
     fn default() -> Self {
         Self {
-            host: "62.171.141.136".to_string(), // public Edge pool
+            host: "pool.zionterranova.com".to_string(), // public Edge pool
             port: 8444,
             bind: default_pool_bind(),
             wallet: String::new(),

@@ -200,6 +200,10 @@ fn show_console(cmd: &mut Command) {
         const CREATE_NEW_PROCESS_GROUP: u32 = 0x0000_0200;
         cmd.creation_flags(CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP);
     }
+    #[cfg(not(windows))]
+    {
+        let _ = cmd;
+    }
 }
 
 /// Find a binary in common locations.
@@ -313,7 +317,7 @@ pub fn find_binary_safely(name: &str) -> Option<PathBuf> {
 pub fn resolve_binary(name: &str) -> Result<PathBuf> {
     find_binary(name).ok_or_else(|| {
         anyhow!(
-            "{} not found. Download it from https://zionterranova.com/download or build with: cargo build --release -p {}",
+            "{} not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build with: cargo build --release -p {}",
             name,
             name
         )

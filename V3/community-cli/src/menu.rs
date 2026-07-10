@@ -666,7 +666,7 @@ fn config_menu() -> Result<Option<Vec<String>>> {
                 Some(args_owned(vec!["config".into(), "set".into(), "node.seed_peers".into(), val]))
             }
             4 => {
-                let host = required_input("Pool host", Some("62.171.141.136"))?;
+                let host = required_input("Pool host", Some("pool.zionterranova.com"))?;
                 Some(args_owned(vec!["config".into(), "set".into(), "pool.host".into(), host]))
             }
             5 => {
