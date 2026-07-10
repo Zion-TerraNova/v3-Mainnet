@@ -11,7 +11,7 @@ members = [
     "L4/oasis",
     "L5/free-world",
     "sdk",
-    "cli",
+    "community-cli",
 ]
 resolver = "2"
 
