@@ -9,7 +9,8 @@ use crate::db::BridgeDb;
 use crate::evm_rpc::EvmHttpClient;
 use crate::evm_tx::{
     build_and_sign_eip1559_tx, derive_evm_address, encode_confirm_burn_release,
-    encode_execute_timelocked_mint, encode_submit_lock_proof, hash_to_bytes32,
+    encode_execute_timelocked_mint, encode_get_burn_release_status,
+    encode_get_lock_proof_status, encode_submit_lock_proof, hash_to_bytes32,
 };
 use crate::metrics::BridgeMetrics;
 use crate::rate_limiter::{RateLimitResult, RateLimiter};
@@ -26,6 +27,7 @@ use tokio::net::TcpStream;
 use tokio::sync::mpsc;
 use tracing::{error, info, warn};
 use zeroize::Zeroizing;
+use zion_l1_types::normalize_rpc_addr;
 
 /// Gas limit safety margin (multiply estimate by this fraction numerator/denominator).
 const GAS_MARGIN_NUM: u64 = 130; // 130%
@@ -295,6 +297,23 @@ impl Relayer {
             );
         }
 
+        // ── Check on-chain status before spending gas ─────────────────
+        let rpc_url = chain_config.effective_rpc_url(&self.config.ankr);
+        let evm = EvmHttpClient::from_rpc_url(&rpc_url);
+        if is_lock_executed(&evm, &chain_config.bridge_contract_address, &lock.l1_tx_hash).await {
+            info!(
+                "   🟡 Lock {} already executed on-chain (mint already performed) — marking Completed",
+                lock.l1_tx_hash
+            );
+            let _ = self
+                .db
+                .update_lock_status(&lock.l1_tx_hash, BridgeStatus::Completed);
+            self.metrics
+                .evm_mints_confirmed
+                .fetch_add(1, Ordering::Relaxed);
+            return Ok(());
+        }
+
         // ── Load all available validator keys (multi-validator support) ──
         let all_keys = load_all_validator_keys(&self.config.validator);
         if all_keys.is_empty() {
@@ -318,10 +337,6 @@ impl Relayer {
             calldata.len(),
             chain_config.bridge_contract_address
         );
-
-        // ── Setup EVM HTTP client ─────────────────────────────────────
-        let rpc_url = chain_config.effective_rpc_url(&self.config.ankr);
-        let evm = EvmHttpClient::from_rpc_url(&rpc_url);
 
         // ── Get gas params once (shared across all validator TXs) ────
         // M3: retry once before falling back to conservative defaults so a
@@ -601,6 +616,32 @@ impl Relayer {
         }
 
         let l1_amount = burn.amount_flowers;
+
+        // ── Look up EVM chain config early so we can check on-chain status ──
+        let chain_config = self
+            .config
+            .evm_chains
+            .iter()
+            .find(|c| c.chain_id == burn.evm_chain && c.enabled)
+            .ok_or_else(|| anyhow::anyhow!("Burn chain '{}' not configured", burn.evm_chain))?;
+        let rpc_url = chain_config.effective_rpc_url(&self.config.ankr);
+        let evm = EvmHttpClient::from_rpc_url(&rpc_url);
+
+        // ── Check on-chain status before touching L1 or EVM gas ─────────
+        if is_burn_released(&evm, &chain_config.bridge_contract_address, &burn.burn_id).await {
+            info!(
+                "   🟡 Burn {} already released on-chain — marking Completed",
+                burn.burn_id
+            );
+            let _ = self
+                .db
+                .update_burn_status(&burn.burn_id, BridgeStatus::Completed);
+            self.metrics
+                .l1_unlocks_confirmed
+                .fetch_add(1, Ordering::Relaxed);
+            return Ok(());
+        }
+
         info!(
             "   Step 1: Submitting L1 unlock TX for {} ZION ({} atomic) to {}",
             crate::types::conversion::flowers_to_zion_display(l1_amount),
@@ -638,34 +679,78 @@ impl Relayer {
             proof_count
         );
 
-        let l1_result: Value = self
-            .l1_rpc("submitBridgeUnlock", unlock_request)
-            .await
-            .map_err(|e| anyhow::anyhow!("submitBridgeUnlock failed: {}", e))?;
+        let mut l1_unlock_already_done = false;
+        let l1_result: Value = match self.l1_rpc("submitBridgeUnlock", unlock_request).await {
+            Ok(r) => r,
+            Err(e) => {
+                let msg = e.to_string().to_lowercase();
+                if msg.contains("already used") || msg.contains("already executed") {
+                    let released = is_burn_released(
+                        &evm,
+                        &chain_config.bridge_contract_address,
+                        &burn.burn_id,
+                    )
+                    .await;
+                    if released {
+                        info!(
+                            "   🟡 L1 unlock reports already used and EVM confirms released — marking Completed (burn_id: {})",
+                            burn.burn_id
+                        );
+                        let _ = self
+                            .db
+                            .update_burn_status(&burn.burn_id, BridgeStatus::Completed);
+                        self.metrics
+                            .l1_unlocks_confirmed
+                            .fetch_add(1, Ordering::Relaxed);
+                        return Ok(());
+                    }
+                    warn!(
+                        "   ⚠️ L1 unlock reports already used but EVM contract not released — proceeding to confirmBurnRelease (burn_id: {})",
+                        burn.burn_id
+                    );
+                    l1_unlock_already_done = true;
+                    json!({ "tx_hash": "already-used" })
+                } else {
+                    return Err(anyhow::anyhow!("submitBridgeUnlock failed: {}", e));
+                }
+            }
+        };
         let l1_tx_hash = l1_result
             .get("tx_hash")
             .and_then(|v| v.as_str())
             .unwrap_or("unknown");
 
-        info!(
-            "   ✅ L1 unlock TX submitted — L1 TX: {}, amount: {} ZION",
-            l1_tx_hash,
-            crate::types::conversion::flowers_to_zion_display(l1_amount),
-        );
-        self.metrics
-            .l1_unlocks_submitted
-            .fetch_add(1, Ordering::Relaxed);
+        if l1_unlock_already_done {
+            warn!(
+                "   ⚠️ L1 unlock was already processed (replay key used) — L1 TX: {}",
+                l1_tx_hash
+            );
+        } else {
+            info!(
+                "   ✅ L1 unlock TX submitted — L1 TX: {}, amount: {} ZION",
+                l1_tx_hash,
+                crate::types::conversion::flowers_to_zion_display(l1_amount),
+            );
+            self.metrics
+                .l1_unlocks_submitted
+                .fetch_add(1, Ordering::Relaxed);
+        }
 
         // ── Step 2: Confirm burn release on ZIONBridge EVM contract via Ankr ──
-        let chain_config = self
-            .config
-            .evm_chains
-            .iter()
-            .find(|c| c.chain_id == burn.evm_chain && c.enabled)
-            .ok_or_else(|| anyhow::anyhow!("Burn chain '{}' not configured", burn.evm_chain))?;
-
-        let rpc_url = chain_config.effective_rpc_url(&self.config.ankr);
-        let evm = EvmHttpClient::from_rpc_url(&rpc_url);
+        // Re-check on-chain status before spending gas on confirmBurnRelease.
+        if is_burn_released(&evm, &chain_config.bridge_contract_address, &burn.burn_id).await {
+            info!(
+                "   🟡 Burn {} already released before confirmBurnRelease — marking Completed",
+                burn.burn_id
+            );
+            let _ = self
+                .db
+                .update_burn_status(&burn.burn_id, BridgeStatus::Completed);
+            self.metrics
+                .l1_unlocks_confirmed
+                .fetch_add(1, Ordering::Relaxed);
+            return Ok(());
+        }
 
         // Verify burn tx receipt exists on EVM
         match evm.get_receipt(&burn.evm_tx_hash).await {
@@ -696,11 +781,15 @@ impl Relayer {
             }
         }
 
-        // ── Step 3: Submit confirmBurnRelease() to ZIONBridge EVM contract ──
-        let key = load_validator_key(&self.config.validator)
-            .map_err(|e| anyhow::anyhow!("Failed to load validator key: {}", e))?;
-        let validator_address = derive_evm_address(key.as_str())?;
-        info!("   Validator address: {}", validator_address);
+        // ── Step 3: Submit confirmBurnRelease() for each validator key ─────
+        let all_keys = load_all_validator_keys(&self.config.validator);
+        if all_keys.is_empty() {
+            anyhow::bail!("No validator keys available — set ZION_VALIDATOR_PRIVATE_KEY");
+        }
+        info!(
+            "   Submitting confirmBurnRelease with {} validator key(s)",
+            all_keys.len()
+        );
 
         // ABI-encode confirmBurnRelease(bytes32 burnId, address evmBurner, uint256 amount, string l1Recipient)
         let burn_id_bytes = hash_to_bytes32(&burn.burn_id);
@@ -718,15 +807,7 @@ impl Relayer {
             chain_config.bridge_contract_address
         );
 
-        // EVM HTTP client — use the chain's effective RPC (config override or Ankr fallback).
-        let rpc_url = chain_config.effective_rpc_url(&self.config.ankr);
-        let evm = EvmHttpClient::from_rpc_url(&rpc_url);
-
-        // Get nonce + gas params
-        let nonce = evm
-            .get_nonce(&validator_address)
-            .await
-            .map_err(|e| anyhow::anyhow!("confirmBurnRelease: get_nonce failed: {}", e))?;
+        // Get shared gas params once
         let base_fee = evm.get_gas_price().await.unwrap_or(2_000_000_000);
         let priority_fee = evm.get_max_priority_fee().await.unwrap_or(1_500_000_000);
         let max_gas_gwei = chain_config.max_gas_gwei;
@@ -734,9 +815,19 @@ impl Relayer {
         let max_fee = (2 * base_fee + priority_fee).min(max_fee_cap);
         let max_priority = priority_fee.min(max_fee);
 
+        // Estimate gas using validator-1's address as the sender
+        let first_validator_addr = match derive_evm_address(all_keys[0].as_str()) {
+            Ok(a) => a,
+            Err(e) => {
+                return Err(anyhow::anyhow!(
+                    "Failed to derive validator-1 address for gas estimate: {}",
+                    e
+                ));
+            }
+        };
         let gas_estimate = evm
             .estimate_gas(
-                &validator_address,
+                &first_validator_addr,
                 &chain_config.bridge_contract_address,
                 &calldata_hex,
             )
@@ -745,8 +836,7 @@ impl Relayer {
         let gas_limit = gas_estimate * GAS_MARGIN_NUM / GAS_MARGIN_DEN;
 
         info!(
-            "   Gas: nonce={} base_fee={} gwei priority={} gwei cap={} gwei estimate={} limit={}",
-            nonce,
+            "   Gas: base_fee={} gwei priority={} gwei cap={} gwei estimate={} limit={}",
             base_fee / 1_000_000_000,
             priority_fee / 1_000_000_000,
             max_gas_gwei,
@@ -754,29 +844,106 @@ impl Relayer {
             gas_limit,
         );
 
-        // Build + sign + submit EIP-1559 TX
-        let raw_tx = build_and_sign_eip1559_tx(
-            chain_config.evm_chain_id,
-            nonce,
-            max_priority,
-            max_fee,
-            gas_limit,
-            &chain_config.bridge_contract_address,
-            &calldata,
-            key.as_str(),
-        )?;
+        let mut last_cbr_tx_hash = String::new();
+        for (idx, key) in all_keys.iter().enumerate() {
+            let validator_address = match derive_evm_address(key.as_str()) {
+                Ok(a) => a,
+                Err(e) => {
+                    warn!("   Validator-{} — failed to derive address: {}", idx + 1, e);
+                    continue;
+                }
+            };
+            info!("   Validator-{} address: {}", idx + 1, validator_address);
 
-        let cbr_tx_hash = evm
-            .send_raw_transaction(&raw_tx)
-            .await
-            .map_err(|e| anyhow::anyhow!("confirmBurnRelease TX submit failed: {}", e))?;
+            let nonce = match evm.get_nonce(&validator_address).await {
+                Ok(n) => n,
+                Err(e) => {
+                    warn!("   Validator-{} — failed to get nonce: {}", idx + 1, e);
+                    continue;
+                }
+            };
+            info!("   Validator-{} nonce: {}", idx + 1, nonce);
 
-        info!(
-            "   ✅ confirmBurnRelease TX submitted! hash: {} | chain: {} | burn_id: {} | L1 TX: {}",
-            cbr_tx_hash, chain_config.name, burn.burn_id, l1_tx_hash,
-        );
+            let raw_tx = match build_and_sign_eip1559_tx(
+                chain_config.evm_chain_id,
+                nonce,
+                max_priority,
+                max_fee,
+                gas_limit,
+                &chain_config.bridge_contract_address,
+                &calldata,
+                key.as_str(),
+            ) {
+                Ok(t) => t,
+                Err(e) => {
+                    warn!(
+                        "   Validator-{} — failed to sign confirmBurnRelease TX: {}",
+                        idx + 1,
+                        e
+                    );
+                    continue;
+                }
+            };
 
-        // Poll for receipt in background
+            match evm.send_raw_transaction(&raw_tx).await {
+                Ok(tx_hash) => {
+                    info!(
+                        "   ✅ confirmBurnRelease TX submitted! hash: {} | validator-{} | chain: {} | burn_id: {} | L1 TX: {}",
+                        tx_hash, idx + 1, chain_config.name, burn.burn_id, l1_tx_hash
+                    );
+                    last_cbr_tx_hash = tx_hash;
+                    self.metrics
+                        .l1_unlocks_submitted
+                        .fetch_add(1, Ordering::Relaxed);
+                }
+                Err(e) => {
+                    warn!(
+                        "   Validator-{} — confirmBurnRelease TX submit failed: {}",
+                        idx + 1,
+                        e
+                    );
+                }
+            }
+
+            if idx + 1 < all_keys.len() {
+                tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+            }
+        }
+
+        if last_cbr_tx_hash.is_empty() {
+            let err_msg = format!(
+                "All validator key submissions failed for confirmBurnRelease — burn_id: {}",
+                burn.burn_id
+            );
+            let retry_count = self
+                .db
+                .increment_burn_retry(&burn.burn_id, &err_msg)
+                .unwrap_or(0);
+            if retry_count >= MAX_RELAY_RETRIES {
+                error!(
+                    "   ☠️ confirmBurnRelease permanently failed after {} retries — manual intervention required",
+                    retry_count
+                );
+                let _ = self
+                    .db
+                    .update_burn_status(&burn.burn_id, BridgeStatus::Failed);
+            } else {
+                warn!(
+                    "   ⚠️ confirmBurnRelease failed (retry {}/{}), will be retried on next startup",
+                    retry_count, MAX_RELAY_RETRIES
+                );
+                let _ = self
+                    .db
+                    .update_burn_status(&burn.burn_id, BridgeStatus::Failed);
+            }
+            self.metrics
+                .errors
+                .fetch_add(1, Ordering::Relaxed);
+            return Err(anyhow::anyhow!("{}", err_msg));
+        }
+
+        // Poll the last confirmBurnRelease receipt in the background.
+        let cbr_tx_hash = last_cbr_tx_hash;
         tokio::spawn({
             let evm_url = rpc_url.to_string();
             let tx = cbr_tx_hash.clone();
@@ -1057,6 +1224,76 @@ impl Relayer {
     }
 }
 
+/// Query the ZIONBridge contract to see whether a given L1 lock has already
+/// been executed (minted). Returns `false` on RPC failure so the relayer
+/// falls back to the normal submission path.
+async fn is_lock_executed(evm: &EvmHttpClient, bridge_contract: &str, l1_tx_hash: &str) -> bool {
+    let hash_bytes = hash_to_bytes32(l1_tx_hash);
+    let calldata = encode_get_lock_proof_status(&hash_bytes);
+    let data_hex = format!("0x{}", hex::encode(&calldata));
+
+    match evm.eth_call(bridge_contract, &data_hex).await {
+        Ok(bytes) => {
+            // getLockProofStatus returns (uint8, bool, bool, uint256, address, uint256)
+            if bytes.len() < 64 {
+                warn!(
+                    "getLockProofStatus returned {} bytes (expected ≥64), treating lock as not executed",
+                    bytes.len()
+                );
+                return false;
+            }
+            let executed = bytes[32..64].iter().any(|b| *b != 0);
+            info!(
+                "   On-chain lock status for {}: executed={}",
+                l1_tx_hash, executed
+            );
+            executed
+        }
+        Err(e) => {
+            warn!(
+                "   Could not check on-chain lock status for {}: {} — proceeding with submission",
+                l1_tx_hash, e
+            );
+            false
+        }
+    }
+}
+
+/// Query the ZIONBridge contract to see whether a given wZION burn has already
+/// been released. Returns `false` on RPC failure so the relayer falls back to
+/// the normal submission path.
+async fn is_burn_released(evm: &EvmHttpClient, bridge_contract: &str, burn_id: &str) -> bool {
+    let burn_id_bytes = hash_to_bytes32(burn_id);
+    let calldata = encode_get_burn_release_status(&burn_id_bytes);
+    let data_hex = format!("0x{}", hex::encode(&calldata));
+
+    match evm.eth_call(bridge_contract, &data_hex).await {
+        Ok(bytes) => {
+            // getBurnReleaseStatus returns (uint8, bool, address, uint256, string)
+            if bytes.len() < 64 {
+                warn!(
+                    "getBurnReleaseStatus returned {} bytes (expected ≥64), treating burn as not released",
+                    bytes.len()
+                );
+                return false;
+            }
+            let released = bytes[32..64].iter().any(|b| *b != 0);
+            info!(
+                "   On-chain burn status for {}: released={}",
+                burn_id, released
+            );
+            released
+        }
+        Err(e) => {
+            warn!(
+                "   Could not check on-chain burn status for {}: {} — proceeding with submission",
+                burn_id, e
+            );
+            false
+        }
+    }
+}
+
 /// Sign an operation message with a secp256k1 signing key and return
 /// `(signature_hex, compressed_public_key_hex)`, both prefixed with `0x`.
 ///
@@ -1134,17 +1371,6 @@ fn build_validator_proofs_checked(
     }
 
     Ok(proofs)
-}
-
-fn normalize_rpc_addr(value: &str) -> String {
-    let trimmed = value.trim().trim_end_matches('/');
-    let trimmed = trimmed.strip_suffix("/jsonrpc").unwrap_or(trimmed);
-    trimmed
-        .strip_prefix("tcp://")
-        .or_else(|| trimmed.strip_prefix("http://"))
-        .or_else(|| trimmed.strip_prefix("https://"))
-        .unwrap_or(trimmed)
-        .to_string()
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

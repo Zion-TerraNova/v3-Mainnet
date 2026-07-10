@@ -164,6 +164,24 @@ impl EvmHttpClient {
             Ok(Some(result))
         }
     }
+
+    /// Execute a read-only contract call via `eth_call` and return raw bytes.
+    ///
+    /// `data_hex` must be a `0x`-prefixed ABI-encoded call (4-byte selector + args).
+    pub async fn eth_call(&self, to: &str, data_hex: &str) -> Result<Vec<u8>> {
+        let result = self
+            .call("eth_call", json!([{
+                "to": to,
+                "data": data_hex,
+            }, "latest"]))
+            .await?;
+        let hex_str = result
+            .as_str()
+            .ok_or_else(|| anyhow!("Expected hex string from eth_call, got {:?}", result))?;
+        let bytes = hex::decode(hex_str.trim_start_matches("0x"))
+            .with_context(|| format!("Failed to decode eth_call result: {}", hex_str))?;
+        Ok(bytes)
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

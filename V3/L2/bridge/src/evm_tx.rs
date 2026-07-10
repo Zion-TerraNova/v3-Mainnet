@@ -49,6 +49,38 @@ pub fn encode_execute_timelocked_mint(l1_tx_hash_bytes: &[u8; 32]) -> Vec<u8> {
     calldata
 }
 
+/// ABI-encode `getLockProofStatus(bytes32)`.
+///
+/// Used to query whether a given L1 lock has already been executed
+/// (minted) on-chain before the relayer spends gas on a redundant proof.
+pub fn encode_get_lock_proof_status(l1_tx_hash_bytes: &[u8; 32]) -> Vec<u8> {
+    let mut h = Keccak256::new();
+    h.update(b"getLockProofStatus(bytes32)");
+    let digest = h.finalize();
+    let selector = [digest[0], digest[1], digest[2], digest[3]];
+
+    let mut calldata = Vec::with_capacity(36);
+    calldata.extend_from_slice(&selector);
+    calldata.extend_from_slice(l1_tx_hash_bytes);
+    calldata
+}
+
+/// ABI-encode `getBurnReleaseStatus(bytes32)`.
+///
+/// Used to query whether a given wZION burn has already been released
+/// (L1 unlock confirmed) on-chain before the relayer resubmits.
+pub fn encode_get_burn_release_status(burn_id_bytes: &[u8; 32]) -> Vec<u8> {
+    let mut h = Keccak256::new();
+    h.update(b"getBurnReleaseStatus(bytes32)");
+    let digest = h.finalize();
+    let selector = [digest[0], digest[1], digest[2], digest[3]];
+
+    let mut calldata = Vec::with_capacity(36);
+    calldata.extend_from_slice(&selector);
+    calldata.extend_from_slice(burn_id_bytes);
+    calldata
+}
+
 /// Derive a deterministic bytes32 for any string (e.g. UTXO key or tx hash).
 /// Uses keccak256 for uniqueness.
 pub fn hash_to_bytes32(input: &str) -> [u8; 32] {
