@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.0.5-beta] — 2026-07-10 (Community CLI)
+
+### Added
+- **Simplified community CLI** — single `zion` binary replaces 8 separate binaries
+- **Interactive arrow-key menu** — `zion menu` with live dashboard (node, miner, pool, wallet)
+- **Guided Setup** — wallet → node → pool → miner workflow, step by step
+- **Live monitor** — `zion monitor` shows local stack status + chain height
+- **Doctor diagnostics** — `zion doctor` checks config, node, wallet, pool, miner, AI
+- **Network status** — `zion status` pings node, pool, website, explorer, AI
+- **Hiran AI chat** — `zion ai chat` / `zion ai ask` (OpenAI-compatible endpoint)
+- **Config management** — `zion config set/get` with TOML config at `~/.zion/zion.toml`
+- **Custom command input** — type any `zion` subcommand from the interactive menu
+- **Shell completions** — `zion completions bash|zsh|fish|powershell`
+- **Windows self-contained bundle** — node, pool, miner embedded in CLI binary
+- **Begin Guide** — beginner-friendly guide added to all 5 Lite READMEs (EN, CS, ES, FR, PT)
+- **Visual README redesign** — Stargate hero, shields.io badges, emoji portal, footer
+
+### Fixed
+- **Server addresses** — replaced decommissioned `77.42.71.94` with `62.171.141.136` / `pool.zionterranova.com` in all config defaults, menu prompts, and help text
+- **Wallet send** — sender address now read from wallet file (was broken using `cfg.miner.wallet`)
+- **Wallet address/balance** — fallback to `zion-wallet.json` when config `miner.wallet` is empty
+- **Doctor on Linux** — searches for `zion-miner` (not `zion-miner.exe`)
+- **Download URLs** — error messages now point to GitHub releases page
+- **Unused variable warning** — `show_console` on Unix no longer warns
+
+### Changed
+- **CLI package** — renamed `V3/cli/` → `V3/community-cli/` (package `zion-public`)
+- **Pool default** — `pool.zionterranova.com:8444` (resolves to `62.171.141.136`)
+- **Seed peers** — `62.171.141.136:8333`
+- **AI endpoint** — `http://62.171.141.136:8080`
+
+---
+
 ## [3.0.4-beta] — 2026-07-09 (Mainnet Beta)
 
 ### Added
@@ -125,6 +158,7 @@ ZION uses a modified semantic versioning scheme:
 
 | Version | Target | Status |
 |---------|--------|--------|
+| 3.0.5-beta | Community CLI | ✅ Live (2026-07-10) |
 | 3.0.4-beta | Mainnet Beta | ✅ Live (2026-07-09) |
 | 3.0.4-stable | Official Public Launch | 📅 2026-12-31 |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
