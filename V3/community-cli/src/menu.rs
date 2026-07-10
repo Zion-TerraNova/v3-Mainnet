@@ -662,11 +662,11 @@ fn config_menu() -> Result<Option<Vec<String>>> {
                 Some(args_owned(vec!["config".into(), "set".into(), "node.p2p_bind".into(), val]))
             }
             3 => {
-                let val = required_input("Seed peers", Some("77.42.71.94:8333"))?;
+                let val = required_input("Seed peers", Some("62.171.141.136:8333"))?;
                 Some(args_owned(vec!["config".into(), "set".into(), "node.seed_peers".into(), val]))
             }
             4 => {
-                let host = required_input("Pool host", Some("77.42.71.94"))?;
+                let host = required_input("Pool host", Some("62.171.141.136"))?;
                 Some(args_owned(vec!["config".into(), "set".into(), "pool.host".into(), host]))
             }
             5 => {
@@ -674,7 +674,7 @@ fn config_menu() -> Result<Option<Vec<String>>> {
                 Some(args_owned(vec!["config".into(), "set".into(), "pool.bind".into(), val]))
             }
             6 => {
-                let url = required_input("AI endpoint URL", Some("http://77.42.71.94:8080"))?;
+                let url = required_input("AI endpoint URL", Some("http://62.171.141.136:8080"))?;
                 Some(args_owned(vec!["config".into(), "set".into(), "ai.url".into(), url]))
             }
             7 => {
