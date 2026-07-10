@@ -1,0 +1,4 @@
+684c68c0426edf45508838b857b1b95845720685812d7aef5574552b29f7687d  macos-aarch64/zion-cli-macos-aarch64.tar.gz
+79bd7511fefecc1fca643f18750a4fdc7bc8773fe659746d9885c81199e3f230  macos-x86_64/zion-cli-macos-x86_64.tar.gz
+40ce377142e45f3d52f1a356130583f0d8eed38afac581909f624119dea16e8e  windows-x86_64/zion-cli-windows-x86_64.zip
+962ad26178b372aa5f9c58af6597c4be3fd2e1a876242493938c21c4eab316f4  linux-x86_64/zion-cli-linux-x86_64.tar.gz
