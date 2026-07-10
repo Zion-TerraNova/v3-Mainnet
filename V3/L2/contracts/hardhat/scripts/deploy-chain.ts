@@ -88,11 +88,11 @@ const CHAIN_META: Record<string, ChainMeta> = {
 // ─── Validator defaults (same as Base mainnet — EVM address is deterministic) ─
 
 const DEFAULT_VALIDATORS = [
-  "0x9b5b9a6c4ce4bcd4479d8ea6d12cd7bfeb61085f", // validator-1 (new — hard reset 2026-07-06)
-  "0x8a804afd4c200e95f415df6907da111a0258a578", // validator-2 (new — hard reset 2026-07-06)
-  "0x694f3b43f4bf77dfbef53224791272d102449218", // validator-3 (new — hard reset 2026-07-06)
-  "0x64c85af40143484c12316723192a0d71c10e82b8", // validator-4 (new — hard reset 2026-07-06)
-  "0xe093ff26da65079df435a89834497abc380b59ae", // validator-5 (new — hard reset 2026-07-06)
+  "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186", // validator-1 (on-chain verified via Basescan)
+  "0x24d986841E56e5571489B25951eE8C1Ae761FA82", // validator-2 (on-chain verified via Basescan)
+  "0x665c55eDCF25c2c5A1dfF1B20eE950cBDC58d3d0", // validator-3 (on-chain verified via Basescan)
+  "0x8E644b3E9FaBf52eE321DC5B3D5AA06d6e3E66C6", // validator-4 (on-chain verified via Basescan)
+  "0x7e0D2eD71d78B9CFB5034A83333e82e304bc4CB2", // validator-5 (on-chain verified via Basescan)
 ];
 
 const DEFAULT_THRESHOLD = 5;
