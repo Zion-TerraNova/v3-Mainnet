@@ -147,7 +147,7 @@ fn default_ai_model() -> String {
 impl Default for AiConfig {
     fn default() -> Self {
         Self {
-            url: "http://62.171.141.136:8080".to_string(),
+            url: String::new(),
             model: default_ai_model(),
         }
     }

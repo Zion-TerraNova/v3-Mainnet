@@ -154,22 +154,26 @@ pub async fn run(cfg: &Config) -> Result<()> {
 
     // ── 7. AI endpoint ───────────────────────────────────────────────
     ui::print_section("Hiran AI");
-    ui::print_row("Endpoint", &cfg.ai.url);
-    let health_url = format!("{}/health", cfg.ai.url.trim_end_matches('/'));
-    match reqwest::Client::new()
-        .get(&health_url)
-        .timeout(std::time::Duration::from_secs(5))
-        .send()
-        .await
-    {
-        Ok(r) if r.status().is_success() => ui::print_ok("Hiran AI reachable."),
-        Ok(r) => {
-            ui::print_warn(&format!("Hiran AI responded HTTP {}", r.status()));
-            warnings += 1;
-        }
-        Err(e) => {
-            ui::print_warn(&format!("Hiran AI unreachable: {}", e));
-            warnings += 1;
+    if cfg.ai.url.is_empty() {
+        ui::print_info("Not configured (optional). Set with: zion config set ai.url <endpoint>");
+    } else {
+        ui::print_row("Endpoint", &cfg.ai.url);
+        let health_url = format!("{}/health", cfg.ai.url.trim_end_matches('/'));
+        match reqwest::Client::new()
+            .get(&health_url)
+            .timeout(std::time::Duration::from_secs(5))
+            .send()
+            .await
+        {
+            Ok(r) if r.status().is_success() => ui::print_ok("Hiran AI reachable."),
+            Ok(r) => {
+                ui::print_warn(&format!("Hiran AI responded HTTP {}", r.status()));
+                warnings += 1;
+            }
+            Err(e) => {
+                ui::print_warn(&format!("Hiran AI unreachable: {}", e));
+                warnings += 1;
+            }
         }
     }
 

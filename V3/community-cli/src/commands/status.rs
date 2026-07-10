@@ -34,32 +34,29 @@ pub async fn run(cfg: &Config) -> Result<()> {
     }
 
     // ── Pool ─────────────────────────────────────────────────────────
+    // Pool uses stratum protocol (TCP), not HTTP — do a TCP connect check.
     ui::print_section("Mining Pool");
-    let pool_url = format!("http://{}:{}/api/pool", cfg.pool.host, cfg.pool.port);
-    match client.get(&pool_url).send().await {
-        Ok(r) if r.status().is_success() => {
-            ui::print_ok(&format!("Online — {}", pool_url));
-        }
-        Ok(r) => {
-            ui::print_warn(&format!("Responded HTTP {} — {}", r.status(), pool_url));
-        }
-        Err(e) => {
-            // Pool may not have an HTTP API; try TCP connect
-            ui::print_warn(&format!("HTTP probe failed ({}). Pool may still accept stratum on port {}.", e, cfg.pool.port));
-        }
+    let pool_addr = format!("{}:{}", cfg.pool.host, cfg.pool.port);
+    match tokio::net::TcpStream::connect(&pool_addr).await {
+        Ok(_) => ui::print_ok(&format!("Online — {} (stratum/TCP)", pool_addr)),
+        Err(e) => ui::print_err(&format!("Offline — {} ({})", pool_addr, e)),
     }
 
     // ── AI (Hiran) ───────────────────────────────────────────────────
     ui::print_section("Hiran AI");
-    let ai_health = format!("{}/health", cfg.ai.url.trim_end_matches('/'));
-    match client.get(&ai_health).send().await {
-        Ok(r) if r.status().is_success() => {
-            ui::print_ok(&format!("Online — {}", cfg.ai.url));
+    if cfg.ai.url.is_empty() {
+        ui::print_info("Not configured (optional). Set with: zion config set ai.url <endpoint>");
+    } else {
+        let ai_health = format!("{}/health", cfg.ai.url.trim_end_matches('/'));
+        match client.get(&ai_health).send().await {
+            Ok(r) if r.status().is_success() => {
+                ui::print_ok(&format!("Online — {}", cfg.ai.url));
+            }
+            Ok(r) => {
+                ui::print_warn(&format!("Responded HTTP {} — {}", r.status(), cfg.ai.url));
+            }
+            Err(e) => ui::print_warn(&format!("Offline — {} (AI is optional)", e)),
         }
-        Ok(r) => {
-            ui::print_warn(&format!("Responded HTTP {} — {}", r.status(), cfg.ai.url));
-        }
-        Err(e) => ui::print_err(&format!("Offline — {}", e)),
     }
 
     // ── Website ──────────────────────────────────────────────────────
