@@ -44,7 +44,7 @@ fn default_node_id() -> String {
     "zion-public-node".into()
 }
 fn default_seed_peers() -> String {
-    "77.42.71.94:8333".into()
+    "62.171.141.136:8333".into()
 }
 
 impl Default for NodeConfig {
@@ -54,7 +54,7 @@ impl Default for NodeConfig {
             rpc_port: 8443,
             p2p_bind: default_p2p_bind(),
             node_id: default_node_id(),
-            seed_peers: "77.42.71.94:8333".to_string(),
+            seed_peers: "62.171.141.136:8333".to_string(),
             humanitarian_wallet: String::new(),
             issobella_wallet: String::new(),
         }
@@ -78,7 +78,7 @@ fn default_pool_bind() -> String {
 impl Default for PoolConfig {
     fn default() -> Self {
         Self {
-            host: "77.42.71.94".to_string(), // public Edge pool
+            host: "pool.zionterranova.com".to_string(), // public Edge pool
             port: 8444,
             bind: default_pool_bind(),
             wallet: String::new(),
@@ -147,7 +147,7 @@ fn default_ai_model() -> String {
 impl Default for AiConfig {
     fn default() -> Self {
         Self {
-            url: "http://77.42.71.94:8080".to_string(),
+            url: "http://62.171.141.136:8080".to_string(),
             model: default_ai_model(),
         }
     }

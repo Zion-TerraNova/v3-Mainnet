@@ -250,10 +250,14 @@ pub async fn run(cfg: &Config, cmd: WalletCmd) -> Result<()> {
         }
         WalletCmd::Address => {
             ui::print_header("Wallet Address");
-            if cfg.miner.wallet.is_empty() {
-                ui::print_warn("No wallet configured. Run: zion wallet new --mnemonic");
-            } else {
+            if !cfg.miner.wallet.is_empty() {
                 ui::print_row("Address", &cfg.miner.wallet);
+                ui::print_row("Source", "config (miner.wallet)");
+            } else if let Ok(wf) = read_wallet_file(&PathBuf::from("zion-wallet.json")) {
+                ui::print_row("Address", &wf.address);
+                ui::print_row("Source", "zion-wallet.json");
+            } else {
+                ui::print_warn("No wallet configured. Run: zion wallet new --mnemonic --set-default");
             }
             println!();
             Ok(())
@@ -261,6 +265,27 @@ pub async fn run(cfg: &Config, cmd: WalletCmd) -> Result<()> {
         WalletCmd::Balance { address } => {
             let addr = address.unwrap_or_else(|| cfg.miner.wallet.clone());
             if addr.is_empty() {
+                // Try to read address from default wallet file
+                if let Ok(wf) = read_wallet_file(&PathBuf::from("zion-wallet.json")) {
+                    ui::print_header(&format!("Balance: {}", wf.address));
+                    let node = zion_sdk::node::NodeClient::builder(
+                        &cfg.node.rpc_host,
+                        cfg.node.rpc_port,
+                    )
+                    .build();
+                    let wallet_client = zion_sdk::wallet::WalletClient::new(node);
+                    match wallet_client.balance_breakdown(&wf.address).await {
+                        Ok(bal) => {
+                            ui::print_row("Total", &format!("{:.6} ZION", bal.total_zion));
+                            ui::print_row("Account", &format!("{:.6} ZION", bal.account_zion));
+                            ui::print_row("UTXO", &format!("{:.6} ZION", bal.utxo_zion));
+                            ui::print_row("UTXO count", &bal.utxo_count.to_string());
+                        }
+                        Err(e) => ui::print_warn(&format!("Cannot fetch balance: {}", e)),
+                    }
+                    println!();
+                    return Ok(());
+                }
                 ui::print_warn("No address. Use --address <addr> or set miner.wallet in config.");
                 return Ok(());
             }
@@ -288,20 +313,11 @@ pub async fn run(cfg: &Config, cmd: WalletCmd) -> Result<()> {
         WalletCmd::Send {
             to, amount, memo, wallet, password_env,
         } => {
-            if cfg.miner.wallet.is_empty() {
-                ui::print_warn("No wallet configured. Set miner.wallet in config first.");
-                return Ok(());
-            }
             ui::print_header("Send ZION");
-            ui::print_row("From", &cfg.miner.wallet);
-            ui::print_row("To", &to);
-            ui::print_row("Amount", &format!("{:.8} ZION", amount));
-            if let Some(ref m) = memo {
-                ui::print_row("Memo", m);
-            }
 
-            // Load wallet & signing key
+            // Load wallet & signing key first — the sender address comes from the wallet file.
             let wallet_file = read_wallet_file(&wallet)?;
+            let from_address = wallet_file.address.clone();
             let secrets = resolve_wallet_secrets(&wallet_file, password_env.as_deref())?;
             let sk_bytes = zion_core::crypto::from_hex(&secrets.secret_key_hex)
                 .ok_or_else(|| anyhow!("invalid secret key hex in wallet"))?;
@@ -309,6 +325,13 @@ pub async fn run(cfg: &Config, cmd: WalletCmd) -> Result<()> {
                 .try_into()
                 .map_err(|_| anyhow!("secret key must be 32 bytes"))?;
             let signing_key = SigningKey::from_bytes(&sk_bytes);
+
+            ui::print_row("From", &from_address);
+            ui::print_row("To", &to);
+            ui::print_row("Amount", &format!("{:.8} ZION", amount));
+            if let Some(ref m) = memo {
+                ui::print_row("Memo", m);
+            }
 
             let node = zion_sdk::node::NodeClient::builder(
                 &cfg.node.rpc_host,
@@ -319,7 +342,7 @@ pub async fn run(cfg: &Config, cmd: WalletCmd) -> Result<()> {
 
             // Use SDK send (auto-fallback UTXO → account)
             let result = wallet_client
-                .send(&signing_key, &cfg.miner.wallet, &to, amount, None)
+                .send(&signing_key, &from_address, &to, amount, None)
                 .await;
 
             match result {

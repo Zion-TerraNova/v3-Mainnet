@@ -140,6 +140,6 @@ fn find_pool_binary() -> Result<PathBuf> {
     }
 
     Err(anyhow::anyhow!(
-        "pool binary not found. Download zion-pool-windows-x86_64.exe from https://zionterranova.com/download or build: cargo build --release -p zion-pool --bin server"
+        "pool binary not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build: cargo build --release -p zion-pool --bin server"
     ))
 }

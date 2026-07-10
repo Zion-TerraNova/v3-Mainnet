@@ -230,6 +230,6 @@ fn find_miner_binary() -> Result<PathBuf> {
     }
 
     Err(anyhow::anyhow!(
-        "miner binary not found. Download zion-miner-windows-x86_64.exe from https://zionterranova.com/download or build: cargo build --release -p zion-miner"
+        "miner binary not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build: cargo build --release -p zion-miner"
     ))
 }

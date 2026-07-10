@@ -239,7 +239,7 @@ pub fn print_start_guide() {
     println!("  {} Tips:", "5.".bold().bright_white());
     println!("     {} Write down your 24-word mnemonic on paper. Never store it digitally.", "⚠".yellow());
     println!("     {} Mining on CPU is slow. GPU (opencl/cuda) is much faster.", "◉".cyan());
-    println!("     {} The public pool at 77.42.71.94:8444 works without running a local node.", "◉".cyan());
+    println!("     {} The public pool at pool.zionterranova.com:8444 works without running a local node.", "◉".cyan());
     println!("     {} You can type any command directly from the menu: choose 'Run command'.", "◉".cyan());
     println!();
 }
