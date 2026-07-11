@@ -38,10 +38,6 @@ sha2.workspace = true
 chrono.workspace = true
 dirs = "5"
 
-# Unix process detachment (setsid)
-[target.'cfg(unix)'.dependencies]
-libc = "0.2"
-
 # Archive extraction for binary download (Linux/macOS bundle fallback)
 flate2 = "1"
 tar = "0.4"
@@ -50,3 +46,7 @@ zip = { version = "2", default-features = false, features = ["deflate"] }
 # Link the same L1 core + SDK — byte-exact crypto compatibility with the node.
 zion-core = { path = "../L1/core" }
 zion-sdk = { path = "../sdk" }
+
+# Unix process detachment (setsid)
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
