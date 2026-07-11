@@ -654,7 +654,7 @@ fn config_menu() -> Result<Option<Vec<String>>> {
                 Some(args_owned(vec!["config".into(), "set".into(), "miner.wallet".into(), val]))
             }
             1 => {
-                let host = required_input("RPC host", Some("127.0.0.1"))?;
+                let host = required_input("RPC host", Some("rpc.zionterranova.com"))?;
                 Some(args_owned(vec!["config".into(), "set".into(), "node.rpc_host".into(), host]))
             }
             2 => {
@@ -674,7 +674,7 @@ fn config_menu() -> Result<Option<Vec<String>>> {
                 Some(args_owned(vec!["config".into(), "set".into(), "pool.bind".into(), val]))
             }
             6 => {
-                let url = required_input("AI endpoint URL", Some("http://62.171.141.136:8080"))?;
+                let url = required_input("AI endpoint URL (blank = disabled)", Some(""))?;
                 Some(args_owned(vec!["config".into(), "set".into(), "ai.url".into(), url]))
             }
             7 => {

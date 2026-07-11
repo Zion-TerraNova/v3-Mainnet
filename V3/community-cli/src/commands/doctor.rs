@@ -43,11 +43,34 @@ pub async fn run(cfg: &Config) -> Result<()> {
     match node_client.chain_info().await {
         Ok(chain) => {
             ui::print_ok(&format!("Node reachable — height {}", chain.chain_height));
+            ui::print_row("Network", &chain.network);
+            ui::print_row("Consensus", &chain.consensus_profile);
+            ui::print_row("Tip", &chain.tip_hash_hex);
+            ui::print_row("Mempool txs", &chain.mempool_transactions.to_string());
         }
         Err(e) => {
             ui::print_err(&format!("Node unreachable: {}", e));
             errors += 1;
         }
+    }
+
+    // Peers
+    match node_client.peer_info().await {
+        Ok(peers) => {
+            ui::print_row("Connected peers", &peers.count.to_string());
+        }
+        Err(_) => {}
+    }
+
+    // Supply
+    match node_client.supply_info().await {
+        Ok(supply) => {
+            ui::print_row("Total supply", &format!("{} ZION", supply.total_supply_zion));
+            ui::print_row("Mined so far", &format!("{} ZION", supply.mined_so_far_zion));
+            ui::print_row("Mined %", &format!("{}%", supply.supply_mined_percent));
+            ui::print_row("Block reward", &format!("{:.6} ZION", supply.block_reward_zion));
+        }
+        Err(_) => {}
     }
 
     // ── 3. Wallet ────────────────────────────────────────────────────

@@ -50,7 +50,7 @@ fn default_seed_peers() -> String {
 impl Default for NodeConfig {
     fn default() -> Self {
         Self {
-            rpc_host: "127.0.0.1".to_string(), // when running local node
+            rpc_host: "rpc.zionterranova.com".to_string(), // public RPC (nginx TCP proxy)
             rpc_port: 8443,
             p2p_bind: default_p2p_bind(),
             node_id: default_node_id(),
