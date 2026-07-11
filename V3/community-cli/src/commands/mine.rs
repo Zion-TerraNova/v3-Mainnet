@@ -155,6 +155,29 @@ async fn start_mining(
     // Find the miner binary
     let bin = find_miner_binary()?;
 
+    // Kill any orphaned miner processes from previous runs (old CLI versions,
+    // crashed processes, etc.) that aren't tracked by PID file.
+    #[cfg(unix)]
+    {
+        use std::process::Command;
+        let output = Command::new("sh")
+            .args(["-c", "ps aux | grep -E 'zion-miner|\\.zion/bin/miner' | grep -v grep | awk '{print $2}'"])
+            .output();
+        if let Ok(out) = output {
+            let pids: Vec<String> = String::from_utf8_lossy(&out.stdout)
+                .lines()
+                .filter(|s| !s.is_empty())
+                .map(|s| s.trim().to_string())
+                .collect();
+            if !pids.is_empty() {
+                for pid in &pids {
+                    let _ = Command::new("kill").args(["-9", pid]).output();
+                }
+                ui::print_warn(&format!("Killed {} orphaned miner process(es) from previous run.", pids.len()));
+            }
+        }
+    }
+
     // Clean stale stats file from previous run
     if let Some(path) = stats_file_path() {
         let _ = std::fs::remove_file(&path);
@@ -233,6 +256,37 @@ fn stop_mining() -> Result<()> {
         true => ui::print_ok("Miner stopped."),
         false => ui::print_warn("Miner was not running."),
     }
+
+    // Also kill any orphaned miner processes that aren't tracked by PID file.
+    // This can happen if a previous miner was started by an older CLI version
+    // or if the PID file was deleted. We search for processes matching
+    // "zion-miner" or "~/.zion/bin/miner" and kill them.
+    #[cfg(unix)]
+    {
+        use std::process::Command;
+        let output = Command::new("sh")
+            .args(["-c", "ps aux | grep -E 'zion-miner|\\.zion/bin/miner' | grep -v grep | awk '{print $2}'"])
+            .output();
+        if let Ok(out) = output {
+            let pids: Vec<String> = String::from_utf8_lossy(&out.stdout)
+                .lines()
+                .filter(|s| !s.is_empty())
+                .map(|s| s.trim().to_string())
+                .collect();
+            if !pids.is_empty() {
+                for pid in &pids {
+                    let _ = Command::new("kill").args(["-9", pid]).output();
+                }
+                ui::print_info(&format!("Killed {} orphaned miner process(es).", pids.len()));
+            }
+        }
+    }
+
+    // Clean up stale stats file
+    if let Some(path) = stats_file_path() {
+        let _ = std::fs::remove_file(&path);
+    }
+
     println!();
     Ok(())
 }
@@ -327,6 +381,12 @@ struct MinerLiveStats {
     miner_id: String,
     #[serde(default)]
     pool_addr: String,
+    #[serde(default)]
+    current_iteration: u64,
+    #[serde(default)]
+    best_batch_ms: u64,
+    #[serde(default)]
+    last_job_id: u64,
 }
 
 fn read_miner_live_stats() -> Option<MinerLiveStats> {
@@ -369,7 +429,11 @@ fn format_uptime(secs: u64) -> String {
 
 fn print_miner_stats(stats: &MinerLiveStats) {
     ui::print_section("Mining Stats");
-    ui::print_row("Status", &stats.status);
+    let status_display = match stats.status.as_str() {
+        "gpu_batch_in_progress" => "running (GPU batch in progress)",
+        s => s,
+    };
+    ui::print_row("Status", status_display);
     ui::print_row("Uptime", &format_uptime(stats.uptime_sec));
     ui::print_row("Algorithm", &stats.algorithm);
     ui::print_row("Backend", &stats.backend);
@@ -381,13 +445,23 @@ fn print_miner_stats(stats: &MinerLiveStats) {
     println!();
 
     ui::print_section("Hashrate");
-    ui::print_row("Current (10s)", &format_hashrate(stats.hashrate_10s));
-    ui::print_row("Average (60s)", &format_hashrate(stats.hashrate_60s));
-    ui::print_row("Long-term (15m)", &format_hashrate(stats.hashrate_15m));
-    ui::print_row("Peak", &format_hashrate(stats.hashrate_max));
-    if stats.hashrate_gpu > 0.0 {
-        ui::print_row("GPU", &format_hashrate(stats.hashrate_gpu));
-        ui::print_row("CPU", &format_hashrate(stats.hashrate_cpu));
+    if stats.status == "gpu_batch_in_progress" {
+        ui::print_row("Current (10s)", "— (GPU batch in progress)");
+        ui::print_row("Average (60s)", &format_hashrate(stats.hashrate_60s));
+        ui::print_row("Long-term (15m)", &format_hashrate(stats.hashrate_15m));
+        ui::print_row("Peak", &format_hashrate(stats.hashrate_max));
+        if stats.hashrate_gpu > 0.0 {
+            ui::print_row("GPU (peak)", &format_hashrate(stats.hashrate_gpu));
+        }
+    } else {
+        ui::print_row("Current (10s)", &format_hashrate(stats.hashrate_10s));
+        ui::print_row("Average (60s)", &format_hashrate(stats.hashrate_60s));
+        ui::print_row("Long-term (15m)", &format_hashrate(stats.hashrate_15m));
+        ui::print_row("Peak", &format_hashrate(stats.hashrate_max));
+        if stats.hashrate_gpu > 0.0 {
+            ui::print_row("GPU", &format_hashrate(stats.hashrate_gpu));
+            ui::print_row("CPU", &format_hashrate(stats.hashrate_cpu));
+        }
     }
     println!();
 
@@ -408,6 +482,14 @@ fn print_miner_stats(stats: &MinerLiveStats) {
     ui::print_row("Pool height", &stats.pool_height.to_string());
     ui::print_row("Latency", &format!("{} ms", stats.pool_latency_ms));
     ui::print_row("Total hashes", &stats.total_hashes.to_string());
+    println!();
+
+    ui::print_section("Mining Progress");
+    ui::print_row("Iteration", &stats.current_iteration.to_string());
+    ui::print_row("Last job ID", &stats.last_job_id.to_string());
+    if stats.best_batch_ms > 0 {
+        ui::print_row("Best batch time", &format!("{}.{:03}s", stats.best_batch_ms / 1000, stats.best_batch_ms % 1000));
+    }
 }
 
 /// Live monitoring dashboard — refreshes every 2 seconds.
@@ -454,12 +536,14 @@ async fn miner_monitor() -> Result<()> {
         match read_miner_live_stats() {
             Some(stats) => {
                 // Status line
-                let status_color = if stats.status == "running" {
+                let status_label = if stats.status == "gpu_batch_in_progress" {
+                    "GPU BATCH".cyan().bold()
+                } else if stats.status == "running" {
                     "RUNNING".green().bold()
                 } else {
                     stats.status.yellow().bold()
                 };
-                println!("  Status: {}  |  Uptime: {}  |  Tick: {}", status_color, format_uptime(stats.uptime_sec), tick);
+                println!("  Status: {}  |  Uptime: {}  |  Tick: {}", status_label, format_uptime(stats.uptime_sec), tick);
                 println!("  {}", "─".repeat(70).dimmed());
 
                 // Hashrate
@@ -497,6 +581,11 @@ async fn miner_monitor() -> Result<()> {
                     stats.pool_addr, stats.pool_height, stats.pool_latency_ms);
                 println!("    Algorithm: {}  |  Backend: {}  |  Worker: {}  |  Threads: {}",
                     stats.algorithm, stats.backend, stats.worker, stats.cpu_threads);
+                println!("    Iteration: {}  |  Job ID: {}  |  Best batch: {}",
+                    stats.current_iteration, stats.last_job_id,
+                    if stats.best_batch_ms > 0 {
+                        format!("{}.{:03}s", stats.best_batch_ms / 1000, stats.best_batch_ms % 1000)
+                    } else { "—".to_string() });
                 println!();
 
                 // Last few log lines
