@@ -45,20 +45,33 @@ pub enum MineCmd {
         /// Run miner in a visible console window
         #[arg(long)]
         console: bool,
+        /// Follow miner log output in real-time (Ctrl+C to stop following, miner keeps running)
+        #[arg(long)]
+        follow: bool,
     },
     /// Stop the running miner
     Stop,
     /// Show miner process status
     Status,
+    /// Show recent miner log output
+    Log {
+        /// Number of lines to show (default: 50)
+        #[arg(long, short = 'n')]
+        lines: Option<usize>,
+        /// Follow log output in real-time
+        #[arg(long, short = 'f')]
+        follow: bool,
+    },
 }
 
 pub async fn run(cfg: &Config, cmd: MineCmd) -> Result<()> {
     match cmd {
         MineCmd::Start {
-            pool, wallet, algorithm, backend, worker, auto_node, auto_pool, console,
-        } => start_mining(cfg, pool, wallet, algorithm, backend, worker, auto_node, auto_pool, console).await,
+            pool, wallet, algorithm, backend, worker, auto_node, auto_pool, console, follow,
+        } => start_mining(cfg, pool, wallet, algorithm, backend, worker, auto_node, auto_pool, console, follow).await,
         MineCmd::Stop => stop_mining(),
         MineCmd::Status => miner_status(),
+        MineCmd::Log { lines, follow } => miner_log(lines, follow),
     }
 }
 
@@ -72,6 +85,7 @@ async fn start_mining(
     auto_node: bool,
     auto_pool: bool,
     console: bool,
+    follow: bool,
 ) -> Result<()> {
     ui::print_header("Start Mining");
 
@@ -175,7 +189,19 @@ async fn start_mining(
     ui::print_ok(&format!("Miner started (PID {})", pid));
     ui::print_info("Stop with: zion mine stop");
     ui::print_info("Check status: zion mine status");
+
+    // Show log file path
+    if let Some(log_path) = process::get_log_path("miner") {
+        ui::print_info(&format!("Log file: {}", log_path.display()));
+        ui::print_info("View logs: zion mine log");
+    }
+
     println!();
+
+    // If --follow, tail the log file. Ctrl+C stops following but miner keeps running.
+    if follow {
+        follow_log("miner")?;
+    }
 
     Ok(())
 }
@@ -232,4 +258,98 @@ fn find_miner_binary() -> Result<PathBuf> {
     Err(anyhow::anyhow!(
         "miner binary not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build: cargo build --release -p zion-miner"
     ))
+}
+
+/// Show recent miner log output.
+fn miner_log(lines: Option<usize>, follow: bool) -> Result<()> {
+    ui::print_header("Miner Log");
+
+    let log_path = process::get_log_path("miner")
+        .ok_or_else(|| anyhow::anyhow!("cannot determine log path"))?;
+
+    if !log_path.exists() {
+        ui::print_warn(&format!("Log file not found: {}", log_path.display()));
+        ui::print_info("The miner may not have been started yet.");
+        return Ok(());
+    }
+
+    ui::print_row("Log file", &log_path.display().to_string());
+    println!();
+
+    if follow {
+        follow_log("miner")?;
+    } else {
+        let n = lines.unwrap_or(50);
+        show_log_tail(&log_path, n)?;
+    }
+
+    Ok(())
+}
+
+/// Show the last N lines of a log file.
+fn show_log_tail(path: &std::path::Path, n: usize) -> Result<()> {
+    let output = std::process::Command::new("tail")
+        .args(["-n", &n.to_string()])
+        .arg(path)
+        .output();
+
+    match output {
+        Ok(o) => {
+            let stdout = String::from_utf8_lossy(&o.stdout);
+            if stdout.is_empty() {
+                ui::print_info("(log is empty)");
+            } else {
+                print!("{}", stdout);
+            }
+        }
+        Err(_) => {
+            // Fallback: read the whole file and show last N lines
+            let content = std::fs::read_to_string(path)?;
+            let lines: Vec<&str> = content.lines().collect();
+            let start = lines.len().saturating_sub(n);
+            for line in &lines[start..] {
+                println!("{}", line);
+            }
+        }
+    }
+    println!();
+    Ok(())
+}
+
+/// Follow a log file in real-time. Ctrl+C stops following but the process keeps running.
+fn follow_log(name: &str) -> Result<()> {
+    let log_path = process::get_log_path(name)
+        .ok_or_else(|| anyhow::anyhow!("cannot determine log path"))?;
+
+    if !log_path.exists() {
+        ui::print_warn(&format!("Log file not found: {}", log_path.display()));
+        return Ok(());
+    }
+
+    ui::print_info(&format!("Following {} log (Ctrl+C to stop, {} keeps running)...", name, name));
+    println!();
+
+    // Use `tail -f` on Unix; on Windows, we'd need a different approach.
+    #[cfg(unix)]
+    {
+        let status = std::process::Command::new("tail")
+            .args(["-n", "20", "-f"])
+            .arg(&log_path)
+            .status();
+
+        match status {
+            Ok(_) => {}
+            Err(e) => ui::print_warn(&format!("Could not follow log: {}", e)),
+        }
+    }
+    #[cfg(windows)]
+    {
+        // On Windows, just show the last 50 lines (no real-time tail).
+        ui::print_info("(Real-time log follow is not available on Windows. Showing last 50 lines.)");
+        show_log_tail(&log_path, 50)?;
+    }
+
+    println!();
+    ui::print_ok(&format!("Stopped following. {} is still running in the background.", name));
+    Ok(())
 }

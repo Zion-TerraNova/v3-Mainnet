@@ -82,7 +82,10 @@ async fn start_node(
     ui::print_row("Node binary", &bin.display().to_string());
 
     let p2p_bind = p2p_bind.unwrap_or_else(|| cfg.node.p2p_bind.clone());
-    let rpc_bind = rpc_bind.unwrap_or_else(|| format!("{}:{}", cfg.node.rpc_host, cfg.node.rpc_port));
+    // When starting a LOCAL node, always bind RPC to localhost — the config's
+    // rpc_host is for CONNECTING to a remote RPC, not for binding. A local node
+    // should listen on 127.0.0.1 so the CLI can query it directly.
+    let rpc_bind = rpc_bind.unwrap_or_else(|| format!("127.0.0.1:{}", cfg.node.rpc_port));
     let seed_peers = seed_peers.unwrap_or_else(|| cfg.node.seed_peers.clone());
     let state_path = state_path.unwrap_or_else(|| default_state_path());
 
@@ -100,6 +103,11 @@ async fn start_node(
         envs.push(("ZION_SEED_PEERS", seed_peers));
     }
     envs.push(("ZION_NODE_STATE_PATH", state_path));
+    // Required for mainnet: the node rejects startup without this on a chain
+    // with existing state. Post-3.0.4 hard reset, migration height is 1 (no
+    // legacy 1e12 blocks — chain starts fresh from genesis).
+    envs.push(("ZION_MIGRATION_HEIGHT", "1".into()));
+    envs.push(("ZION_NETWORK", "mainnet".into()));
     if !cfg.miner.wallet.is_empty() {
         envs.push(("ZION_MINER_ADDRESS", cfg.miner.wallet.clone()));
     }
@@ -116,6 +124,9 @@ async fn start_node(
     ui::print_info("It may take a few seconds to accept RPC connections.");
     ui::print_info("Check status: zion node status");
     ui::print_info("Stop: zion node stop");
+    if let Some(log_path) = process::get_log_path("node") {
+        ui::print_info(&format!("Log file: {}", log_path.display()));
+    }
     println!();
     Ok(())
 }

@@ -565,6 +565,8 @@ fn mine_menu() -> Result<Option<Vec<String>>> {
             "Start mining (custom guided, auto-node)",
             "Start mining (public pool only)",
             "Miner status",
+            "View miner log (last 50 lines)",
+            "Follow miner log (real-time, Ctrl+C to stop)",
             "Stop miner",
             BACK,
         ];
@@ -587,7 +589,9 @@ fn mine_menu() -> Result<Option<Vec<String>>> {
             }
             3 => Some(args(&["mine", "start"])),
             4 => Some(args(&["mine", "status"])),
-            5 => Some(args(&["mine", "stop"])),
+            5 => Some(args(&["mine", "log", "--lines", "50"])),
+            6 => Some(args(&["mine", "log", "--follow"])),
+            7 => Some(args(&["mine", "stop"])),
             _ => return Ok(None),
         };
 
