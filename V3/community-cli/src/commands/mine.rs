@@ -155,6 +155,11 @@ async fn start_mining(
     // Find the miner binary
     let bin = find_miner_binary()?;
 
+    // Clean stale stats file from previous run
+    if let Some(path) = stats_file_path() {
+        let _ = std::fs::remove_file(&path);
+    }
+
     ui::print_row("Miner binary", &bin.display().to_string());
     ui::print_row("Pool", &pool_addr);
     ui::print_row("Wallet", &wallet);
@@ -181,14 +186,19 @@ async fn start_mining(
         "opencl" => {
             envs.push(("ZION_GPU_BACKEND", "opencl".into()));
             envs.push(("ZION_NONCE_COUNT_GPU", "262144".into()));
+            envs.push(("ZION_GPU_WORK_SIZE", "4096".into()));
         }
         "cuda" => {
             envs.push(("ZION_GPU_BACKEND", "cuda".into()));
             envs.push(("ZION_NONCE_COUNT_GPU", "262144".into()));
+            envs.push(("ZION_GPU_WORK_SIZE", "4096".into()));
         }
         "metal" => {
             envs.push(("ZION_GPU_BACKEND", "metal".into()));
             envs.push(("ZION_NONCE_COUNT_GPU", "262144".into()));
+            // Apple Silicon: 4096 threads × 256 KiB = 1 GB scratchpad.
+            // Smaller batch = faster completion (~10-15s vs 82s with 14K threads).
+            envs.push(("ZION_GPU_WORK_SIZE", "4096".into()));
         }
         _ => {
             envs.push(("ZION_NONCE_COUNT", "4096".into()));
@@ -237,8 +247,26 @@ fn miner_status() -> Result<()> {
             if let Some(stats) = read_miner_live_stats() {
                 print_miner_stats(&stats);
             } else {
-                ui::print_info("Stats not available yet (miner may have just started).");
-                ui::print_info("Run 'zion mine monitor' for live dashboard.");
+                // Stats file not yet written — show recent log lines instead
+                ui::print_info("Stats file not available yet (miner may have just started).");
+                println!();
+                if let Some(log_path) = process::get_log_path("miner") {
+                    if log_path.exists() {
+                        ui::print_section("Recent Log (last 15 lines)");
+                        if let Ok(content) = std::fs::read_to_string(&log_path) {
+                            let lines: Vec<&str> = content.lines().collect();
+                            let start = lines.len().saturating_sub(15);
+                            for line in &lines[start..] {
+                                let clean = strip_ansi(line);
+                                if !clean.is_empty() {
+                                    println!("  {}", clean.chars().take(90).collect::<String>());
+                                }
+                            }
+                        }
+                        println!();
+                        ui::print_info("Run 'zion mine monitor' for live dashboard.");
+                    }
+                }
             }
         }
         None => {
@@ -539,6 +567,7 @@ fn strip_ansi(s: &str) -> String {
 }
 
 fn find_miner_binary() -> Result<PathBuf> {
+    // 1. Explicit config override
     if let Some(path) = config::load(None).ok().and_then(|c| c.binaries.miner) {
         let p = PathBuf::from(path);
         if p.exists() {
@@ -546,26 +575,30 @@ fn find_miner_binary() -> Result<PathBuf> {
         }
     }
 
+    // 2. Local cargo build (target/release/zion-miner) — prefer this over
+    //    bundled binary because it may have GPU features compiled in.
     for c in ["zion-miner-windows-x86_64", "zion-miner"] {
         if let Some(p) = process::find_binary(c) {
             return Ok(p);
         }
     }
 
-    // Self-contained bundle.
+    // 3. Bundled binary (~/.zion/bin/miner) — downloaded from releases.
+    //    This is CPU-only; if the user wants GPU, they should build from source
+    //    or use the local cargo build above.
     if let Ok(p) = crate::bundle::ensure_binary("miner") {
         if p.exists() {
             return Ok(p);
         }
     }
 
-    // Bare `miner` is generic; search only safe locations.
+    // 4. Bare `miner` in safe locations (last resort).
     if let Some(p) = process::find_binary_safely("miner") {
         return Ok(p);
     }
 
     Err(anyhow::anyhow!(
-        "miner binary not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build: cargo build --release -p zion-miner"
+        "miner binary not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build: cargo build --release -p zion-miner --features gpu-metal"
     ))
 }
 
