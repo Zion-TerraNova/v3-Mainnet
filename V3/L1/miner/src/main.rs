@@ -704,7 +704,15 @@ fn main() -> Result<()> {
     let metrics = Arc::new(Mutex::new(MinerMetricsSnapshot::from_config(&config)));
 
     // ── Interactive control + hashrate tracker ──
-    let interactive = parse_bool_env("ZION_INTERACTIVE", true);
+    // Auto-detect TTY: if stdin or stdout is not a terminal (e.g. launched
+    // by the CLI with redirected stdio), force non-interactive headless mode.
+    // The TUI requires a real terminal for crossterm raw mode + alternate screen.
+    let tty_available = std::io::IsTerminal::is_terminal(&std::io::stdin())
+        && std::io::IsTerminal::is_terminal(&std::io::stdout());
+    let interactive = parse_bool_env("ZION_INTERACTIVE", true) && tty_available;
+    if !tty_available && parse_bool_env("ZION_INTERACTIVE", true) {
+        println!("headless=enabled reason=stdin_or_stdout_not_tty");
+    }
     let control = Arc::new(Mutex::new(MinerControl::new(
         &config.algorithm,
         config.threads,

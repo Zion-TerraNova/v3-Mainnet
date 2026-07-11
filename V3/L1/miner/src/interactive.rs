@@ -326,7 +326,7 @@ pub fn draw_dashboard(
 
     // ── Title bar ──
     let title = format!(
-        " ZION v3.0.1  GPU Miner  |  {}",
+        " ZION v3.0.5  GPU Miner  |  {}",
         algo_display(&control.algorithm)
     );
     let title_padded = format!("{:<78}", title);
