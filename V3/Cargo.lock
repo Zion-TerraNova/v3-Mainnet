@@ -4290,6 +4290,7 @@ dependencies = [
  "flate2",
  "hex",
  "indicatif",
+ "libc",
  "pbkdf2",
  "rand 0.8.6",
  "reqwest",
