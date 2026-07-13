@@ -66,6 +66,9 @@ pub enum ExternalCoin {
     CLORE,
     /// Monero — RandomX. CPU coin. MoneroOcean, XMR→BTC.
     XMR,
+    /// Verus — VerusHash v2.2 (Haraka+CLHash). CPU coin. LuckPool.
+    /// B2b revenue stream: ASIC/GPU resistant, PBaaS merge mining.
+    VRSC,
 }
 
 impl ExternalCoin {
@@ -83,6 +86,7 @@ impl ExternalCoin {
             Self::FLUX => "FLUX",
             Self::CLORE => "CLORE",
             Self::XMR => "XMR",
+            Self::VRSC => "VRSC",
         }
     }
 
@@ -100,6 +104,7 @@ impl ExternalCoin {
             Self::FLUX => "zelhash",
             Self::CLORE => "kawpow",
             Self::XMR => "randomx",
+            Self::VRSC => "verushash",
         }
     }
 
@@ -111,7 +116,7 @@ impl ExternalCoin {
 
     /// Whether this coin is CPU-minable (no GPU required).
     pub fn is_cpu(self) -> bool {
-        matches!(self, Self::XMR)
+        matches!(self, Self::XMR | Self::VRSC)
     }
 
     /// Parse from a case-insensitive string. Accepts ticker, full name, and
@@ -129,6 +134,7 @@ impl ExternalCoin {
             "flux" | "zelhash" => Some(Self::FLUX),
             "clore" | "clore.ai" => Some(Self::CLORE),
             "xmr" | "monero" | "randomx" => Some(Self::XMR),
+            "vrsc" | "verus" | "verushash" => Some(Self::VRSC),
             _ => None,
         }
     }
@@ -137,9 +143,9 @@ impl ExternalCoin {
     /// Uses 2miners where available (BTC payout), falls back to ZPool/WoolyPooly.
     pub fn default_pool(self) -> &'static str {
         match self {
-            Self::DCR => "dcr.2miners.com:3333",
-            Self::ALPH => "alph.2miners.com:4545",
-            Self::KAS => "kas.2miners.com:4444",
+            Self::DCR => "pool.woolypooly.com:3152",
+            Self::ALPH => "pool.woolypooly.com:3106",
+            Self::KAS => "kas.2miners.com:2020",
             Self::ERG => "erg.2miners.com:3056",
             Self::RVN => "rvn.2miners.com:6060",
             Self::ETC => "etc.2miners.com:1010",
@@ -148,6 +154,7 @@ impl ExternalCoin {
             Self::FLUX => "flux.woolypooly.com:3000",
             Self::CLORE => "clore.woolypooly.com:3090",
             Self::XMR => "gulf.moneroocean.stream:10001",
+            Self::VRSC => "eu.luckpool.net:3956",
         }
     }
 
@@ -260,6 +267,7 @@ impl ExternalCoin {
             Self::FLUX => StratumProtocol::Stratum,
             Self::CLORE => StratumProtocol::EthStratum,
             Self::XMR => StratumProtocol::Stratum,
+            Self::VRSC => StratumProtocol::ZcashStratum,
         }
     }
 
@@ -277,6 +285,7 @@ impl ExternalCoin {
             Self::FLUX,
             Self::CLORE,
             Self::XMR,
+            Self::VRSC,
         ]
     }
 
@@ -297,6 +306,7 @@ impl ExternalCoin {
             Self::ERG => RevenueSource::AutolykosExternal,
             Self::XMR => RevenueSource::RandomXExternal,
             Self::FLUX => RevenueSource::ZelHashExternal,
+            Self::VRSC => RevenueSource::VerusHashExternal,
         }
     }
 }
@@ -315,6 +325,9 @@ pub enum StratumProtocol {
     Stratum,
     /// EthStratum / ETH-proxy variant (eth_submitWork, eth_getWork)
     EthStratum,
+    /// Zcash/Equihash-style Stratum — used by VRSC/VerusHash pools (LuckPool).
+    /// Uses mining.subscribe/authorize/notify/set_target and 5-param submit.
+    ZcashStratum,
 }
 
 impl StratumProtocol {
@@ -322,6 +335,7 @@ impl StratumProtocol {
         match self {
             Self::Stratum => "stratum",
             Self::EthStratum => "ethstratum",
+            Self::ZcashStratum => "zcashstratum",
         }
     }
 }
@@ -454,7 +468,134 @@ pub fn fallback_estimates() -> Vec<ProfitEntry> {
             revenue_per_day_usd: 0.12,
             power_cost_usd: 0.03,
         },
+        ProfitEntry {
+            coin: ExternalCoin::VRSC,
+            revenue_per_day_usd: 0.08,
+            power_cost_usd: 0.01,
+        },
     ]
+}
+
+// ── Live profit fetching ─────────────────────────────────────────────
+
+/// Fetch live profitability estimates from WhatToMine API.
+///
+/// WhatToMine provides `https://whattomine.com/coins.json` with per-coin
+/// revenue estimates in USD per GH/s-day.  We map the coin tags to our
+/// `ExternalCoin` enum and return `Vec<ProfitEntry>`.
+///
+/// On any error (network, parse, empty), falls back to `fallback_estimates()`.
+pub fn fetch_live_profit_estimates() -> Vec<ProfitEntry> {
+    let url = "https://whattomine.com/coins.json";
+    match fetch_url_blocking_internal(url, 10) {
+        Ok(body) => parse_whattomine_for_external_coins(&body),
+        Err(e) => {
+            eprintln!("profit_router: whattomine fetch error: {e}");
+            fallback_estimates()
+        }
+    }
+}
+
+/// Parse WhatToMine coins.json response into `Vec<ProfitEntry>`.
+///
+/// WhatToMine returns: `{ "coins": { "1": { "tag": "DCR", "revenue": "0.45", ... } } }`
+fn parse_whattomine_for_external_coins(body: &str) -> Vec<ProfitEntry> {
+    let parsed: Option<serde_json::Value> = serde_json::from_str(body).ok();
+    let Some(json) = parsed else {
+        eprintln!("profit_router: whattomine parse error");
+        return fallback_estimates();
+    };
+
+    let mut entries = Vec::new();
+    let fallback = fallback_estimates();
+
+    if let Some(coins) = json.get("coins").and_then(|c| c.as_object()) {
+        for (_id, coin_data) in coins {
+            let tag = coin_data
+                .get("tag")
+                .and_then(|t| t.as_str())
+                .unwrap_or("");
+            let revenue = coin_data
+                .get("revenue")
+                .and_then(|r| r.as_str())
+                .and_then(|s| s.parse::<f64>().ok())
+                .unwrap_or(0.0);
+
+            // Map WhatToMine coin tags to our ExternalCoin enum.
+            if let Some(coin) = tag_to_external_coin(tag) {
+                // Use the fallback power cost for this coin.
+                let power_cost = fallback
+                    .iter()
+                    .find(|e| e.coin == coin)
+                    .map(|e| e.power_cost_usd)
+                    .unwrap_or(0.10);
+                entries.push(ProfitEntry {
+                    coin,
+                    revenue_per_day_usd: revenue.max(0.01),
+                    power_cost_usd: power_cost,
+                });
+            }
+        }
+    }
+
+    // If we got fewer entries than fallback, merge in any missing coins.
+    for fb in &fallback {
+        if !entries.iter().any(|e| e.coin == fb.coin) {
+            entries.push(fb.clone());
+        }
+    }
+
+    if entries.is_empty() {
+        fallback_estimates()
+    } else {
+        entries
+    }
+}
+
+/// Map a WhatToMine coin tag to our `ExternalCoin` enum.
+fn tag_to_external_coin(tag: &str) -> Option<ExternalCoin> {
+    match tag.to_uppercase().as_str() {
+        "DCR" => Some(ExternalCoin::DCR),
+        "ALPH" => Some(ExternalCoin::ALPH),
+        "KAS" => Some(ExternalCoin::KAS),
+        "ERG" => Some(ExternalCoin::ERG),
+        "RVN" => Some(ExternalCoin::RVN),
+        "ETC" => Some(ExternalCoin::ETC),
+        "XMR" => Some(ExternalCoin::XMR),
+        "FLUX" => Some(ExternalCoin::FLUX),
+        "CLORE" => Some(ExternalCoin::CLORE),
+        _ => None, // EVR, MEWC not on WhatToMine
+    }
+}
+
+/// Fetch a URL with a timeout using a blocking reqwest client.
+fn fetch_url_blocking_internal(url: &str, timeout_secs: u64) -> Result<String, String> {
+    let rt = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .map_err(|e| format!("tokio runtime error: {e}"))?;
+
+    rt.block_on(async move {
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(timeout_secs))
+            .user_agent("ZION-Pool/3.0.4")
+            .build()
+            .map_err(|e| format!("reqwest client error: {e}"))?;
+
+        let resp = client
+            .get(url)
+            .send()
+            .await
+            .map_err(|e| format!("reqwest send error: {e}"))?;
+
+        if !resp.status().is_success() {
+            return Err(format!("HTTP {}", resp.status()));
+        }
+
+        resp.text()
+            .await
+            .map_err(|e| format!("reqwest body error: {e}"))
+    })
 }
 
 // ── Coin selection ───────────────────────────────────────────────────
@@ -527,7 +668,7 @@ mod tests {
     fn dcr_uses_blake3() {
         assert_eq!(ExternalCoin::DCR.algorithm(), "blake3");
         assert!(ExternalCoin::DCR.is_blake3());
-        assert_eq!(ExternalCoin::DCR.default_pool(), "dcr.2miners.com:3333");
+        assert_eq!(ExternalCoin::DCR.default_pool(), "pool.woolypooly.com:3152");
     }
 
     #[test]
@@ -577,8 +718,8 @@ mod tests {
         let profile = CoinProfile::default_for(ExternalCoin::DCR);
         assert_eq!(profile.ticker, "DCR");
         assert_eq!(profile.algorithm, "blake3");
-        assert_eq!(profile.pool_host, "dcr.2miners.com");
-        assert_eq!(profile.pool_port, 3333);
+        assert_eq!(profile.pool_host, "pool.woolypooly.com");
+        assert_eq!(profile.pool_port, 3152);
         assert_eq!(profile.protocol, StratumProtocol::Stratum);
         assert!(profile.enabled);
     }
@@ -680,7 +821,7 @@ mod tests {
     #[test]
     fn nicehash_blake3_coin_falls_back() {
         let pool = ExternalCoin::DCR.best_pool(PoolPreference::NiceHash, "eu");
-        assert_eq!(pool, "dcr.2miners.com:3333");
+        assert_eq!(pool, "pool.woolypooly.com:3152");
     }
 
     #[test]

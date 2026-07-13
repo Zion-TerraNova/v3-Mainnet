@@ -65,6 +65,9 @@ pub enum RevenueSource {
     RandomXExternal,
     /// Revenue from ZelHash / Equihash external coins (FLUX).
     ZelHashExternal,
+    /// Revenue from VerusHash v2.2 external coins (VRSC).
+    /// B2b revenue stream: CPU-only, ASIC/GPU resistant, LuckPool 1% fee.
+    VerusHashExternal,
     /// Revenue from DeekshaLite v1 simplified mining (GCN-friendly).
     DeekshaLite,
     /// Revenue from DeekshaLite Fire thermal-intensive mining (winter heating).
@@ -87,6 +90,7 @@ impl RevenueSource {
             Self::AutolykosExternal => "autolykos_external",
             Self::RandomXExternal => "randomx_external",
             Self::ZelHashExternal => "zelhash_external",
+            Self::VerusHashExternal => "verushash_external",
             Self::DeekshaLite => "deeksha_lite",
             Self::ThermalBonus => "thermal_bonus",
             Self::NclAi => "ncl_ai",
@@ -103,7 +107,8 @@ impl RevenueSource {
             | Self::KawPowExternal
             | Self::AutolykosExternal
             | Self::RandomXExternal
-            | Self::ZelHashExternal => BLAKE3_EXTERNAL_FEE,
+            | Self::ZelHashExternal
+            | Self::VerusHashExternal => BLAKE3_EXTERNAL_FEE,
             Self::DeekshaLite | Self::ThermalBonus => MERGED_MINING_FEE,
             Self::NclAi => NCL_FEE,
         }

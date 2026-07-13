@@ -208,16 +208,111 @@ fn main() {
 
     // -----------------------------------------------------------------------
     // VerusHash v2.2  (VRSC)
-    //   Portable stub; for production swap csrc/verushash/verushash_portable.c
-    //   with the CLHash + Haraka pipeline from the VerusCoin upstream repo.
+    //   Production: Haraka + CLHash pipeline from VerusCoin upstream.
+    //   Sources in csrc/verushash/real/ (downloaded from VerusCoin GitHub).
+    //   Falls back to portable stub if real sources are not present.
     // -----------------------------------------------------------------------
     if feat("native-verushash") {
-        base_build(
-            "csrc/verushash/verushash_portable.c",
-            "verushash_zion",
-            &target_os,
-            is_msvc,
-        );
+        let real_dir = "csrc/verushash/real";
+        let has_real = std::path::Path::new(real_dir).join("verus_hash.cpp").exists();
+
+        if has_real {
+            // --- Production build: compile real VerusHash C++ sources ---
+            // 1. Compile pure-C sources (haraka)
+            let mut c_build = cc::Build::new();
+            c_build
+                .file("csrc/verushash/real/haraka.c")
+                .file("csrc/verushash/real/haraka_portable.c")
+                .include("csrc/verushash/real")
+                .opt_level(3)
+                .warnings(false)
+                .cargo_warnings(false)
+                .flag_if_supported("-funroll-loops")
+                .flag_if_supported("-fomit-frame-pointer")
+                .flag_if_supported("-fPIC");
+            if !is_msvc {
+                if target_arch == "x86_64" {
+                    c_build
+                        .flag_if_supported("-mpclmul")
+                        .flag_if_supported("-msse4")
+                        .flag_if_supported("-msse4.1")
+                        .flag_if_supported("-msse4.2")
+                        .flag_if_supported("-mssse3")
+                        .flag_if_supported("-maes");
+                } else if target_arch == "aarch64" {
+                    c_build
+                        .flag_if_supported("-march=armv8-a+crypto")
+                        .flag_if_supported("-flax-vector-conversions");
+                    c_build.define("__ARM_NEON", None);
+                }
+            } else {
+                add_msvc_includes(&mut c_build);
+            }
+            c_build.compile("verushash_c");
+
+            // 2. Compile C++ sources (verus_hash, verus_clhash, ffi_wrapper)
+            //    Also compile haraka C sources here so all symbols are in one archive.
+            let mut cpp_build = cc::Build::new();
+            cpp_build
+                .cpp(true)
+                .file("csrc/verushash/real/haraka.c")
+                .file("csrc/verushash/real/haraka_portable.c")
+                .file("csrc/verushash/real/verus_hash.cpp")
+                .file("csrc/verushash/real/verus_clhash.cpp")
+                .file("csrc/verushash/real/verus_clhash_portable.cpp")
+                .file("csrc/verushash/real/ffi_wrapper_v3.cpp")
+                .include("csrc/verushash/real")
+                .opt_level(3)
+                .warnings(false)
+                .cargo_warnings(false)
+                .flag_if_supported("-std=c++17")
+                .flag_if_supported("-funroll-loops")
+                .flag_if_supported("-fomit-frame-pointer")
+                .flag_if_supported("-fPIC");
+            if !is_msvc {
+                if target_arch == "x86_64" {
+                    cpp_build
+                        .flag_if_supported("-mpclmul")
+                        .flag_if_supported("-msse4")
+                        .flag_if_supported("-msse4.1")
+                        .flag_if_supported("-msse4.2")
+                        .flag_if_supported("-mssse3")
+                        .flag_if_supported("-maes");
+                } else if target_arch == "aarch64" {
+                    cpp_build
+                        .flag_if_supported("-march=armv8-a+crypto")
+                        .flag_if_supported("-flax-vector-conversions");
+                    cpp_build.define("__ARM_NEON", None);
+                }
+                if target_os == "macos" {
+                    cpp_build.flag_if_supported("-stdlib=libc++");
+                }
+            } else {
+                add_msvc_includes(&mut cpp_build);
+            }
+            cpp_build.compile("verushash_cpp");
+
+            // 3. Link C++ stdlib + force re-link C archive for unresolved symbols
+            if target_os == "macos" {
+                println!("cargo:rustc-link-lib=c++");
+            } else if !is_msvc {
+                println!("cargo:rustc-link-lib=stdc++");
+            }
+            let out_dir = env::var("OUT_DIR").unwrap_or_default();
+            if !out_dir.is_empty() {
+                println!("cargo:rustc-link-search=native={}", out_dir);
+                println!("cargo:rustc-link-lib=static=verushash_c");
+            }
+            println!("cargo:rerun-if-changed=csrc/verushash/real/");
+        } else {
+            // --- Fallback: portable stub (Keccak-256 placeholder) ---
+            base_build(
+                "csrc/verushash/verushash_portable.c",
+                "verushash_zion",
+                &target_os,
+                is_msvc,
+            );
+        }
     }
 
     // -----------------------------------------------------------------------
