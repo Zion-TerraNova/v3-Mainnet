@@ -3557,7 +3557,7 @@ pub mod opencl_external {
             }
             .map_err(|e| anyhow::anyhow!("auxpow_gpu_mine_failed algorithm={} err={}", self.algorithm, e))?;
 
-            if let Some(GpuFoundShare { nonce, hash, mix_hash }) = found {
+            if let Some(GpuFoundShare { nonce, hash, mix_hash, .. }) = found {
                 Ok(GpuBatchResult {
                     solutions: vec![(nonce, hash, mix_hash)],
                     nonces_tested: actual_batch,
@@ -3597,7 +3597,7 @@ pub mod opencl_external {
                     )
                 })?;
 
-            if let Some(GpuFoundShare { nonce, hash, mix_hash }) = found {
+            if let Some(GpuFoundShare { nonce, hash, mix_hash, .. }) = found {
                 Ok(GpuBatchResult {
                     solutions: vec![(nonce, hash, mix_hash)],
                     nonces_tested: actual_batch,
