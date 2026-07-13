@@ -11,6 +11,7 @@
 #![allow(dead_code)]
 
 use anyhow::Result;
+use zion_auxpow::external_hashers::hash_blake3;
 use zion_core::{DifficultyTarget, MiningHeader, MiningJob, MiningSolution};
 
 #[cfg(feature = "gpu-opencl")]
@@ -61,10 +62,27 @@ impl GpuBackendKind {
 
 /// Result of a GPU batch mining operation.
 pub struct GpuBatchResult {
-    /// Nonces that met the target.
-    pub solutions: Vec<(u64, [u8; 32])>,
+    /// Nonces that met the target: (nonce, final_hash, mix_hash).
+    /// mix_hash is None for algorithms that don't produce one.
+    pub solutions: Vec<(u64, [u8; 32], Option<[u8; 32]>)>,
     /// Total nonces tested in this batch.
     pub nonces_tested: u64,
+}
+
+/// Convert `StreamWeights` into the fixed 6-element float array consumed by
+/// the OpenCL Deeksha kernels.
+fn stream_weights_f32(
+    weights: &zion_cosmic_harmony::stream_profit::StreamWeights,
+) -> [f32; 6] {
+    use zion_cosmic_harmony::revenue::RevenueSource;
+    [
+        weights.weight_for(RevenueSource::Zion) as f32,
+        weights.weight_for(RevenueSource::KeccakBonus) as f32,
+        weights.weight_for(RevenueSource::Sha3Bonus) as f32,
+        weights.weight_for(RevenueSource::NclAi) as f32,
+        weights.weight_for(RevenueSource::DeekshaLite) as f32,
+        weights.weight_for(RevenueSource::ThermalBonus) as f32,
+    ]
 }
 
 /// Trait for GPU mining backends.
@@ -84,6 +102,16 @@ pub trait GpuMiner: Send {
         Ok(())
     }
 
+    /// Update stream-profit weights for the current job.  Backends that support
+    /// stream-weight parametrisation use these to adjust work distribution in
+    /// the GPU kernel; others ignore them.
+    fn set_stream_weights(
+        &mut self,
+        _weights: &zion_cosmic_harmony::stream_profit::StreamWeights,
+    ) -> Result<()> {
+        Ok(())
+    }
+
     /// Whether to suppress GPU vs CPU mismatch warnings (e.g. s4-only mode
     /// where GPU and CPU use different implementations for stage 4).
     fn suppress_mismatch_warnings(&self) -> bool {
@@ -99,6 +127,24 @@ pub trait GpuMiner: Send {
         nonce_start: u64,
         batch_size: u64,
     ) -> Result<GpuBatchResult>;
+
+    /// Mine a batch using raw header bytes (for external algorithms with
+    /// headers longer than 80 bytes, e.g. DCR = 180 bytes).
+    /// Default: falls back to mine_batch with truncated header.
+    fn mine_batch_raw(
+        &mut self,
+        raw_header: &[u8],
+        target: DifficultyTarget,
+        nonce_start: u64,
+        batch_size: u64,
+    ) -> Result<GpuBatchResult> {
+        // Default: truncate to 80 bytes and use mine_batch
+        let mut bytes = [0u8; 80];
+        let len = raw_header.len().min(80);
+        bytes[..len].copy_from_slice(&raw_header[..len]);
+        let header = MiningHeader::from_bytes(bytes);
+        self.mine_batch(header, target, nonce_start, batch_size)
+    }
 
     /// Run a benchmark for the given duration.
     fn benchmark(&mut self, secs: f64) -> Result<(u64, f64, f64)>;
@@ -146,9 +192,16 @@ impl GpuBackendManager {
     /// Run a benchmark across all supported algorithms.
     pub fn benchmark_all(&mut self, secs: f64) -> Vec<(String, f64)> {
         let algos = vec![
+            "deeksha_chv3",
             "deeksha_lite_v1",
             "cosmic_harmony_ekam_deeksha_v2",
             "deeksha_lite_fire",
+            // External AuxPoW algorithms
+            "blake3",
+            "kheavyhash",
+            "autolykos",
+            "kawpow",
+            "ethash",
         ];
         let mut results = Vec::new();
         for algo in algos {
@@ -174,6 +227,30 @@ impl GpuBackendManager {
 /// Alias for backward compatibility.
 pub type GpuBackend = GpuBackendManager;
 
+/// Set of external AuxPoW algorithms that are handled by `zion_auxpow` GPU miner.
+pub fn is_external_algorithm(algorithm: &str) -> bool {
+    matches!(
+        algorithm,
+        "blake3"
+            | "blake3_alph"
+            | "blake3_dcr"
+            | "kheavyhash"
+            | "kheavyhash_kas"
+            | "autolykos"
+            | "autolykos_erg"
+            | "kawpow"
+            | "kawpow_rvn"
+            | "kawpow_clore"
+            | "kawpow_evr"
+            | "kawpow_mewc"
+            | "ethash"
+            | "etchash"
+            | "ethash_etc"
+            | "verushash"
+            | "randomx"
+    )
+}
+
 /// Try to create the best available GPU backend.
 /// Selects the appropriate OpenCL miner based on the algorithm.
 pub fn create_gpu_backend(
@@ -181,6 +258,8 @@ pub fn create_gpu_backend(
     work_size: usize,
     algorithm: &str,
 ) -> Result<Box<dyn GpuMiner>> {
+    let _ = algorithm;
+    let _ = work_size;
     match kind {
         GpuBackendKind::Cpu => {
             anyhow::bail!("GPU backend requested but kind=cpu — use CPU mining path instead");
@@ -188,8 +267,32 @@ pub fn create_gpu_backend(
         GpuBackendKind::OpenCL | GpuBackendKind::Auto => {
             #[cfg(feature = "gpu-opencl")]
             {
+                // External AuxPoW algorithms (Blake3, kHeavyHash, ...)
+                if is_external_algorithm(algorithm) {
+                    match opencl_external::OpenClExternalMiner::new(algorithm, work_size) {
+                        Ok(miner) => return Ok(Box::new(miner)),
+                        Err(e) => {
+                            if kind == GpuBackendKind::OpenCL {
+                                anyhow::bail!("External OpenCL init failed: {e}");
+                            }
+                            println!("external_opencl_unavailable algorithm={algorithm} reason=\"{e}\"");
+                        }
+                    }
+                }
+
                 // Select miner based on algorithm
-                if algorithm == "deeksha_lite_v1" {
+                if algorithm == "deeksha_chv3" {
+                    // Phase C: use canonical deeksha_chv3.cl kernel
+                    match opencl_deeksha_lite::OpenClDeekshaLiteMiner::new_chv3(work_size) {
+                        Ok(miner) => return Ok(Box::new(miner)),
+                        Err(e) => {
+                            if kind == GpuBackendKind::OpenCL {
+                                anyhow::bail!("DeekshaChv3 OpenCL init failed: {e}");
+                            }
+                            println!("deeksha_chv3_opencl_unavailable reason=\"{e}\"");
+                        }
+                    }
+                } else if algorithm == "deeksha_lite_v1" {
                     match opencl_deeksha_lite::OpenClDeekshaLiteMiner::new(work_size) {
                         Ok(miner) => return Ok(Box::new(miner)),
                         Err(e) => {
@@ -282,6 +385,9 @@ pub fn create_gpu_backend(
 /// Outcome of a GPU scan with candidate-filter statistics.
 pub struct GpuScanOutcome {
     pub solution: Option<MiningSolution>,
+    /// Mix hash for Ethash/KawPow (needed for eth_submitWork).  None for
+    /// algorithms that don't produce a mix hash.
+    pub mix_hash: Option<[u8; 32]>,
     pub nonces_tested: u64,
     pub candidates_found: u64,
     pub candidates_verified: u64,
@@ -297,11 +403,71 @@ pub struct GpuScanOutcome {
 /// - The solution always carries gpu_hash so the pool receives the same hash the
 ///   GPU kernel produced.  Pool re-computes the hash server-side (cpu path) and
 ///   compares — if GPU and CPU kernels are in sync this will agree.
-pub fn gpu_scan_job(gpu: &mut dyn GpuMiner, job: MiningJob, algorithm: &str) -> GpuScanOutcome {
-    match gpu.mine_batch(job.header, job.target, job.start_nonce, job.nonce_count) {
+pub fn gpu_scan_job(
+    gpu: &mut dyn GpuMiner,
+    job: MiningJob,
+    algorithm: &str,
+    raw_header_bytes: &[u8],
+) -> GpuScanOutcome {
+    // For external AuxPoW algorithms (kheavyhash, blake3, etc.), the pool
+    // encodes the external block timestamp in job.height.  Inject it into
+    // the MiningHeader.timestamp field so the GPU kernel receives it.
+    let mut effective_header = job.header;
+    if is_external_algorithm(algorithm) {
+        effective_header.timestamp = job.height;
+    }
+
+    // For Ethash/KawPow, derive the epoch from the block height and ensure
+    // the DAG is loaded.  The pool sends the external block number as
+    // job.height for EthStratum coins (ETC/RVN/CLORE).
+    if is_external_algorithm(algorithm)
+        && matches!(
+            algorithm,
+            "ethash" | "etchash" | "ethash_etc"
+                | "kawpow" | "kawpow_rvn" | "kawpow_clore"
+                | "kawpow_evr" | "kawpow_mewc"
+        )
+    {
+        let epoch = if matches!(algorithm, "ethash" | "etchash" | "ethash_etc") {
+            (job.height / 30000) as u32
+        } else {
+            (job.height / 7500) as u32
+        };
+
+        // Try to update the DAG via the external miner's epoch method.
+        // This is a no-op if the DAG is already loaded for this epoch.
+        // We use a trait-object downcast check — if the backend is
+        // OpenClExternalMiner, it has update_epoch_from_job.
+        // Since we can't downcast easily, we rely on update_epoch() being
+        // called by the caller (main.rs) which passes height.
+        // The OpenClExternalMiner's update_epoch() is a no-op for external
+        // algos; the DAG is managed via update_epoch_from_job() which is
+        // called from a separate path.
+        // For now, we log the epoch for diagnostics.
+        eprintln!(
+            "auxpow_dag_epoch_hint algorithm={} height={} epoch={}",
+            algorithm, job.height, epoch
+        );
+    }
+
+    // Use raw header bytes for external algorithms that need the full header
+    // (e.g. DCR blake3 with 180-byte headers).  Fall back to mine_batch for
+    // ZION algorithms and kheavyhash (which only uses first 32 bytes).
+    let use_raw = is_external_algorithm(algorithm)
+        && !algorithm.starts_with("kheavyhash")
+        && raw_header_bytes.len() > 80;
+
+    let result = if use_raw {
+        gpu.mine_batch_raw(raw_header_bytes, job.target, job.start_nonce, job.nonce_count)
+    } else {
+        gpu.mine_batch(effective_header, job.target, job.start_nonce, job.nonce_count)
+    };
+
+    match result {
         Ok(result) => {
             let nonces_tested = result.nonces_tested;
-            if let Some((nonce, gpu_hash)) = result.solutions.first() {
+            if let Some((nonce, gpu_hash, mix_hash)) = result.solutions.first() {
+                let mix_hash = *mix_hash;
                 let candidate = zion_core::BlockCandidate {
                     header: job.header,
                     nonce: *nonce,
@@ -309,7 +475,13 @@ pub fn gpu_scan_job(gpu: &mut dyn GpuMiner, job: MiningJob, algorithm: &str) -> 
                 };
 
                 // ── CPU audit hash (independent path, diagnostic only) ────
-                let cpu_hash = candidate.hash_with_algorithm(algorithm);
+                // For DCR the GPU scans the full 180-byte raw header; the CPU
+                // audit must hash the same bytes to be comparable.
+                let cpu_hash = if use_raw && algorithm == "blake3_dcr" {
+                    hash_blake3(raw_header_bytes, 0, *nonce)
+                } else {
+                    candidate.hash_with_algorithm(algorithm)
+                };
                 let is_mismatch = cpu_hash != *gpu_hash;
                 let cpu_above_target = !job.target.allows(&cpu_hash);
                 let gpu_above_target = !job.target.allows(gpu_hash);
@@ -352,6 +524,7 @@ pub fn gpu_scan_job(gpu: &mut dyn GpuMiner, job: MiningJob, algorithm: &str) -> 
                     }
                     return GpuScanOutcome {
                         solution: None,
+                        mix_hash,
                         nonces_tested,
                         candidates_found: 1,
                         candidates_verified: 0,
@@ -368,6 +541,7 @@ pub fn gpu_scan_job(gpu: &mut dyn GpuMiner, job: MiningJob, algorithm: &str) -> 
                         candidate,
                         hash: *gpu_hash,
                     }),
+                    mix_hash,
                     nonces_tested,
                     candidates_found: 1,
                     candidates_verified: 1,
@@ -377,6 +551,7 @@ pub fn gpu_scan_job(gpu: &mut dyn GpuMiner, job: MiningJob, algorithm: &str) -> 
             } else {
                 GpuScanOutcome {
                     solution: None,
+                    mix_hash: None,
                     nonces_tested,
                     candidates_found: 0,
                     candidates_verified: 0,
@@ -389,6 +564,7 @@ pub fn gpu_scan_job(gpu: &mut dyn GpuMiner, job: MiningJob, algorithm: &str) -> 
             eprintln!("gpu_mine_batch_error: {e}");
             GpuScanOutcome {
                 solution: None,
+                mix_hash: None,
                 nonces_tested: 0,
                 candidates_found: 0,
                 candidates_verified: 0,
@@ -1188,7 +1364,7 @@ pub mod opencl_deeksha {
 
                 if let Some((i, hash_data)) = candidates.into_iter().min_by_key(|(i, _)| *i) {
                     let nonce = current_nonce.wrapping_add(i as u64);
-                    all_solutions.push((nonce, hash_data));
+                    all_solutions.push((nonce, hash_data, None));
                 }
 
                 total_tested += chunk as u64;
@@ -1264,7 +1440,7 @@ pub mod opencl_deeksha {
                     self.pro_que.queue().finish()?;
                     let mut hash = [0u8; 32];
                     hash.copy_from_slice(&hash_out);
-                    all_solutions.push((nonce_out[0], hash));
+                    all_solutions.push((nonce_out[0], hash, None));
                     total_tested += chunk as u64;
                     break;
                 }
@@ -1492,6 +1668,7 @@ pub mod opencl_deeksha_lite {
         header_state_buf: Buffer<u64>,
         scratchpad_buf: Buffer<u8>,
         output_hashes_buf: Buffer<u8>,
+        stream_weights_buf: Buffer<f32>,
         work_size: usize,
         local_work_size: usize,
         device_name_cached: String,
@@ -1585,7 +1762,27 @@ pub mod opencl_deeksha_lite {
         }
 
         pub fn new(requested_work_size: usize) -> Result<Self> {
-            let kernel_src = opencl_kernel::get_deeksha_lite_kernel_source().to_string();
+            Self::new_with_kernel(requested_work_size, false)
+        }
+
+        /// Phase C: Create a DeekshaChv3 GPU miner using the canonical
+        /// `deeksha_chv3.cl` kernel source and `deeksha_chv3_mine` entry point.
+        /// Bit-identical to `new()` — only the kernel name/source differs.
+        pub fn new_chv3(requested_work_size: usize) -> Result<Self> {
+            Self::new_with_kernel(requested_work_size, true)
+        }
+
+        fn new_with_kernel(requested_work_size: usize, use_chv3: bool) -> Result<Self> {
+            let kernel_src = if use_chv3 {
+                opencl_kernel::get_deeksha_chv3_kernel_source().to_string()
+            } else {
+                opencl_kernel::get_deeksha_lite_kernel_source().to_string()
+            };
+            let kernel_name = if use_chv3 {
+                opencl_kernel::DEEKSHA_CHV3_KERNEL_NAME
+            } else {
+                opencl_kernel::DEEKSHA_LITE_KERNEL_NAME
+            };
             let (platform, device, platform_name, device_name) = Self::pick_device()?;
 
             let family = GpuDeviceFamily::from_name(&device_name);
@@ -1644,13 +1841,20 @@ pub mod opencl_deeksha_lite {
                 .queue(q.clone())
                 .len(actual_work_size * 32)
                 .build()?;
+            let stream_weights_zero = [0.0f32; 6];
+            let stream_weights_buf = Buffer::<f32>::builder()
+                .queue(q.clone())
+                .len(6)
+                .copy_host_slice(&stream_weights_zero[..])
+                .build()?;
             let kernel = pro_que
-                .kernel_builder(opencl_kernel::DEEKSHA_LITE_KERNEL_NAME)
+                .kernel_builder(kernel_name)
                 .arg(&header_state_buf)
                 .arg(0u64)
                 .arg(0u32)
                 .arg(&output_hashes_buf)
                 .arg(&scratchpad_buf)
+                .arg(&stream_weights_buf)
                 .build()
                 .map_err(|e| anyhow::anyhow!("kernel build failed: {e}"))?;
             println!(
@@ -1666,6 +1870,7 @@ pub mod opencl_deeksha_lite {
                 header_state_buf,
                 scratchpad_buf,
                 output_hashes_buf,
+                stream_weights_buf,
                 work_size: actual_work_size,
                 local_work_size: tuning.local_ws,
                 device_name_cached: device_name,
@@ -1692,6 +1897,17 @@ pub mod opencl_deeksha_lite {
 
         fn suppress_mismatch_warnings(&self) -> bool {
             false
+        }
+
+        fn set_stream_weights(
+            &mut self,
+            weights: &zion_cosmic_harmony::stream_profit::StreamWeights,
+        ) -> Result<()> {
+            let arr = stream_weights_f32(weights);
+            self.stream_weights_buf.write(&arr[..]).enq()?;
+            self.pro_que.queue().finish()?;
+            println!("gpu_opencl_lite_stream_weights {}", weights.describe());
+            Ok(())
         }
 
         fn mine_batch(
@@ -1770,7 +1986,7 @@ pub mod opencl_deeksha_lite {
                     let hash: [u8; 32] = hashes[i * 32..(i + 1) * 32].try_into().unwrap();
                     if target.allows(&hash) {
                         let nonce = current_nonce.wrapping_add(i as u64);
-                        all_solutions.push((nonce, hash));
+                        all_solutions.push((nonce, hash, None));
                         break; // first match wins
                     }
                 }
@@ -1836,6 +2052,7 @@ pub mod opencl_deeksha_lite_fire {
         header_state_buf: Buffer<u64>,
         scratchpad_buf: Buffer<u8>,
         output_hashes_buf: Buffer<u8>,
+        stream_weights_buf: Buffer<f32>,
         work_size: usize,
         local_work_size: usize,
         device_name_cached: String,
@@ -1988,6 +2205,12 @@ pub mod opencl_deeksha_lite_fire {
                 .queue(q.clone())
                 .len(actual_work_size * 32)
                 .build()?;
+            let stream_weights_zero = [0.0f32; 6];
+            let stream_weights_buf = Buffer::<f32>::builder()
+                .queue(q.clone())
+                .len(6)
+                .copy_host_slice(&stream_weights_zero[..])
+                .build()?;
             let kernel = pro_que
                 .kernel_builder(opencl_kernel::DEEKSHA_LITE_FIRE_KERNEL_NAME)
                 .arg(&header_state_buf)
@@ -1995,6 +2218,7 @@ pub mod opencl_deeksha_lite_fire {
                 .arg(0u32)
                 .arg(&output_hashes_buf)
                 .arg(&scratchpad_buf)
+                .arg(&stream_weights_buf)
                 .build()
                 .map_err(|e| anyhow::anyhow!("kernel build failed: {e}"))?;
             println!(
@@ -2010,6 +2234,7 @@ pub mod opencl_deeksha_lite_fire {
                 header_state_buf,
                 scratchpad_buf,
                 output_hashes_buf,
+                stream_weights_buf,
                 work_size: actual_work_size,
                 local_work_size: tuning.local_ws,
                 device_name_cached: device_name,
@@ -2036,6 +2261,17 @@ pub mod opencl_deeksha_lite_fire {
 
         fn suppress_mismatch_warnings(&self) -> bool {
             false
+        }
+
+        fn set_stream_weights(
+            &mut self,
+            weights: &zion_cosmic_harmony::stream_profit::StreamWeights,
+        ) -> Result<()> {
+            let arr = stream_weights_f32(weights);
+            self.stream_weights_buf.write(&arr[..]).enq()?;
+            self.pro_que.queue().finish()?;
+            println!("gpu_opencl_fire_stream_weights {}", weights.describe());
+            Ok(())
         }
 
         fn mine_batch(
@@ -2124,7 +2360,7 @@ pub mod opencl_deeksha_lite_fire {
                     let hash: [u8; 32] = hashes[i * 32..(i + 1) * 32].try_into().unwrap();
                     if target.allows(&hash) {
                         let nonce = current_nonce.wrapping_add(i as u64);
-                        all_solutions.push((nonce, hash));
+                        all_solutions.push((nonce, hash, None));
                         break;
                     }
                 }
@@ -2443,7 +2679,7 @@ pub mod cuda_deeksha {
                         .map_err(|e| anyhow::anyhow!("read result_hash: {e}"))?;
                     let mut hash = [0u8; 32];
                     hash.copy_from_slice(&hash_result[..32]);
-                    all_solutions.push((nonce_result[0], hash));
+                    all_solutions.push((nonce_result[0], hash, None));
                     total_tested += chunk as u64;
                     break; // Early termination on solution
                 }
@@ -2825,7 +3061,7 @@ pub mod metal_deeksha {
                     .map_err(|_| anyhow::anyhow!("Metal async wait failed"))?;
 
                 if let Some((nonce, hash)) = self.read_result() {
-                    all_solutions.push((nonce, hash));
+                    all_solutions.push((nonce, hash, None));
                     total_tested += (nonce.saturating_sub(current_nonce) + 1).min(chunk as u64);
                     // Phase-3 optimization: do NOT break on first solution.
                     // With pool diff=1 we find a share after ~200-500 nonces,
@@ -3131,7 +3367,7 @@ pub mod metal_deeksha_lite_fire {
                     .map_err(|_| anyhow::anyhow!("Metal Fire async wait failed"))?;
 
                 if let Some((nonce, hash)) = self.read_result() {
-                    all_solutions.push((nonce, hash));
+                    all_solutions.push((nonce, hash, None));
                     total_tested += (nonce.saturating_sub(current_nonce) + 1).min(chunk as u64);
                 }
 
@@ -3178,6 +3414,220 @@ pub mod metal_deeksha_lite_fire {
                 nonce = nonce.wrapping_add(self.batch_size as u64);
             }
 
+            let elapsed = start.elapsed().as_secs_f64();
+            let khps = if elapsed > 0.0 {
+                total as f64 / elapsed / 1_000.0
+            } else {
+                0.0
+            };
+            Ok((total, elapsed, khps))
+        }
+    }
+}
+
+/// OpenCL miner for external AuxPoW algorithms (Blake3, kHeavyHash, etc.).
+/// Delegates to `zion_auxpow::gpu_miner::GpuMiner`.
+#[cfg(feature = "gpu-opencl")]
+pub mod opencl_external {
+    use super::*;
+    use std::time::Instant;
+    use zion_auxpow::gpu_miner::{GpuFoundShare, GpuMiner as AuxPowGpuMiner};
+    #[cfg(feature = "native-hashers")]
+    use zion_auxpow::DagManager;
+
+    pub struct OpenClExternalMiner {
+        algorithm: String,
+        miner: AuxPowGpuMiner,
+        work_size: usize,
+        /// DAG manager for Ethash/KawPow (only available with native-hashers).
+        #[cfg(feature = "native-hashers")]
+        dag_manager: DagManager,
+        /// Current epoch hint from the job (set by update_epoch_from_job).
+        current_epoch_hint: Option<u32>,
+    }
+
+    impl OpenClExternalMiner {
+        pub fn new(algorithm: &str, work_size: usize) -> Result<Self> {
+            let miner = AuxPowGpuMiner::new()
+                .map_err(|e| anyhow::anyhow!("auxpow_gpu_init_failed algorithm={algorithm} err={e}"))?;
+            Ok(Self {
+                algorithm: algorithm.to_string(),
+                miner,
+                work_size,
+                #[cfg(feature = "native-hashers")]
+                dag_manager: DagManager::new(),
+                current_epoch_hint: None,
+            })
+        }
+
+        /// Update the epoch hint from the job (called before mine_batch).
+        /// If the epoch changed, triggers DAG regeneration via DagManager
+        /// (with disk caching for fast restarts).
+        pub fn update_epoch_from_job(&mut self, epoch: Option<u32>) -> Result<()> {
+            if let Some(ep) = epoch {
+                self.current_epoch_hint = Some(ep);
+                #[cfg(feature = "native-hashers")]
+                {
+                    self.dag_manager.ensure_dag(&mut self.miner, &self.algorithm, ep)?;
+                }
+            }
+            Ok(())
+        }
+    }
+
+    impl GpuMiner for OpenClExternalMiner {
+        fn device_name(&self) -> String {
+            format!("opencl_auxpow_{}", self.algorithm)
+        }
+
+        fn backend_kind(&self) -> GpuBackendKind {
+            GpuBackendKind::OpenCL
+        }
+
+        fn algorithm(&self) -> String {
+            self.algorithm.clone()
+        }
+
+        fn update_epoch(&mut self, height: u64) -> Result<()> {
+            // For Ethash/KawPow, derive epoch from block height and ensure DAG.
+            // The pool sends the external block number as `height` for
+            // EthStratum coins (ETC/RVN/CLORE).
+            let epoch = if matches!(self.algorithm.as_str(), "ethash" | "etchash" | "ethash_etc") {
+                Some((height / 30000) as u32)
+            } else if matches!(
+                self.algorithm.as_str(),
+                "kawpow" | "kawpow_rvn" | "kawpow_clore" | "kawpow_evr" | "kawpow_mewc"
+            ) {
+                Some((height / 7500) as u32)
+            } else {
+                None
+            };
+            self.update_epoch_from_job(epoch)
+        }
+
+        fn mine_batch(
+            &mut self,
+            header: MiningHeader,
+            target: DifficultyTarget,
+            nonce_start: u64,
+            batch_size: u64,
+        ) -> Result<GpuBatchResult> {
+            let header_bytes = header.to_bytes();
+            let actual_batch = batch_size.min(self.work_size as u64);
+
+            let found = match self.algorithm.as_str() {
+                "blake3"
+                | "blake3_alph"
+                | "blake3_dcr"
+                | "autolykos"
+                | "autolykos_erg"
+                | "ethash"
+                | "etchash"
+                | "ethash_etc"
+                | "kawpow"
+                | "kawpow_rvn"
+                | "kawpow_clore"
+                | "kawpow_evr"
+                | "kawpow_mewc" => self.miner.mine(
+                    &self.algorithm,
+                    &header_bytes,
+                    &[],
+                    &target.bytes,
+                    nonce_start,
+                    actual_batch,
+                ),
+                "kheavyhash" | "kheavyhash_kas" => {
+                    // KAS external jobs send a 32-byte pre_pow_hash in header_hex.
+                    // The pool pads it to 80 bytes (MiningHeader); the pre_pow_hash
+                    // is in the first 32 bytes (previous_hash field).
+                    // Timestamp comes from the job's height field (stored in
+                    // header.timestamp for external jobs).
+                    let pre_pow_hash = &header_bytes[..32];
+                    let timestamp = header.timestamp.to_le_bytes().to_vec();
+                    self.miner.mine(
+                        &self.algorithm,
+                        pre_pow_hash,
+                        &timestamp,
+                        &target.bytes,
+                        nonce_start,
+                        actual_batch,
+                    )
+                }
+                other => anyhow::bail!("unsupported external GPU algorithm: {other}"),
+            }
+            .map_err(|e| anyhow::anyhow!("auxpow_gpu_mine_failed algorithm={} err={}", self.algorithm, e))?;
+
+            if let Some(GpuFoundShare { nonce, hash, mix_hash }) = found {
+                Ok(GpuBatchResult {
+                    solutions: vec![(nonce, hash, mix_hash)],
+                    nonces_tested: actual_batch,
+                })
+            } else {
+                Ok(GpuBatchResult {
+                    solutions: Vec::new(),
+                    nonces_tested: actual_batch,
+                })
+            }
+        }
+
+        fn mine_batch_raw(
+            &mut self,
+            raw_header: &[u8],
+            target: DifficultyTarget,
+            nonce_start: u64,
+            batch_size: u64,
+        ) -> Result<GpuBatchResult> {
+            // Use raw header bytes directly (supports >80B headers for DCR etc.)
+            let actual_batch = batch_size.min(self.work_size as u64);
+            let found = self
+                .miner
+                .mine(
+                    &self.algorithm,
+                    raw_header,
+                    &[],
+                    &target.bytes,
+                    nonce_start,
+                    actual_batch,
+                )
+                .map_err(|e| {
+                    anyhow::anyhow!(
+                        "auxpow_gpu_mine_failed_raw algorithm={} err={}",
+                        self.algorithm,
+                        e
+                    )
+                })?;
+
+            if let Some(GpuFoundShare { nonce, hash, mix_hash }) = found {
+                Ok(GpuBatchResult {
+                    solutions: vec![(nonce, hash, mix_hash)],
+                    nonces_tested: actual_batch,
+                })
+            } else {
+                Ok(GpuBatchResult {
+                    solutions: Vec::new(),
+                    nonces_tested: actual_batch,
+                })
+            }
+        }
+
+        fn benchmark(&mut self, secs: f64) -> Result<(u64, f64, f64)> {
+            let header = MiningHeader {
+                version: 3,
+                previous_hash: [0xAA; 32],
+                merkle_root: [0xBB; 32],
+                timestamp: 1_762_000_200,
+                difficulty_bits: 0x1f00ffff,
+            };
+            let target = DifficultyTarget::MAX;
+
+            let start = Instant::now();
+            let mut total = 0u64;
+            let mut nonce = 0u64;
+            while start.elapsed().as_secs_f64() < secs {
+                let result = self.mine_batch(header, target, nonce, self.work_size as u64)?;
+                total += result.nonces_tested;
+                nonce = nonce.wrapping_add(self.work_size as u64);
+            }
             let elapsed = start.elapsed().as_secs_f64();
             let khps = if elapsed > 0.0 {
                 total as f64 / elapsed / 1_000.0
