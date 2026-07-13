@@ -633,20 +633,30 @@ pub mod kheavyhash {
         /// - `output` must be valid for 32 writable bytes, non-aliasing.
         pub fn kheavyhash_hash(input: *const u8, len: usize, output: *mut u8);
 
-        /// Mining variant: hash `(header || nonce_le)` into 32 bytes.
+        /// Mining variant: compute the full kHeavyHash for a Kaspa block
+        /// candidate.  `pre_pow_hash` is the 32-byte pre-pow hash, `timestamp`
+        /// is the block timestamp (Unix seconds), and `nonce` is the 64-bit
+        /// nonce.  Output is 32 bytes.
         ///
         /// # Safety
-        /// Same as [`kheavyhash_hash`] for `header` / `output`.
-        pub fn kheavyhash_mine(header: *const u8, header_len: usize, nonce: u64, output: *mut u8);
+        /// Same as [`kheavyhash_hash`] for `pre_pow_hash` / `output`.
+        pub fn kheavyhash_mine(
+            pre_pow_hash: *const u8,
+            pre_pow_hash_len: usize,
+            timestamp: u64,
+            nonce: u64,
+            output: *mut u8,
+        );
 
         /// Verify mining hash against 32-byte target.
         ///
         /// # Safety
-        /// `header` and `target` must be valid for their respective lengths.
-        /// Returns `1`/`0`; other values are ABI breaks.
+        /// `pre_pow_hash` and `target` must be valid for their respective
+        /// lengths.  Returns `1`/`0`; other values are ABI breaks.
         pub fn kheavyhash_verify(
-            header: *const u8,
-            header_len: usize,
+            pre_pow_hash: *const u8,
+            pre_pow_hash_len: usize,
+            timestamp: u64,
             nonce: u64,
             target: *const u8,
         ) -> i32;
@@ -673,32 +683,71 @@ pub mod kheavyhash {
         Ok(hash(input))
     }
 
-    pub fn mine(header: &[u8], nonce: u64) -> [u8; 32] {
+    /// Mining variant: compute the full kHeavyHash for a Kaspa block candidate.
+    ///
+    /// `pre_pow_hash` is the 32-byte pre-pow hash, `timestamp` is the block
+    /// timestamp (Unix seconds), and `nonce` is the 64-bit nonce.
+    pub fn mine(pre_pow_hash: &[u8], timestamp: u64, nonce: u64) -> [u8; 32] {
         let mut out = [0u8; 32];
         // SAFETY: same as `hash`.
         unsafe {
-            kheavyhash_mine(header.as_ptr(), header.len(), nonce, out.as_mut_ptr());
+            kheavyhash_mine(
+                pre_pow_hash.as_ptr(),
+                pre_pow_hash.len(),
+                timestamp,
+                nonce,
+                out.as_mut_ptr(),
+            );
         }
         out
     }
 
     /// Fallible variant of [`mine`] that rejects empty / oversized inputs.
-    pub fn try_mine(header: &[u8], nonce: u64) -> Result<[u8; 32], FfiError> {
-        safety::validate_input_len(header)?;
-        Ok(mine(header, nonce))
+    pub fn try_mine(
+        pre_pow_hash: &[u8],
+        timestamp: u64,
+        nonce: u64,
+    ) -> Result<[u8; 32], FfiError> {
+        safety::validate_input_len(pre_pow_hash)?;
+        Ok(mine(pre_pow_hash, timestamp, nonce))
     }
 
-    pub fn verify(header: &[u8], nonce: u64, target: &[u8; 32]) -> bool {
-        // SAFETY: `header`/`target` valid; thread-safe.
-        unsafe { kheavyhash_verify(header.as_ptr(), header.len(), nonce, target.as_ptr()) == 1 }
+    pub fn verify(
+        pre_pow_hash: &[u8],
+        timestamp: u64,
+        nonce: u64,
+        target: &[u8; 32],
+    ) -> bool {
+        // SAFETY: `pre_pow_hash`/`target` valid; thread-safe.
+        unsafe {
+            kheavyhash_verify(
+                pre_pow_hash.as_ptr(),
+                pre_pow_hash.len(),
+                timestamp,
+                nonce,
+                target.as_ptr(),
+            ) == 1
+        }
     }
 
     /// Strict variant of [`verify`] surfacing unexpected C return codes.
-    pub fn try_verify(header: &[u8], nonce: u64, target: &[u8; 32]) -> Result<bool, FfiError> {
-        safety::validate_input_len(header)?;
+    pub fn try_verify(
+        pre_pow_hash: &[u8],
+        timestamp: u64,
+        nonce: u64,
+        target: &[u8; 32],
+    ) -> Result<bool, FfiError> {
+        safety::validate_input_len(pre_pow_hash)?;
         // SAFETY: see `verify`.
-        let code =
-            unsafe { kheavyhash_verify(header.as_ptr(), header.len(), nonce, target.as_ptr()) };
+        let code = unsafe {
+            kheavyhash_verify(
+                pre_pow_hash.as_ptr(),
+                pre_pow_hash.len(),
+                timestamp,
+                nonce,
+                target.as_ptr(),
+            )
+        };
         safety::parse_c_bool("kheavyhash_verify", code)
     }
 
@@ -1283,9 +1332,9 @@ pub fn runtime_self_test() -> Vec<AlgoTestResult> {
     #[cfg(feature = "native-kheavyhash")]
     {
         let name = "kheavyhash";
-        let header = [0xA4u8; 80];
-        let h1 = kheavyhash::mine(&header, 1);
-        let h2 = kheavyhash::mine(&header, 1);
+        let header = [0xA4u8; 32];
+        let h1 = kheavyhash::mine(&header, 5_435_345_234, 1);
+        let h2 = kheavyhash::mine(&header, 5_435_345_234, 1);
         let ok = h1 != [0u8; 32] && h1 == h2;
         results.push(AlgoTestResult {
             name,
@@ -1458,8 +1507,8 @@ mod tests {
     #[cfg(feature = "native-kheavyhash")]
     #[test]
     fn kheavyhash_smoke() {
-        let header = [0x04u8; 80];
-        let hash = kheavyhash::mine(&header, 1234);
+        let header = [0x04u8; 32];
+        let hash = kheavyhash::mine(&header, 5_435_345_234, 1234);
         assert_ne!(hash, [0u8; 32], "kheavyhash must produce non-zero output");
         println!("kheavyhash smoke: {:02x?}", &hash[..8]);
     }
@@ -1671,7 +1720,7 @@ mod tests {
     fn kheavyhash_try_hash_rejects_empty_input() {
         let err = kheavyhash::try_hash(&[]).expect_err("empty input must reject");
         assert!(matches!(err, super::safety::FfiError::EmptyInput));
-        let err = kheavyhash::try_mine(&[], 0).expect_err("empty input must reject");
+        let err = kheavyhash::try_mine(&[], 0, 0).expect_err("empty input must reject");
         assert!(matches!(err, super::safety::FfiError::EmptyInput));
     }
 

@@ -372,11 +372,11 @@ Zdroj: `V3/L2/dao/config/dao-mainnet.toml`
 
 | # | EVM adresa |
 |---|------------|
-| 1 | `0x9b5b9a6c4ce4bcd4479d8ea6d12cd7bfeb61085f` |
-| 2 | `0x8a804afd4c200e95f415df6907da111a0258a578` |
-| 3 | `0x694f3b43f4bf77dfbef53224791272d102449218` |
-| 4 | `0x64c85af40143484c12316723192a0d71c10e82b8` |
-| 5 | `0xe093ff26da65079df435a89834497abc380b59ae` |
+| 1 | `0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186` |
+| 2 | `0x24d986841E56e5571489B25951eE8C1Ae761FA82` |
+| 3 | `0x665c55eDCF25c2c5A1dfF1B20eE950cBDC58d3d0` |
+| 4 | `0x8E644b3E9FaBf52eE321DC5B3D5AA06d6e3E66C6` |
+| 5 | `0x7e0D2eD71d78B9CFB5034A83333e82e304bc4CB2` |
 
 Threshold: **5/5** (po hard resetu zvýšeno z 3/5 na 5/5 pro maximální bezpečnost)
 

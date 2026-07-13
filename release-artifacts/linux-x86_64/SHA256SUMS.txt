@@ -1,0 +1,8 @@
+e3ce3b045a536f0d3b9eb8d343c80efc81af3c8d6612fa351b4fa683f7f1c281  zion-all-linux-x86_64.tar.gz
+8151f865f0ade56597a4843ed756ae23cd4143cd446e5d1d332ee62c0606fdfd  zion-atomic-swap-linux-x86_64.tar.gz
+8f66141b97e3bb54318a2f07de3578f6a0d8527bc9540e8e6d92f63a2b15afca  zion-bridge-linux-x86_64.tar.gz
+35b96fc4ea7084083bfcccbee79158c5198bef435cbdf72875fc0896d1b61cc5  zion-cli-linux-x86_64.tar.gz
+313bd188cd727c0d1e31db275e5ffcebe0176ad82bdeda064ab41b1e237d8c3e  zion-dao-linux-x86_64.tar.gz
+81971e26d80d448132c8ce787570c4621846333d99ab5507a7e8d2ba01ab35bf  zion-miner-linux-x86_64.tar.gz
+220ce3436412558b0598ff5f34c120e78c06297a4104f825a23b6e1d994c3a9e  zion-node-linux-x86_64.tar.gz
+63dae9d6c85fa5ed228e31824596071bf977ffc2c87b11448e7362e04cbd90b2  zion-pool-linux-x86_64.tar.gz

@@ -1062,11 +1062,11 @@ fn test_parse_bridge_mainnet_toml() {
     assert_eq!(
         cfg.validator.validator_addresses,
         vec![
-            "0x9b5b9a6c4ce4bcd4479d8ea6d12cd7bfeb61085f",
-            "0x8a804afd4c200e95f415df6907da111a0258a578",
-            "0x694f3b43f4bf77dfbef53224791272d102449218",
-            "0x64c85af40143484c12316723192a0d71c10e82b8",
-            "0xe093ff26da65079df435a89834497abc380b59ae",
+            "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186",
+            "0x24d986841E56e5571489B25951eE8C1Ae761FA82",
+            "0x665c55eDCF25c2c5A1dfF1B20eE950cBDC58d3d0",
+            "0x8E644b3E9FaBf52eE321DC5B3D5AA06d6e3E66C6",
+            "0x7e0D2eD71d78B9CFB5034A83333e82e304bc4CB2",
         ]
     );
 }

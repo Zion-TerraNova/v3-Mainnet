@@ -49,9 +49,9 @@ pub fn start(
     if console {
         show_console(&mut cmd);
     } else {
-        // Run in background. On Windows we use DETACHED_PROCESS so the child
-        // survives if the CLI console exits; on Unix we just discard stdio.
-        detach(&mut cmd);
+        // Run in background — fully detached from the terminal.
+        // On Windows we use DETACHED_PROCESS; on Unix we use setsid() + log files.
+        detach(&mut cmd, name);
     }
 
     let child = cmd.spawn().with_context(|| format!("failed to start {}", name))?;
@@ -170,8 +170,13 @@ fn kill(pid: u32) -> Result<()> {
 }
 
 /// Configure a command to spawn in a new detached console on Windows,
-/// or detached in the background on Unix.
-fn detach(cmd: &mut Command) {
+/// or fully detached in the background on Unix (setsid + log files).
+///
+/// On Unix, the child is placed in a new session via `setsid()`, so it has
+/// no controlling terminal. stdout/stderr are redirected to log files under
+/// `~/.zion/logs/<name>.log` so output can be inspected without interfering
+/// with the CLI's terminal.
+fn detach(cmd: &mut Command, name: &str) {
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
@@ -183,11 +188,62 @@ fn detach(cmd: &mut Command) {
     }
     #[cfg(unix)]
     {
+        use std::os::unix::process::CommandExt;
         use std::process::Stdio;
+
+        // Redirect stdout/stderr to a log file so the child's output doesn't
+        // interfere with the CLI's terminal (dialoguer raw mode, etc.).
+        let log_path = log_file_path(name);
+        let (stdout_stdio, stderr_stdio) = match log_path {
+            Some(p) => {
+                let out = std::fs::OpenOptions::new()
+                    .create(true)
+                    .write(true)
+                    .truncate(true)
+                    .open(&p)
+                    .map(Stdio::from)
+                    .ok();
+                let err = std::fs::OpenOptions::new()
+                    .create(true)
+                    .write(true)
+                    .truncate(true)
+                    .open(&p)
+                    .map(Stdio::from)
+                    .ok();
+                (out.unwrap_or(Stdio::null()), err.unwrap_or(Stdio::null()))
+            }
+            None => (Stdio::null(), Stdio::null()),
+        };
+
         cmd.stdin(Stdio::null())
-            .stdout(Stdio::null())
-            .stderr(Stdio::null());
+            .stdout(stdout_stdio)
+            .stderr(stderr_stdio);
+
+        // setsid() — put the child in a new session with no controlling
+        // terminal. This prevents it from receiving terminal signals (SIGINT,
+        // SIGTSTP, etc.) and from writing to /dev/tty.
+        unsafe {
+            cmd.pre_exec(|| {
+                libc::setsid();
+                Ok(())
+            });
+        }
     }
+}
+
+/// Get the log file path for a service: `~/.zion/logs/<name>.log`
+fn log_file_path(name: &str) -> Option<PathBuf> {
+    let home = env::var("HOME")
+        .or_else(|_| env::var("USERPROFILE"))
+        .ok()?;
+    let log_dir = PathBuf::from(home).join(".zion").join("logs");
+    let _ = std::fs::create_dir_all(&log_dir);
+    Some(log_dir.join(format!("{}.log", name)))
+}
+
+/// Get the log file path for a service (public API).
+pub fn get_log_path(name: &str) -> Option<PathBuf> {
+    log_file_path(name)
 }
 
 /// Configure a command to spawn in a new visible console window.

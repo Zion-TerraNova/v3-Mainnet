@@ -27,6 +27,13 @@ pub enum AiCmd {
 }
 
 pub async fn run(cfg: &Config, cmd: AiCmd) -> Result<()> {
+    if cfg.ai.url.is_empty() {
+        ui::print_header("Hiran AI");
+        ui::print_info("AI endpoint is not configured (optional feature).");
+        ui::print_info("Set with: zion config set ai.url <endpoint>");
+        println!();
+        return Ok(());
+    }
     match cmd {
         AiCmd::Status => ai_status(cfg).await,
         AiCmd::Ask { question } => {

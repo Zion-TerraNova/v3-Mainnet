@@ -43,11 +43,34 @@ pub async fn run(cfg: &Config) -> Result<()> {
     match node_client.chain_info().await {
         Ok(chain) => {
             ui::print_ok(&format!("Node reachable — height {}", chain.chain_height));
+            ui::print_row("Network", &chain.network);
+            ui::print_row("Consensus", &chain.consensus_profile);
+            ui::print_row("Tip", &chain.tip_hash_hex);
+            ui::print_row("Mempool txs", &chain.mempool_transactions.to_string());
         }
         Err(e) => {
             ui::print_err(&format!("Node unreachable: {}", e));
             errors += 1;
         }
+    }
+
+    // Peers
+    match node_client.peer_info().await {
+        Ok(peers) => {
+            ui::print_row("Connected peers", &peers.count.to_string());
+        }
+        Err(_) => {}
+    }
+
+    // Supply
+    match node_client.supply_info().await {
+        Ok(supply) => {
+            ui::print_row("Total supply", &format!("{} ZION", supply.total_supply_zion));
+            ui::print_row("Mined so far", &format!("{} ZION", supply.mined_so_far_zion));
+            ui::print_row("Mined %", &format!("{}%", supply.supply_mined_percent));
+            ui::print_row("Block reward", &format!("{:.6} ZION", supply.block_reward_zion));
+        }
+        Err(_) => {}
     }
 
     // ── 3. Wallet ────────────────────────────────────────────────────
@@ -154,22 +177,26 @@ pub async fn run(cfg: &Config) -> Result<()> {
 
     // ── 7. AI endpoint ───────────────────────────────────────────────
     ui::print_section("Hiran AI");
-    ui::print_row("Endpoint", &cfg.ai.url);
-    let health_url = format!("{}/health", cfg.ai.url.trim_end_matches('/'));
-    match reqwest::Client::new()
-        .get(&health_url)
-        .timeout(std::time::Duration::from_secs(5))
-        .send()
-        .await
-    {
-        Ok(r) if r.status().is_success() => ui::print_ok("Hiran AI reachable."),
-        Ok(r) => {
-            ui::print_warn(&format!("Hiran AI responded HTTP {}", r.status()));
-            warnings += 1;
-        }
-        Err(e) => {
-            ui::print_warn(&format!("Hiran AI unreachable: {}", e));
-            warnings += 1;
+    if cfg.ai.url.is_empty() {
+        ui::print_info("Not configured (optional). Set with: zion config set ai.url <endpoint>");
+    } else {
+        ui::print_row("Endpoint", &cfg.ai.url);
+        let health_url = format!("{}/health", cfg.ai.url.trim_end_matches('/'));
+        match reqwest::Client::new()
+            .get(&health_url)
+            .timeout(std::time::Duration::from_secs(5))
+            .send()
+            .await
+        {
+            Ok(r) if r.status().is_success() => ui::print_ok("Hiran AI reachable."),
+            Ok(r) => {
+                ui::print_warn(&format!("Hiran AI responded HTTP {}", r.status()));
+                warnings += 1;
+            }
+            Err(e) => {
+                ui::print_warn(&format!("Hiran AI unreachable: {}", e));
+                warnings += 1;
+            }
         }
     }
 

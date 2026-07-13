@@ -564,7 +564,10 @@ fn mine_menu() -> Result<Option<Vec<String>>> {
             "Start mining (GPU guided, auto-node)",
             "Start mining (custom guided, auto-node)",
             "Start mining (public pool only)",
-            "Miner status",
+            "Miner status (hashrate, shares, uptime)",
+            "Live monitor dashboard (refreshes every 2s)",
+            "View miner log (last 50 lines)",
+            "Follow miner log (real-time, Ctrl+C to stop)",
             "Stop miner",
             BACK,
         ];
@@ -587,7 +590,10 @@ fn mine_menu() -> Result<Option<Vec<String>>> {
             }
             3 => Some(args(&["mine", "start"])),
             4 => Some(args(&["mine", "status"])),
-            5 => Some(args(&["mine", "stop"])),
+            5 => Some(args(&["mine", "monitor"])),
+            6 => Some(args(&["mine", "log", "--lines", "50"])),
+            7 => Some(args(&["mine", "log", "--follow"])),
+            8 => Some(args(&["mine", "stop"])),
             _ => return Ok(None),
         };
 
@@ -654,7 +660,7 @@ fn config_menu() -> Result<Option<Vec<String>>> {
                 Some(args_owned(vec!["config".into(), "set".into(), "miner.wallet".into(), val]))
             }
             1 => {
-                let host = required_input("RPC host", Some("127.0.0.1"))?;
+                let host = required_input("RPC host", Some("rpc.zionterranova.com"))?;
                 Some(args_owned(vec!["config".into(), "set".into(), "node.rpc_host".into(), host]))
             }
             2 => {
@@ -674,7 +680,7 @@ fn config_menu() -> Result<Option<Vec<String>>> {
                 Some(args_owned(vec!["config".into(), "set".into(), "pool.bind".into(), val]))
             }
             6 => {
-                let url = required_input("AI endpoint URL", Some("http://62.171.141.136:8080"))?;
+                let url = required_input("AI endpoint URL (blank = disabled)", Some(""))?;
                 Some(args_owned(vec!["config".into(), "set".into(), "ai.url".into(), url]))
             }
             7 => {

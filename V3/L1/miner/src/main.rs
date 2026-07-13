@@ -523,6 +523,10 @@ fn write_stats_file(path: &str, snapshot: &MinerMetricsSnapshot) {
         "status": snapshot.status,
         "miner_id": snapshot.miner_id,
         "pool_addr": snapshot.pool_addr,
+        // Batch info — lets the user see the miner is working even mid-batch
+        "current_iteration": snapshot.current_iteration,
+        "best_batch_ms": snapshot.best_batch_ms,
+        "last_job_id": snapshot.last_job_id,
     });
 
     // Atomic write: write to temp then rename (prevents partial reads by agent)
@@ -704,13 +708,93 @@ fn main() -> Result<()> {
     let metrics = Arc::new(Mutex::new(MinerMetricsSnapshot::from_config(&config)));
 
     // ── Interactive control + hashrate tracker ──
-    let interactive = parse_bool_env("ZION_INTERACTIVE", true);
+    // Auto-detect TTY: if stdin or stdout is not a terminal (e.g. launched
+    // by the CLI with redirected stdio), force non-interactive headless mode.
+    // The TUI requires a real terminal for crossterm raw mode + alternate screen.
+    let tty_available = std::io::IsTerminal::is_terminal(&std::io::stdin())
+        && std::io::IsTerminal::is_terminal(&std::io::stdout());
+    let interactive = parse_bool_env("ZION_INTERACTIVE", true) && tty_available;
+    if !tty_available && parse_bool_env("ZION_INTERACTIVE", true) {
+        println!("headless=enabled reason=stdin_or_stdout_not_tty");
+    }
     let control = Arc::new(Mutex::new(MinerControl::new(
         &config.algorithm,
         config.threads,
         config.gpu_backend != gpu_backend::GpuBackendKind::Cpu,
     )));
     let hashrate = HashrateTracker::new();
+
+    // ── Background stats writer thread ──
+    // Writes miner-stats.json every 5 seconds independently of batch completion.
+    // This ensures the CLI's 'mine status' and 'mine monitor' always see fresh data,
+    // even during long GPU batches (which can take 40-80 seconds on Apple Silicon).
+    if let Some(stats_path) = config.stats_file.as_deref() {
+        let stats_metrics = Arc::clone(&metrics);
+        let stats_path = stats_path.to_string();
+        let stats_control = Arc::clone(&control);
+        let stats_hashrate = Arc::clone(&hashrate);
+        thread::spawn(move || {
+            loop {
+                thread::sleep(Duration::from_secs(5));
+                // Check if miner is quitting
+                if stats_control.lock().map(|c| c.requested_quit).unwrap_or(false) {
+                    break;
+                }
+                // Write current stats snapshot, enriched with real-time hashrate data
+                if let Ok(mut snapshot) = stats_metrics.lock() {
+                    // Pull real-time rates from HashrateTracker (works mid-batch)
+                    let rates = stats_hashrate.compute_rates();
+                    let total_hashes_now = stats_hashrate.total_hashes.load(Ordering::Relaxed);
+                    let accepted_now = stats_hashrate.accepted_shares.load(Ordering::Relaxed);
+                    let rejected_now = stats_hashrate.rejected_shares.load(Ordering::Relaxed);
+                    let pool_height_now = stats_hashrate.pool_height.load(Ordering::Relaxed);
+
+                    // Detect "GPU batch in progress": miner is running but no new
+                    // hashes have been recorded recently (hashrate_10s == 0).
+                    // This happens during long GPU batches (40-80s on Apple Silicon).
+                    let batch_in_progress = rates.total_10s_hps == 0.0
+                        && (snapshot.backend == "metal"
+                            || snapshot.backend == "opencl"
+                            || snapshot.backend == "cuda");
+
+                    // Update hashrate from real-time tracker
+                    if rates.total_10s_hps > 0.0 {
+                        snapshot.hashrate_10s_hps = rates.total_10s_hps;
+                    }
+                    if rates.total_60s_hps > 0.0 {
+                        snapshot.hashrate_60s_hps = rates.total_60s_hps;
+                    }
+                    if rates.total_15m_hps > 0.0 {
+                        snapshot.hashrate_15m_hps = rates.total_15m_hps;
+                    }
+                    // Update shares from tracker (atomic, real-time)
+                    snapshot.accepted_shares = accepted_now;
+                    snapshot.rejected_shares = rejected_now;
+                    // Update peak if current is higher
+                    let current_peak = if rates.total_10s_hps > 0.0 {
+                        rates.total_10s_hps
+                    } else {
+                        snapshot.hashrate_hps
+                    };
+                    if current_peak > snapshot.hashrate_max {
+                        snapshot.hashrate_max = current_peak;
+                    }
+                    // Update total hashes from tracker (atomic, real-time)
+                    snapshot.attempted_hashes = total_hashes_now;
+                    // Update pool height from tracker
+                    snapshot.pool_height = pool_height_now;
+                    // Status: show "gpu_batch_in_progress" during GPU batches, "running" otherwise
+                    if batch_in_progress {
+                        snapshot.status = "gpu_batch_in_progress".to_string();
+                    } else if snapshot.status == "starting" || snapshot.status == "gpu_batch_in_progress" {
+                        snapshot.status = "running".to_string();
+                    }
+                    snapshot.last_update_at = Instant::now();
+                    write_stats_file(&stats_path, &snapshot);
+                }
+            }
+        });
+    }
 
     let outcome = match config.pool_addr.as_deref() {
         Some(pool_addr) => {

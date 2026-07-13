@@ -51,23 +51,21 @@ pub async fn collect(cfg: &Config) -> Stats {
         .request_timeout(Duration::from_secs(5))
         .build();
 
-    let (node_height, node_network, _node_peers_initial, node_tip, node_rpc_ok) =
+    let (node_height, node_network, node_tip, node_rpc_ok) =
         match client.chain_info().await {
             Ok(chain) => (
                 Some(chain.chain_height),
                 Some(chain.network),
-                None::<u64>,
                 Some(chain.tip_hash_hex),
                 true,
             ),
-            Err(_) => (None, None, None, None, false),
+            Err(_) => (None, None, None, false),
         };
 
     let node_peers = match client.peer_info().await {
         Ok(p) => Some(p.count as u64),
         Err(_) => None,
     };
-    let _ = _node_peers_initial;
 
     let wallet_balance = if !cfg.miner.wallet.is_empty() {
         match client.balance(&cfg.miner.wallet).await {
