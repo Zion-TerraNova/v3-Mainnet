@@ -223,7 +223,12 @@ async fn start_mining(
             // Smaller batch = faster completion (~10-15s vs 82s with 14K threads).
             envs.push(("ZION_GPU_WORK_SIZE", "4096".into()));
         }
+        "cpu" => {
+            envs.push(("ZION_GPU_BACKEND", "cpu".into()));
+            envs.push(("ZION_NONCE_COUNT", "4096".into()));
+        }
         _ => {
+            envs.push(("ZION_GPU_BACKEND", "cpu".into()));
             envs.push(("ZION_NONCE_COUNT", "4096".into()));
         }
     }
@@ -664,9 +669,14 @@ fn find_miner_binary() -> Result<PathBuf> {
         }
     }
 
-    // 2. Local cargo build (target/release/zion-miner) — prefer this over
-    //    bundled binary because it may have GPU features compiled in.
-    for c in ["zion-miner-windows-x86_64", "zion-miner"] {
+    // 2. Local cargo build (target/release/zion-miner) or a manually-downloaded
+    //    release binary (e.g. zion-miner-linux-x86_64) — prefer these over the
+    //    bundled download because they may have GPU features compiled in.
+    let mut candidates = vec!["zion-miner-windows-x86_64".to_string(), "zion-miner".to_string()];
+    if let Ok(platform) = crate::bundle::current_platform() {
+        candidates.insert(0, format!("zion-miner-{}", platform));
+    }
+    for c in &candidates {
         if let Some(p) = process::find_binary(c) {
             return Ok(p);
         }
@@ -686,8 +696,10 @@ fn find_miner_binary() -> Result<PathBuf> {
         return Ok(p);
     }
 
+    let gpu_feature = if cfg!(target_os = "macos") { "gpu-metal" } else { "gpu-opencl" };
     Err(anyhow::anyhow!(
-        "miner binary not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build: cargo build --release -p zion-miner --features gpu-metal"
+        "miner binary not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build: cargo build --release -p zion-miner --features {}",
+        gpu_feature
     ))
 }
 

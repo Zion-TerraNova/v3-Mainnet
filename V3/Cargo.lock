@@ -4147,9 +4147,11 @@ dependencies = [
  "libc",
  "log",
  "ort",
+ "reqwest",
  "serde",
  "serde_json",
  "sha3",
+ "tokio",
 ]
 
 [[package]]

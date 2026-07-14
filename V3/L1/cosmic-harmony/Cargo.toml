@@ -24,4 +24,6 @@ libc = "0.2"
 serde_json.workspace = true
 log = "0.4"
 ort = { version = "2.0.0-rc.10", optional = true, default-features = false, features = ["load-dynamic"] }
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
 sha3 = "0.10"
+tokio = { version = "1", features = ["rt"] }

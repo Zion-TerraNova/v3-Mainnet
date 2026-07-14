@@ -88,6 +88,10 @@ fn extract_or_download(name: &str, target: &Path) -> Result<()> {
 }
 
 /// Download a binary from GitHub Releases and extract it from the tar.gz/zip.
+///
+/// The actual network request is performed on a dedicated std::thread so the
+/// reqwest::blocking runtime is created and dropped outside the tokio async
+/// context, avoiding a runtime panic when the CLI is spawned from `#[tokio::main]`.
 fn download_binary(name: &str, target: &Path) -> Result<()> {
     let platform = current_platform()?;
     let ext = if cfg!(windows) { "zip" } else { "tar.gz" };
@@ -99,35 +103,41 @@ fn download_binary(name: &str, target: &Path) -> Result<()> {
 
     eprintln!("  ◉ Downloading {} from GitHub Releases...", name);
 
-    let client = reqwest::blocking::Client::builder()
-        .timeout(std::time::Duration::from_secs(120))
-        .build()?;
+    let name_for_thread = name.to_string();
+    let asset_name_for_thread = asset_name.clone();
+    let url_for_thread = url.clone();
 
-    let resp = client
-        .get(&url)
-        .header("User-Agent", "zion-cli/3.0.5")
-        .send()
-        .map_err(|e| anyhow!("download failed: {} ({})", e, url))?;
+    let body_bytes = run_off_thread(move || -> Result<Vec<u8>> {
+        let client = reqwest::blocking::Client::builder()
+            .timeout(std::time::Duration::from_secs(120))
+            .build()?;
 
-    if !resp.status().is_success() {
-        return Err(anyhow!(
-            "GitHub returned HTTP {} for {} — the binary may not be available for this platform yet. \
-             Build from source: cargo build --release -p zion-{}",
-            resp.status(),
-            asset_name,
-            binary_crate_name(name)
-        ));
-    }
+        let resp = client
+            .get(&url_for_thread)
+            .header("User-Agent", "zion-cli/3.0.5")
+            .send()
+            .map_err(|e| anyhow!("download failed: {} ({})", e, url_for_thread))?;
 
-    let body = resp.bytes().map_err(|e| anyhow!("read download body: {}", e))?;
-    let body_bytes = body.as_ref();
+        if !resp.status().is_success() {
+            return Err(anyhow!(
+                "GitHub returned HTTP {} for {} — the binary may not be available for this platform yet. \
+                 Build from source: cargo build --release -p zion-{}",
+                resp.status(),
+                asset_name_for_thread,
+                binary_crate_name(&name_for_thread)
+            ));
+        }
+
+        let body = resp.bytes().map_err(|e| anyhow!("read download body: {}", e))?;
+        Ok(body.to_vec())
+    })?;
 
     if cfg!(windows) {
         // Extract from zip
-        extract_from_zip(body_bytes, target, name)?;
+        extract_from_zip(&body_bytes, target, name, &platform)?;
     } else {
         // Extract from tar.gz
-        extract_from_tar_gz(body_bytes, target, name)?;
+        extract_from_tar_gz(&body_bytes, target, name, &platform)?;
     }
 
     // Set executable permission on Unix
@@ -143,7 +153,24 @@ fn download_binary(name: &str, target: &Path) -> Result<()> {
     Ok(())
 }
 
-fn extract_from_tar_gz(data: &[u8], target: &Path, expected_name: &str) -> Result<()> {
+/// Run a blocking, `'static` closure on a dedicated std::thread. If we are
+/// inside a tokio runtime, wrap the join in `block_in_place` so we don't block
+/// an executor thread.
+fn run_off_thread<F, R>(f: F) -> Result<R>
+where
+    F: FnOnce() -> Result<R> + Send + 'static,
+    R: Send + 'static,
+{
+    let join = if tokio::runtime::Handle::try_current().is_ok() {
+        tokio::task::block_in_place(|| std::thread::spawn(f).join())
+    } else {
+        std::thread::spawn(f).join()
+    };
+
+    join.map_err(|_| anyhow!("download thread panicked"))?
+}
+
+fn extract_from_tar_gz(data: &[u8], target: &Path, expected_name: &str, platform: &str) -> Result<()> {
     use flate2::read::GzDecoder;
     use tar::Archive;
 
@@ -151,6 +178,8 @@ fn extract_from_tar_gz(data: &[u8], target: &Path, expected_name: &str) -> Resul
     let mut archive = Archive::new(decoder);
 
     let bin_name = binary_filename(expected_name);
+    let zion_name = format!("zion-{}-{}", expected_name, platform);
+    let zion_exe_name = format!("zion-{}-{}.exe", expected_name, platform);
 
     for entry in archive.entries()? {
         let mut entry = entry.context("read tar entry")?;
@@ -160,10 +189,14 @@ fn extract_from_tar_gz(data: &[u8], target: &Path, expected_name: &str) -> Resul
             .and_then(|n| n.to_str())
             .unwrap_or("");
 
-        // Match the expected binary name (with or without .exe)
+        // Match the expected binary name (with or without .exe) or the
+        // platform-specific release name used for miner assets (e.g.
+        // zion-miner-linux-x86_64).
         if file_name == bin_name
             || file_name == expected_name
             || file_name == format!("{}.exe", expected_name)
+            || file_name == zion_name
+            || file_name == zion_exe_name
         {
             let mut bytes = Vec::new();
             entry.read_to_end(&mut bytes).context("read tar entry content")?;
@@ -181,7 +214,7 @@ fn extract_from_tar_gz(data: &[u8], target: &Path, expected_name: &str) -> Resul
 }
 
 #[cfg(windows)]
-fn extract_from_zip(data: &[u8], target: &Path, expected_name: &str) -> Result<()> {
+fn extract_from_zip(data: &[u8], target: &Path, expected_name: &str, platform: &str) -> Result<()> {
     use std::io::Cursor;
     use zip::ZipArchive;
 
@@ -189,6 +222,8 @@ fn extract_from_zip(data: &[u8], target: &Path, expected_name: &str) -> Result<(
     let mut archive = ZipArchive::new(reader).context("open zip archive")?;
 
     let bin_name = binary_filename(expected_name);
+    let zion_name = format!("zion-{}-{}", expected_name, platform);
+    let zion_exe_name = format!("zion-{}-{}.exe", expected_name, platform);
 
     for i in 0..archive.len() {
         let mut entry = archive.by_index(i).context("read zip entry")?;
@@ -198,7 +233,11 @@ fn extract_from_zip(data: &[u8], target: &Path, expected_name: &str) -> Result<(
             .and_then(|n| n.to_str())
             .unwrap_or("");
 
-        if file_name == bin_name || file_name == expected_name {
+        if file_name == bin_name
+            || file_name == expected_name
+            || file_name == zion_name
+            || file_name == zion_exe_name
+        {
             let mut bytes = Vec::new();
             std::io::Read::read_to_end(&mut entry, &mut bytes)
                 .context("read zip entry content")?;
@@ -216,12 +255,12 @@ fn extract_from_zip(data: &[u8], target: &Path, expected_name: &str) -> Result<(
 }
 
 #[cfg(not(windows))]
-fn extract_from_zip(_data: &[u8], _target: &Path, _expected_name: &str) -> Result<()> {
+fn extract_from_zip(_data: &[u8], _target: &Path, _expected_name: &str, _platform: &str) -> Result<()> {
     Err(anyhow!("zip extraction is not available on this platform"))
 }
 
 /// Determine the current platform identifier for download URLs.
-fn current_platform() -> Result<String> {
+pub(crate) fn current_platform() -> Result<String> {
     let os = std::env::consts::OS;
     let arch = std::env::consts::ARCH;
 
