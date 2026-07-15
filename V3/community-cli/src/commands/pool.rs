@@ -1,145 +1,154 @@
-//! Local mining pool control — start, stop, status.
-//!
-//! Manages the `zion-pool` `server` binary via PID file `~/.zion/pool.pid`.
-//! A public user typically does NOT need to run a pool; this is for local
-//! solo-mining or development.
-
 use anyhow::Result;
 use clap::Subcommand;
-use std::path::PathBuf;
+use std::net::ToSocketAddrs;
 
-use crate::config::{self, Config};
-use crate::process;
+use crate::config::Config;
+use crate::rpc::{agent_rpc, node_rpc};
 use crate::ui;
 
 #[derive(Subcommand)]
 pub enum PoolCmd {
-    /// Start a local mining pool
-    Start {
-        /// Override bind address (default: 0.0.0.0:8444)
-        #[arg(long)]
-        bind: Option<String>,
-        /// Override node RPC address (default: config node.rpc_host:port)
-        #[arg(long)]
-        node_rpc: Option<String>,
-        /// Path to pool wallet / fee address
-        #[arg(long)]
-        wallet: Option<String>,
-        /// Run pool in a visible console window
-        #[arg(long)]
-        console: bool,
+    /// Pool stats: connected miners, hashrate, shares
+    Stats {
+        /// Target pool: core | edge | local | vpn (default: edge)
+        #[arg(default_value = "edge")]
+        target: String,
     },
-    /// Stop the running local pool
-    Stop,
-    /// Show local pool process status
-    Status,
+    /// List active workers and hashrate
+    Miners {
+        /// Target pool: core | edge | local | vpn (default: edge)
+        #[arg(default_value = "edge")]
+        target: String,
+    },
+    /// Show pool config
+    Config {
+        /// Target pool: core | edge | local | vpn (default: edge)
+        #[arg(default_value = "edge")]
+        target: String,
+    },
+    /// PPLNS earnings for an address
+    Earnings {
+        #[arg(long)]
+        address: Option<String>,
+        /// Target pool: core | edge | local | vpn (default: edge)
+        #[arg(default_value = "edge")]
+        target: String,
+    },
 }
 
 pub async fn run(cfg: &Config, cmd: PoolCmd) -> Result<()> {
     match cmd {
-        PoolCmd::Start { bind, node_rpc, wallet, console } => {
-            start_pool(cfg, bind, node_rpc, wallet, console).await
+        PoolCmd::Stats { target } => pool_stats(cfg, &target).await,
+        PoolCmd::Miners { target } => pool_miners(cfg, &target).await,
+        PoolCmd::Config { target } => {
+            let (host, port) = cfg.target_pool(&target);
+            ui::print_header("Pool Config");
+            ui::print_row("Host", host);
+            ui::print_row("Port", &port.to_string());
+            ui::print_row(
+                "Algorithm",
+                "multi-algo (deeksha_lite_v1, deeksha_lite_fire, cosmic_harmony_ekam_deeksha_v2)",
+            );
+            println!();
+            Ok(())
         }
-        PoolCmd::Stop => stop_pool(),
-        PoolCmd::Status => pool_status(),
-    }
-}
-
-async fn start_pool(
-    cfg: &Config,
-    bind: Option<String>,
-    node_rpc: Option<String>,
-    wallet: Option<String>,
-    console: bool,
-) -> Result<()> {
-    ui::print_header("Start Pool");
-
-    let bin = find_pool_binary()?;
-    ui::print_row("Pool binary", &bin.display().to_string());
-
-    let bind = bind.unwrap_or_else(|| cfg.pool.bind.clone());
-    let node_rpc = node_rpc.unwrap_or_else(|| format!("{}:{}", cfg.node.rpc_host, cfg.node.rpc_port));
-    let wallet = wallet.unwrap_or_else(|| cfg.pool.wallet.clone());
-
-    ui::print_row("Pool bind", &bind);
-    ui::print_row("Node RPC", &node_rpc);
-    if !wallet.is_empty() {
-        ui::print_row("Pool wallet", &wallet);
-    }
-    println!();
-
-    let mut envs: Vec<(&str, String)> = Vec::new();
-    envs.push(("ZION_POOL_BIND", bind));
-    envs.push(("ZION_NODE_RPC_ADDR", node_rpc));
-    envs.push(("ZION_POOL_LOOP_COUNT", "1000000".into()));
-    envs.push(("ZION_NONCE_COUNT", "4096".into()));
-    envs.push(("ZION_NONCE_COUNT_GPU", "262144".into()));
-    if !wallet.is_empty() {
-        envs.push(("ZION_POOL_WALLET", wallet));
-    }
-    if !cfg.miner.wallet.is_empty() {
-        envs.push(("ZION_POOL_WALLET", cfg.miner.wallet.clone()));
-    }
-
-    let pid = process::start("pool", &bin, &[], &envs, console)?;
-
-    ui::print_ok(&format!("Pool started (PID {})", pid));
-    ui::print_info("Miners can connect to this pool's bind address.");
-    ui::print_info("Stop: zion pool stop");
-    println!();
-    Ok(())
-}
-
-fn stop_pool() -> Result<()> {
-    ui::print_header("Stop Pool");
-    match process::stop("pool")? {
-        true => ui::print_ok("Pool stopped."),
-        false => ui::print_warn("Pool was not running."),
-    }
-    println!();
-    Ok(())
-}
-
-fn pool_status() -> Result<()> {
-    ui::print_header("Pool Status");
-    match process::status("pool") {
-        Some(pid) => ui::print_ok(&format!("Pool is running (PID {})", pid)),
-        None => {
-            ui::print_warn("Pool is not running.");
-            ui::print_info("Start with: zion pool start");
+        PoolCmd::Earnings { address, target } => {
+            let (pool_host, _) = cfg.target_pool(&target);
+            ui::print_header("PPLNS Earnings");
+            let addr = address.unwrap_or_else(|| cfg.miner.wallet.clone());
+            if addr.is_empty() {
+                ui::print_warn("No address specified. Use --address <addr>");
+                return Ok(());
+            }
+            // The pool exposes miner stats via HTTP on the metrics port, not the stratum port.
+            let base_url = format!("http://{}:{}", pool_host, cfg.pool.metrics_port);
+            let path = format!("api/v1/miner/{}/stats", addr);
+            match agent_rpc::get(&base_url, &path).await {
+                Ok(v) => println!("{}", serde_json::to_string_pretty(&v)?),
+                Err(e) => ui::print_warn(&format!("Pool earnings not available: {}", e)),
+            }
+            println!();
+            Ok(())
         }
     }
+}
+
+async fn pool_stats(cfg: &Config, target: &str) -> Result<()> {
+    let (host, port) = cfg.target_pool(target);
+    ui::print_header("Pool Stats");
+
+    // The V3 pool is a pure TCP stratum server — no HTTP stats API.
+    // Probe liveness via TCP, then show node-side mempool context.
+    let alive = tcp_probe(host, port, std::time::Duration::from_secs(3));
+
+    ui::print_row("Pool host", &format!("{}:{}", host, port));
+    ui::print_row("Algorithm", "multi-algo (session-based: deeksha_lite_v1, deeksha_lite_fire, cosmic_harmony_ekam_deeksha_v2)");
+    ui::print_row("Protocol", "ZION stratum v3 (TCP)");
+
+    if alive {
+        ui::print_ok(&format!("Pool stratum reachable ({}:{})", host, port));
+    } else {
+        ui::print_warn(&format!(
+            "Pool stratum not reachable ({}:{}) — start with: zion start pool",
+            host, port
+        ));
+    }
+
+    // Pull chain context from node to show block template info
+    let (rpc_host, rpc_port) = cfg.target_rpc(target);
+    let node_result = node_rpc::call0(rpc_host, rpc_port, "getMempoolInfo").await;
+    if let Ok(v) = node_result {
+        let size = v["size"].as_u64().unwrap_or(0);
+        let tmpl_txs = v["template_transactions"].as_u64().unwrap_or(0);
+        ui::print_row("Mempool txs", &format!("{} pending", size));
+        ui::print_row("Template txs", &tmpl_txs.to_string());
+    }
+
     println!();
     Ok(())
 }
 
-fn find_pool_binary() -> Result<PathBuf> {
-    if let Some(path) = config::load(None).ok().and_then(|c| c.binaries.pool) {
-        let p = PathBuf::from(path);
-        if p.exists() {
-            return Ok(p);
+async fn pool_miners(cfg: &Config, target: &str) -> Result<()> {
+    let (host, port) = cfg.target_pool(target);
+    let (rpc_host, rpc_port) = cfg.target_rpc(target);
+    ui::print_header("Active Workers");
+
+    // Pool is stratum-only; get template info from node as proxy indicator
+    ui::print_info(&format!("Pool stratum: {}:{}", host, port));
+
+    let alive = tcp_probe(host, port, std::time::Duration::from_secs(3));
+    if !alive {
+        ui::print_warn("Pool stratum not reachable — cannot query worker sessions");
+        println!();
+        return Ok(());
+    }
+
+    // Pool does not expose an HTTP session API; worker list would require
+    // pool internal state. Show node block template as proxy for current work.
+    let tmpl = node_rpc::call0(rpc_host, rpc_port, "getBlockTemplate").await;
+    match tmpl {
+        Ok(v) => {
+            let height = v["height"].as_u64().unwrap_or(0);
+            let difficulty = v["difficulty"].as_u64().unwrap_or(0);
+            ui::print_ok("Pool stratum is accepting connections");
+            ui::print_row("Current template height", &height.to_string());
+            ui::print_row("Current difficulty", &difficulty.to_string());
+            ui::print_info(
+                "Live per-worker session info requires pool metrics endpoint (Phase 4).",
+            );
         }
+        Err(e) => ui::print_warn(&format!("Node block template unavailable: {}", e)),
     }
 
-    for c in ["zion-pool-windows-x86_64", "zion-pool"] {
-        if let Some(p) = process::find_binary(c) {
-            return Ok(p);
-        }
-    }
+    println!();
+    Ok(())
+}
 
-    // Self-contained bundle.
-    if let Ok(p) = crate::bundle::ensure_binary("pool") {
-        if p.exists() {
-            return Ok(p);
-        }
+/// Non-async TCP probe: returns true if a TCP connection can be established.
+fn tcp_probe(host: &str, port: u16, timeout: std::time::Duration) -> bool {
+    let addr = format!("{}:{}", host, port);
+    match addr.to_socket_addrs() {
+        Ok(mut addrs) => addrs.any(|a| std::net::TcpStream::connect_timeout(&a, timeout).is_ok()),
+        Err(_) => false,
     }
-
-    // Bare `server` is too generic; search only safe locations.
-    if let Some(p) = process::find_binary_safely("server") {
-        return Ok(p);
-    }
-
-    Err(anyhow::anyhow!(
-        "pool binary not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build: cargo build --release -p zion-pool --bin server"
-    ))
 }

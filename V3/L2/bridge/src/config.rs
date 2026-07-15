@@ -235,9 +235,15 @@ pub struct MetricsConfig {
 
 impl BridgeConfig {
     /// Load configuration from a TOML file.
+    /// The validator key file can be overridden via `ZION_BRIDGE_VALIDATOR_KEY_FILE`.
     pub fn load(path: &str) -> anyhow::Result<Self> {
         let content = std::fs::read_to_string(path)?;
-        let config: BridgeConfig = toml::from_str(&content)?;
+        let mut config: BridgeConfig = toml::from_str(&content)?;
+        if let Ok(key_file) = std::env::var("ZION_BRIDGE_VALIDATOR_KEY_FILE") {
+            if !key_file.trim().is_empty() {
+                config.validator.private_key_file = std::path::PathBuf::from(key_file);
+            }
+        }
         Ok(config)
     }
 

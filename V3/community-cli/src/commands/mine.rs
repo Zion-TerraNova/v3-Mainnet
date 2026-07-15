@@ -1,798 +1,625 @@
-//! Local miner control — start, stop, status.
-//!
-//! Manages the `zion-miner` process via PID file `~/.zion/miner.pid`. The
-//! miner can connect to the public Edge pool (default) or to a local pool.
-//!
-//! Autonomous mode: when `miner.auto_start_node` is true in config, the CLI
-//! will start the local node first if it's not running, then start the miner.
-
 use anyhow::Result;
 use clap::Subcommand;
-use colored::Colorize;
-use std::path::PathBuf;
-use std::time::Duration;
+use std::path::{Path, PathBuf};
 
-use crate::config::{self, Config};
-use crate::process;
+use crate::config::Config;
 use crate::ui;
-use crate::commands::node;
-use crate::commands::pool;
 
 #[derive(Subcommand)]
 pub enum MineCmd {
-    /// Start mining (connects to the configured pool)
+    /// Start mining (pool mode by default)
     Start {
-        /// Override pool address (host:port)
+        /// Pool address host:port
         #[arg(long)]
         pool: Option<String>,
-        /// Override wallet address
+        /// Wallet address
         #[arg(long)]
         wallet: Option<String>,
-        /// Override algorithm: deeksha_lite_v1 | cosmic_harmony_ekam_deeksha_v2 | deeksha_lite_fire
+        /// Number of threads (default: auto)
         #[arg(long)]
-        algorithm: Option<String>,
-        /// Override backend: cpu | opencl | cuda | metal
+        threads: Option<String>,
+        /// Backend: auto | cpu | gpu | metal | opencl | cuda
         #[arg(long)]
         backend: Option<String>,
-        /// Override worker name
+        /// Profile: pool | solo | benchmark | dual
         #[arg(long)]
-        worker: Option<String>,
-        /// Start a local node first if not running
+        profile: Option<String>,
+        /// Algorithm: deeksha_lite_v1 | cosmic_harmony_ekam_deeksha_v2 | deeksha_lite_fire
         #[arg(long)]
-        auto_node: bool,
-        /// Start a local pool first if not running
-        #[arg(long)]
-        auto_pool: bool,
-        /// Run miner in a visible console window
-        #[arg(long)]
-        console: bool,
-        /// Follow miner log output in real-time (Ctrl+C to stop following, miner keeps running)
-        #[arg(long)]
-        follow: bool,
+        algorithm: Option<String>,
     },
-    /// Stop the running miner
+    /// Stop the mining process
     Stop,
-    /// Show miner process status + live stats (hashrate, shares, uptime)
-    Status,
-    /// Live monitoring dashboard — refreshes every 2 seconds (Ctrl+C to exit, miner keeps running)
-    Monitor,
-    /// Show recent miner log output
-    Log {
-        /// Number of lines to show (default: 50)
-        #[arg(long, short = 'n')]
-        lines: Option<usize>,
-        /// Follow log output in real-time
-        #[arg(long, short = 'f')]
-        follow: bool,
+    /// CPU Blake3 benchmark
+    Bench {
+        #[arg(long)]
+        gpu: bool,
+        /// Cosmic Harmony Ekam Deeksha benchmark
+        #[arg(long)]
+        ekam: bool,
+        /// Backend: auto | gpu | metal | opencl | cuda
+        #[arg(long)]
+        backend: Option<String>,
+        /// Override GPU work size for GPU or Ekam benchmarks
+        #[arg(long)]
+        work_size: Option<usize>,
+        /// Benchmark duration in seconds
+        #[arg(long, default_value = "5")]
+        secs: u64,
     },
+    /// Show live mining status
+    Status,
+    /// DCR stealth worker control
+    Dcr {
+        #[command(subcommand)]
+        cmd: DcrCmd,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum DcrCmd {
+    /// Start DCR stealth worker
+    Start,
+    /// Stop DCR stealth worker
+    Stop,
+    /// Show DCR stats
+    Status,
 }
 
 pub async fn run(cfg: &Config, cmd: MineCmd) -> Result<()> {
     match cmd {
         MineCmd::Start {
-            pool, wallet, algorithm, backend, worker, auto_node, auto_pool, console, follow,
-        } => start_mining(cfg, pool, wallet, algorithm, backend, worker, auto_node, auto_pool, console, follow).await,
-        MineCmd::Stop => stop_mining(),
-        MineCmd::Status => miner_status(),
-        MineCmd::Monitor => miner_monitor().await,
-        MineCmd::Log { lines, follow } => miner_log(lines, follow),
-    }
-}
+            pool,
+            wallet,
+            threads,
+            backend,
+            profile,
+            algorithm,
+        } => {
+            let start =
+                resolve_start_options(cfg, pool, wallet, threads, backend, profile, algorithm)?;
 
-async fn start_mining(
-    cfg: &Config,
-    pool_override: Option<String>,
-    wallet_override: Option<String>,
-    algo_override: Option<String>,
-    backend_override: Option<String>,
-    worker_override: Option<String>,
-    auto_node: bool,
-    auto_pool: bool,
-    console: bool,
-    follow: bool,
-) -> Result<()> {
-    ui::print_header("Start Mining");
-
-    let wallet = wallet_override.unwrap_or_else(|| cfg.miner.wallet.clone());
-    if wallet.is_empty() {
-        ui::print_err("No wallet address configured.");
-        ui::print_info("Run: zion wallet new --mnemonic --set-default");
-        ui::print_info("Or:  zion config set miner.wallet <your_address>");
-        return Ok(());
-    }
-
-    // ── Autonomous dependency startup ─────────────────────────────────────────
-    if auto_node || cfg.miner.auto_start_node {
-        if process::status("node").is_none() {
-            ui::print_info("Local node not running — starting it automatically...");
-            node::run(cfg, node::NodeCmd::Start {
-                p2p_bind: None,
-                rpc_bind: None,
-                seed_peers: None,
-                state_path: None,
-                console: false,
-            }).await?;
-            // Give the node a few seconds to open RPC.
-            tokio::time::sleep(Duration::from_secs(3)).await;
-        } else {
-            ui::print_info("Local node is already running.");
-        }
-    }
-
-    if auto_pool || cfg.miner.auto_start_pool {
-        if process::status("pool").is_none() {
-            ui::print_info("Local pool not running — starting it automatically...");
-            pool::run(cfg, pool::PoolCmd::Start {
-                bind: None,
-                node_rpc: None,
-                wallet: None,
-                console: false,
-            }).await?;
-            tokio::time::sleep(Duration::from_secs(2)).await;
-        } else {
-            ui::print_info("Local pool is already running.");
-        }
-    }
-
-    // ── Resolve pool address ────────────────────────────────────────────────
-    let pool_addr = pool_override.unwrap_or_else(|| {
-        if cfg.miner.auto_start_pool || auto_pool {
-            cfg.pool.bind.clone()
-        } else {
-            format!("{}:{}", cfg.pool.host, cfg.pool.port)
-        }
-    });
-    let algorithm = algo_override.unwrap_or_else(|| cfg.miner.algorithm.clone());
-    let backend = backend_override.unwrap_or_else(|| cfg.miner.backend.clone());
-    let worker = worker_override.unwrap_or_else(|| cfg.miner.worker_name.clone());
-
-    // Check if already running
-    if let Some(pid) = process::status("miner") {
-        ui::print_warn(&format!("Miner already running (PID {}). Run 'zion mine stop' first.", pid));
-        return Ok(());
-    }
-
-    // Find the miner binary
-    let bin = find_miner_binary()?;
-
-    // Kill any orphaned miner processes from previous runs (old CLI versions,
-    // crashed processes, etc.) that aren't tracked by PID file.
-    #[cfg(unix)]
-    {
-        use std::process::Command;
-        let output = Command::new("sh")
-            .args(["-c", "ps aux | grep -E 'zion-miner|\\.zion/bin/miner' | grep -v grep | awk '{print $2}'"])
-            .output();
-        if let Ok(out) = output {
-            let pids: Vec<String> = String::from_utf8_lossy(&out.stdout)
-                .lines()
-                .filter(|s| !s.is_empty())
-                .map(|s| s.trim().to_string())
-                .collect();
-            if !pids.is_empty() {
-                for pid in &pids {
-                    let _ = Command::new("kill").args(["-9", pid]).output();
-                }
-                ui::print_warn(&format!("Killed {} orphaned miner process(es) from previous run.", pids.len()));
-            }
-        }
-    }
-
-    // Clean stale stats file from previous run
-    if let Some(path) = stats_file_path() {
-        let _ = std::fs::remove_file(&path);
-    }
-
-    ui::print_row("Miner binary", &bin.display().to_string());
-    ui::print_row("Pool", &pool_addr);
-    ui::print_row("Wallet", &wallet);
-    ui::print_row("Worker", &worker);
-    ui::print_row("Algorithm", &algorithm);
-    ui::print_row("Backend", &backend);
-    println!();
-
-    let mut envs: Vec<(&str, String)> = Vec::new();
-    envs.push(("ZION_POOL_ADDR", pool_addr));
-    envs.push(("ZION_WORKER_NAME", worker));
-    envs.push(("ZION_MINER_ALGORITHM", algorithm));
-    envs.push(("ZION_PAYOUT_ADDRESS", wallet));
-    envs.push(("ZION_LOOP_COUNT", "1000000".into()));
-    // Stats file — miner writes JSON stats here for live monitoring
-    if let Some(home) = std::env::var("HOME").ok().or_else(|| std::env::var("USERPROFILE").ok()) {
-        let stats_path = format!("{}/.zion/miner-stats.json", home);
-        envs.push(("ZION_STATS_FILE", stats_path));
-    }
-    // Write stats every 5 seconds (default 30 is too slow for live monitoring)
-    envs.push(("ZION_METRICS_REPORT_SECS", "5".into()));
-
-    match backend.as_str() {
-        "opencl" => {
-            envs.push(("ZION_GPU_BACKEND", "opencl".into()));
-            envs.push(("ZION_NONCE_COUNT_GPU", "262144".into()));
-            envs.push(("ZION_GPU_WORK_SIZE", "4096".into()));
-        }
-        "cuda" => {
-            envs.push(("ZION_GPU_BACKEND", "cuda".into()));
-            envs.push(("ZION_NONCE_COUNT_GPU", "262144".into()));
-            envs.push(("ZION_GPU_WORK_SIZE", "4096".into()));
-        }
-        "metal" => {
-            envs.push(("ZION_GPU_BACKEND", "metal".into()));
-            envs.push(("ZION_NONCE_COUNT_GPU", "262144".into()));
-            // Apple Silicon: 4096 threads × 256 KiB = 1 GB scratchpad.
-            // Smaller batch = faster completion (~10-15s vs 82s with 14K threads).
-            envs.push(("ZION_GPU_WORK_SIZE", "4096".into()));
-        }
-        "cpu" => {
-            envs.push(("ZION_GPU_BACKEND", "cpu".into()));
-            envs.push(("ZION_NONCE_COUNT", "4096".into()));
-        }
-        _ => {
-            envs.push(("ZION_GPU_BACKEND", "cpu".into()));
-            envs.push(("ZION_NONCE_COUNT", "4096".into()));
-        }
-    }
-
-    let pid = process::start("miner", &bin, &[], &envs, console)?;
-
-    ui::print_ok(&format!("Miner started (PID {})", pid));
-    ui::print_info("Stop with: zion mine stop");
-    ui::print_info("Check status: zion mine status");
-
-    // Show log file path
-    if let Some(log_path) = process::get_log_path("miner") {
-        ui::print_info(&format!("Log file: {}", log_path.display()));
-        ui::print_info("View logs: zion mine log");
-    }
-
-    println!();
-
-    // If --follow, tail the log file. Ctrl+C stops following but miner keeps running.
-    if follow {
-        follow_log("miner")?;
-    }
-
-    Ok(())
-}
-
-fn stop_mining() -> Result<()> {
-    ui::print_header("Stop Mining");
-    match process::stop("miner")? {
-        true => ui::print_ok("Miner stopped."),
-        false => ui::print_warn("Miner was not running."),
-    }
-
-    // Also kill any orphaned miner processes that aren't tracked by PID file.
-    // This can happen if a previous miner was started by an older CLI version
-    // or if the PID file was deleted. We search for processes matching
-    // "zion-miner" or "~/.zion/bin/miner" and kill them.
-    #[cfg(unix)]
-    {
-        use std::process::Command;
-        let output = Command::new("sh")
-            .args(["-c", "ps aux | grep -E 'zion-miner|\\.zion/bin/miner' | grep -v grep | awk '{print $2}'"])
-            .output();
-        if let Ok(out) = output {
-            let pids: Vec<String> = String::from_utf8_lossy(&out.stdout)
-                .lines()
-                .filter(|s| !s.is_empty())
-                .map(|s| s.trim().to_string())
-                .collect();
-            if !pids.is_empty() {
-                for pid in &pids {
-                    let _ = Command::new("kill").args(["-9", pid]).output();
-                }
-                ui::print_info(&format!("Killed {} orphaned miner process(es).", pids.len()));
-            }
-        }
-    }
-
-    // Clean up stale stats file
-    if let Some(path) = stats_file_path() {
-        let _ = std::fs::remove_file(&path);
-    }
-
-    println!();
-    Ok(())
-}
-
-fn miner_status() -> Result<()> {
-    ui::print_header("Miner Status");
-    match process::status("miner") {
-        Some(pid) => {
-            ui::print_ok(&format!("Miner is running (PID {})", pid));
-            println!();
-            // Show live stats from miner-stats.json
-            if let Some(stats) = read_miner_live_stats() {
-                print_miner_stats(&stats);
-            } else {
-                // Stats file not yet written — show recent log lines instead
-                ui::print_info("Stats file not available yet (miner may have just started).");
-                println!();
-                if let Some(log_path) = process::get_log_path("miner") {
-                    if log_path.exists() {
-                        ui::print_section("Recent Log (last 15 lines)");
-                        if let Ok(content) = std::fs::read_to_string(&log_path) {
-                            let lines: Vec<&str> = content.lines().collect();
-                            let start = lines.len().saturating_sub(15);
-                            for line in &lines[start..] {
-                                let clean = strip_ansi(line);
-                                if !clean.is_empty() {
-                                    println!("  {}", clean.chars().take(90).collect::<String>());
-                                }
-                            }
-                        }
-                        println!();
-                        ui::print_info("Run 'zion mine monitor' for live dashboard.");
-                    }
-                }
-            }
-        }
-        None => {
-            ui::print_warn("Miner is not running.");
-            ui::print_info("Start with: zion mine start");
-        }
-    }
-    println!();
-    Ok(())
-}
-
-/// Live stats written by the miner to ~/.zion/miner-stats.json
-#[derive(Debug, Default, serde::Deserialize)]
-struct MinerLiveStats {
-    #[serde(default)]
-    hashrate: f64,
-    #[serde(default)]
-    hashrate_10s: f64,
-    #[serde(default)]
-    hashrate_60s: f64,
-    #[serde(default)]
-    hashrate_15m: f64,
-    #[serde(default)]
-    hashrate_max: f64,
-    #[serde(default)]
-    hashrate_gpu: f64,
-    #[serde(default)]
-    hashrate_cpu: f64,
-    #[serde(default)]
-    shares_accepted: u64,
-    #[serde(default)]
-    shares_rejected: u64,
-    #[serde(default)]
-    shares_sent: u64,
-    #[serde(default)]
-    pool_height: u64,
-    #[serde(default)]
-    current_epoch: u64,
-    #[serde(default)]
-    total_hashes: u64,
-    #[serde(default)]
-    pool_latency_ms: u64,
-    #[serde(default)]
-    backend: String,
-    #[serde(default)]
-    gpu_name: String,
-    #[serde(default)]
-    worker: String,
-    #[serde(default)]
-    algorithm: String,
-    #[serde(default)]
-    cpu_threads: usize,
-    #[serde(default)]
-    uptime_sec: u64,
-    #[serde(default)]
-    status: String,
-    #[serde(default)]
-    miner_id: String,
-    #[serde(default)]
-    pool_addr: String,
-    #[serde(default)]
-    current_iteration: u64,
-    #[serde(default)]
-    best_batch_ms: u64,
-    #[serde(default)]
-    last_job_id: u64,
-}
-
-fn read_miner_live_stats() -> Option<MinerLiveStats> {
-    let path = stats_file_path()?;
-    let raw = std::fs::read_to_string(&path).ok()?;
-    serde_json::from_str(&raw).ok()
-}
-
-fn stats_file_path() -> Option<PathBuf> {
-    let home = std::env::var("HOME")
-        .or_else(|_| std::env::var("USERPROFILE"))
-        .ok()?;
-    Some(PathBuf::from(home).join(".zion").join("miner-stats.json"))
-}
-
-fn format_hashrate(hps: f64) -> String {
-    if hps >= 1e9 {
-        format!("{:.2} GH/s", hps / 1e9)
-    } else if hps >= 1e6 {
-        format!("{:.2} MH/s", hps / 1e6)
-    } else if hps >= 1e3 {
-        format!("{:.2} KH/s", hps / 1e3)
-    } else {
-        format!("{:.1} H/s", hps)
-    }
-}
-
-fn format_uptime(secs: u64) -> String {
-    let h = secs / 3600;
-    let m = (secs % 3600) / 60;
-    let s = secs % 60;
-    if h > 0 {
-        format!("{}h {}m {}s", h, m, s)
-    } else if m > 0 {
-        format!("{}m {}s", m, s)
-    } else {
-        format!("{}s", s)
-    }
-}
-
-fn print_miner_stats(stats: &MinerLiveStats) {
-    ui::print_section("Mining Stats");
-    let status_display = match stats.status.as_str() {
-        "gpu_batch_in_progress" => "running (GPU batch in progress)",
-        s => s,
-    };
-    ui::print_row("Status", status_display);
-    ui::print_row("Uptime", &format_uptime(stats.uptime_sec));
-    ui::print_row("Algorithm", &stats.algorithm);
-    ui::print_row("Backend", &stats.backend);
-    ui::print_row("Worker", &stats.worker);
-    ui::print_row("CPU threads", &stats.cpu_threads.to_string());
-    if !stats.gpu_name.is_empty() && stats.gpu_name != "none" {
-        ui::print_row("GPU", &stats.gpu_name);
-    }
-    println!();
-
-    ui::print_section("Hashrate");
-    if stats.status == "gpu_batch_in_progress" {
-        ui::print_row("Current (10s)", "— (GPU batch in progress)");
-        ui::print_row("Average (60s)", &format_hashrate(stats.hashrate_60s));
-        ui::print_row("Long-term (15m)", &format_hashrate(stats.hashrate_15m));
-        ui::print_row("Peak", &format_hashrate(stats.hashrate_max));
-        if stats.hashrate_gpu > 0.0 {
-            ui::print_row("GPU (peak)", &format_hashrate(stats.hashrate_gpu));
-        }
-    } else {
-        ui::print_row("Current (10s)", &format_hashrate(stats.hashrate_10s));
-        ui::print_row("Average (60s)", &format_hashrate(stats.hashrate_60s));
-        ui::print_row("Long-term (15m)", &format_hashrate(stats.hashrate_15m));
-        ui::print_row("Peak", &format_hashrate(stats.hashrate_max));
-        if stats.hashrate_gpu > 0.0 {
-            ui::print_row("GPU", &format_hashrate(stats.hashrate_gpu));
-            ui::print_row("CPU", &format_hashrate(stats.hashrate_cpu));
-        }
-    }
-    println!();
-
-    ui::print_section("Shares");
-    ui::print_row("Accepted", &stats.shares_accepted.to_string());
-    ui::print_row("Rejected", &stats.shares_rejected.to_string());
-    let total = stats.shares_accepted + stats.shares_rejected;
-    let pct = if total > 0 {
-        stats.shares_accepted as f64 * 100.0 / total as f64
-    } else {
-        0.0
-    };
-    ui::print_row("Accept rate", &format!("{:.1}%", pct));
-    println!();
-
-    ui::print_section("Pool");
-    ui::print_row("Pool", &stats.pool_addr);
-    ui::print_row("Pool height", &stats.pool_height.to_string());
-    ui::print_row("Latency", &format!("{} ms", stats.pool_latency_ms));
-    ui::print_row("Total hashes", &stats.total_hashes.to_string());
-    println!();
-
-    ui::print_section("Mining Progress");
-    ui::print_row("Iteration", &stats.current_iteration.to_string());
-    ui::print_row("Last job ID", &stats.last_job_id.to_string());
-    if stats.best_batch_ms > 0 {
-        ui::print_row("Best batch time", &format!("{}.{:03}s", stats.best_batch_ms / 1000, stats.best_batch_ms % 1000));
-    }
-}
-
-/// Live monitoring dashboard — refreshes every 2 seconds.
-/// Ctrl+C exits the dashboard but the miner keeps running.
-async fn miner_monitor() -> Result<()> {
-    // Check if miner is running
-    if process::status("miner").is_none() {
-        ui::print_header("Miner Monitor");
-        ui::print_err("Miner is not running. Start it first: zion mine start");
-        return Ok(());
-    }
-
-    let pid = process::status("miner").unwrap();
-    ui::print_header(&format!("Miner Live Monitor (PID {}) — Ctrl+C to exit", pid));
-    println!();
-
-    // Set up Ctrl+C handler
-    let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
-    let r = running.clone();
-    tokio::spawn(async move {
-        let _ = tokio::signal::ctrl_c().await;
-        r.store(false, std::sync::atomic::Ordering::Relaxed);
-    });
-
-    let mut tick = 0u64;
-    while running.load(std::sync::atomic::Ordering::Relaxed) {
-        // Clear screen and move cursor to top
-        print!("\x1b[2J\x1b[H");
-
-        // Header
-        println!("  {} — Live Monitor (PID {}) {}", "ZION Miner".cyan().bold(), pid, "─".dimmed());
-        println!();
-
-        // Check if still running
-        if process::status("miner").is_none() {
-            println!("  {} Miner process has stopped.", "✗".red().bold());
-            println!();
-            println!("  {} Press Ctrl+C to exit...", "◉".dimmed());
-            tokio::time::sleep(Duration::from_secs(2)).await;
-            break;
-        }
-
-        // Read live stats
-        match read_miner_live_stats() {
-            Some(stats) => {
-                // Status line
-                let status_label = if stats.status == "gpu_batch_in_progress" {
-                    "GPU BATCH".cyan().bold()
-                } else if stats.status == "running" {
-                    "RUNNING".green().bold()
+            ui::print_header("Starting Miner");
+            ui::print_row("Pool", &start.pool_addr);
+            ui::print_row(
+                "Wallet",
+                if start.wallet_addr.is_empty() {
+                    "(not set)"
                 } else {
-                    stats.status.yellow().bold()
-                };
-                println!("  Status: {}  |  Uptime: {}  |  Tick: {}", status_label, format_uptime(stats.uptime_sec), tick);
-                println!("  {}", "─".repeat(70).dimmed());
+                    &start.wallet_addr
+                },
+            );
+            ui::print_row("Backend", &start.backend_display_name);
+            ui::print_row(
+                "Algorithm",
+                start.algorithm.as_deref().unwrap_or("deeksha_lite_v1"),
+            );
+            ui::print_row("Threads", &start.thread_count);
+            ui::print_row("Profile", &start.normalized_profile);
+            println!();
 
-                // Hashrate
-                println!("  {} Hashrate", "▸".cyan());
-                println!("    Current (10s): {:>14}  |  Avg (60s): {:>14}  |  Peak: {:>14}",
-                    format_hashrate(stats.hashrate_10s),
-                    format_hashrate(stats.hashrate_60s),
-                    format_hashrate(stats.hashrate_max));
-                if stats.hashrate_gpu > 0.0 {
-                    println!("    GPU:            {:>14}  |  CPU:       {:>14}",
-                        format_hashrate(stats.hashrate_gpu),
-                        format_hashrate(stats.hashrate_cpu));
-                }
-                println!();
+            if start.wallet_addr.is_empty() {
+                ui::print_warn("No wallet set. Run: zion config set miner.wallet <address>");
+                ui::print_warn("Or: zion wallet new");
+                return Ok(());
+            }
 
-                // Shares
-                let total = stats.shares_accepted + stats.shares_rejected;
-                let pct = if total > 0 {
-                    stats.shares_accepted as f64 * 100.0 / total as f64
-                } else { 0.0 };
-                let acc_str = stats.shares_accepted.to_string().green();
-                let rej_str = if stats.shares_rejected > 0 {
-                    stats.shares_rejected.to_string().red()
+            // Build env for miner binary
+            let mut env_args = vec![
+                ("ZION_POOL_ADDR", start.pool_addr.clone()),
+                ("ZION_PROFILE", start.normalized_profile.clone()),
+                ("ZION_MINER_ID", start.wallet_addr.clone()),
+            ];
+            if start.thread_count != "auto" {
+                env_args.push(("ZION_THREADS", start.thread_count.clone()));
+            }
+            if let Some(env_backend) = &start.backend_env {
+                env_args.push(("ZION_BACKEND", env_backend.clone()));
+            }
+            if let Some(env_algorithm) = &start.algorithm {
+                env_args.push(("ZION_MINER_ALGORITHM", env_algorithm.clone()));
+            }
+            if start.normalized_profile == "dual" {
+                if !cfg.miner.btc_wallet.trim().is_empty() {
+                    env_args.push(("ZION_BTC_WALLET", cfg.miner.btc_wallet.clone()));
+                    ui::print_info(
+                        "Dual profile: using configured BTC payout wallet for DCR sidecar.",
+                    );
                 } else {
-                    stats.shares_rejected.to_string().dimmed()
-                };
-                println!("  {} Shares", "▸".cyan());
-                println!("    Accepted: {}  |  Rejected: {}  |  Accept rate: {:.1}%  |  Total hashes: {}",
-                    acc_str, rej_str, pct, stats.total_hashes);
-                println!();
-
-                // Pool / mining info
-                println!("  {} Pool & Mining", "▸".cyan());
-                println!("    Pool: {}  |  Height: {}  |  Latency: {} ms",
-                    stats.pool_addr, stats.pool_height, stats.pool_latency_ms);
-                println!("    Algorithm: {}  |  Backend: {}  |  Worker: {}  |  Threads: {}",
-                    stats.algorithm, stats.backend, stats.worker, stats.cpu_threads);
-                println!("    Iteration: {}  |  Job ID: {}  |  Best batch: {}",
-                    stats.current_iteration, stats.last_job_id,
-                    if stats.best_batch_ms > 0 {
-                        format!("{}.{:03}s", stats.best_batch_ms / 1000, stats.best_batch_ms % 1000)
-                    } else { "—".to_string() });
-                println!();
-
-                // Last few log lines
-                if let Some(log_path) = process::get_log_path("miner") {
-                    if log_path.exists() {
-                        println!("  {} Recent Log", "▸".cyan());
-                        if let Ok(content) = std::fs::read_to_string(&log_path) {
-                            let lines: Vec<&str> = content.lines().collect();
-                            let start = lines.len().saturating_sub(5);
-                            for line in &lines[start..] {
-                                // Strip ANSI codes for cleaner display
-                                let clean = strip_ansi(line);
-                                if !clean.is_empty() {
-                                    println!("    {}", clean.chars().take(80).collect::<String>());
-                                }
-                            }
-                        }
-                    }
+                    ui::print_warn("Dual profile selected but miner.btc_wallet is not set.");
+                    ui::print_warn("Set it with: zion config set miner.btc_wallet <bc1...>");
                 }
-
-                println!();
-                println!("  {} Refreshing every 2s  |  {} Ctrl+C to exit (miner keeps running)", "◉".dimmed(), "⚠".yellow());
             }
-            None => {
-                println!("  {} Waiting for miner stats...", "◉".yellow());
-                println!("  The miner writes stats every 3 seconds. If this persists,");
-                println!("  check the log: zion mine log");
-                println!();
-                println!("  {} Ctrl+C to exit", "◉".dimmed());
+
+            let miner_bin = find_miner_binary()?;
+            ui::print_info(&format!("Running: {}", miner_bin));
+
+            let mut cmd_proc = std::process::Command::new(&miner_bin);
+            for (k, v) in &env_args {
+                cmd_proc.env(k, v);
             }
-        }
+            if let Some(cli_backend) = &start.backend_cli_gpu_arg {
+                cmd_proc.args(["--gpu", cli_backend]);
+            }
 
-        tick += 1;
-        tokio::time::sleep(Duration::from_secs(2)).await;
-    }
-
-    println!();
-    ui::print_ok("Monitor stopped. Miner is still running in the background.");
-    ui::print_info("Check status: zion mine status  |  Stop: zion mine stop");
-    println!();
-    Ok(())
-}
-
-/// Strip ANSI escape codes from a string for clean display.
-fn strip_ansi(s: &str) -> String {
-    let mut out = String::new();
-    let mut chars = s.chars().peekable();
-    while let Some(ch) = chars.next() {
-        if ch == '\x1b' {
-            // Skip escape sequence: ESC [ ... letter
-            if chars.peek() == Some(&'[') {
-                chars.next();
-                while let Some(c) = chars.next() {
-                    if c.is_ascii_alphabetic() { break; }
-                }
+            let interactive = std::env::var("ZION_INTERACTIVE")
+                .map(|v| v == "true" || v == "1")
+                .unwrap_or(true);
+            if interactive {
+                cmd_proc.status()?;
             } else {
-                // Skip other escape sequences
-                while let Some(&c) = chars.peek() {
-                    if c.is_alphabetic() || c == 'm' { chars.next(); break; }
-                    chars.next();
+                let child = cmd_proc.spawn()?;
+                ui::print_info(&format!("Miner started in background (PID {})", child.id()));
+            }
+            Ok(())
+        }
+
+        MineCmd::Bench {
+            gpu,
+            ekam,
+            backend,
+            work_size,
+            secs,
+        } => {
+            ui::print_header("Benchmark");
+            let benchmark_mode = determine_benchmark_mode(gpu, ekam)?;
+            let allow_cpu_backend = matches!(benchmark_mode, BenchmarkMode::CpuBlake3);
+            let normalized_backend = normalize_backend(
+                backend.as_deref().unwrap_or(
+                    if matches!(benchmark_mode, BenchmarkMode::CpuBlake3) {
+                        "cpu"
+                    } else {
+                        "auto"
+                    },
+                ),
+                allow_cpu_backend,
+            )?;
+
+            if matches!(benchmark_mode, BenchmarkMode::CpuBlake3)
+                && normalized_backend.mode != BackendMode::Cpu
+            {
+                anyhow::bail!("CPU benchmark does not accept GPU backends. Use --gpu or --ekam for GPU benchmark modes.");
+            }
+
+            let miner_bin = find_miner_binary()?;
+
+            let mut cmd_proc = std::process::Command::new(&miner_bin);
+            cmd_proc.env("ZION_BENCH_SECS", secs.to_string());
+            if let Some(work_size) = work_size {
+                cmd_proc.env("ZION_GPU_WORK_SIZE", work_size.to_string());
+            }
+            if let Some(env_backend) = normalized_backend.env_backend {
+                cmd_proc.env("ZION_BACKEND", env_backend);
+            }
+
+            match benchmark_mode {
+                BenchmarkMode::EkamDeeksha => {
+                    ui::print_info("Mode: Cosmic Harmony Ekam Deeksha v2");
+                    ui::print_row("Backend", normalized_backend.display_name);
+                    if let Some(work_size) = work_size {
+                        ui::print_row("Work Size", &work_size.to_string());
+                    }
+                    cmd_proc.arg("--ekam-bench");
+                }
+                BenchmarkMode::GpuBlake3 => {
+                    ui::print_info("Mode: GPU Blake3");
+                    ui::print_row("Backend", normalized_backend.display_name);
+                    if let Some(work_size) = work_size {
+                        ui::print_row("Work Size", &work_size.to_string());
+                    }
+                    cmd_proc.arg("--gpu-bench");
+                }
+                BenchmarkMode::CpuBlake3 => {
+                    ui::print_info("Mode: CPU Blake3");
+                    cmd_proc.arg("--bench");
                 }
             }
-        } else {
-            out.push(ch);
+
+            cmd_proc.status()?;
+            Ok(())
         }
+
+        MineCmd::Stop => {
+            // Best-effort: kill any zion-miner process
+            let _ = std::process::Command::new("pkill")
+                .arg("-f")
+                .arg("zion-miner")
+                .status();
+            ui::print_ok("Sent stop signal to miner processes");
+            Ok(())
+        }
+
+        MineCmd::Status => {
+            ui::print_header("Miner Status");
+            let running = is_miner_running();
+            if running {
+                ui::print_ok("Miner is running");
+            } else {
+                ui::print_warn("No miner process detected");
+            }
+            println!();
+            Ok(())
+        }
+
+        MineCmd::Dcr { cmd } => match cmd {
+            DcrCmd::Status => {
+                ui::print_header("DCR Stealth Worker");
+                ui::print_info("DCR worker runs inside the miner process.");
+                ui::print_info("Start with: zion mine start --profile dual");
+                println!();
+                Ok(())
+            }
+            DcrCmd::Start => {
+                ui::print_info("Starting DCR-only stealth miner...");
+                let miner_bin = find_miner_binary()?;
+                std::process::Command::new(&miner_bin)
+                    .env("ZION_DCR_ONLY", "1")
+                    .status()?;
+                Ok(())
+            }
+            DcrCmd::Stop => {
+                let _ = std::process::Command::new("pkill")
+                    .arg("-f")
+                    .arg("zion-miner")
+                    .status();
+                ui::print_ok("Sent stop signal");
+                Ok(())
+            }
+        },
     }
-    out
 }
 
-fn find_miner_binary() -> Result<PathBuf> {
-    // 1. Explicit config override
-    if let Some(path) = config::load(None).ok().and_then(|c| c.binaries.miner) {
-        let p = PathBuf::from(path);
-        if p.exists() {
-            return Ok(p);
-        }
-    }
-
-    // 2. Local cargo build (target/release/zion-miner) or a manually-downloaded
-    //    release binary (e.g. zion-miner-linux-x86_64) — prefer these over the
-    //    bundled download because they may have GPU features compiled in.
-    let mut candidates = vec!["zion-miner-windows-x86_64".to_string(), "zion-miner".to_string()];
-    if let Ok(platform) = crate::bundle::current_platform() {
-        candidates.insert(0, format!("zion-miner-{}", platform));
-    }
-    for c in &candidates {
-        if let Some(p) = process::find_binary(c) {
-            return Ok(p);
-        }
-    }
-
-    // 3. Bundled binary (~/.zion/bin/miner) — downloaded from releases.
-    //    This is CPU-only; if the user wants GPU, they should build from source
-    //    or use the local cargo build above.
-    if let Ok(p) = crate::bundle::ensure_binary("miner") {
-        if p.exists() {
-            return Ok(p);
-        }
-    }
-
-    // 4. Bare `miner` in safe locations (last resort).
-    if let Some(p) = process::find_binary_safely("miner") {
+fn find_miner_binary() -> Result<String> {
+    // 1. Try PATH
+    if let Ok(p) = which_bin("zion-miner") {
         return Ok(p);
     }
 
-    let gpu_feature = if cfg!(target_os = "macos") { "gpu-metal" } else { "gpu-opencl" };
-    Err(anyhow::anyhow!(
-        "miner binary not found. Download from https://github.com/Zion-TerraNova/v3-Mainnet/releases or build: cargo build --release -p zion-miner --features {}",
-        gpu_feature
-    ))
-}
-
-/// Show recent miner log output.
-fn miner_log(lines: Option<usize>, follow: bool) -> Result<()> {
-    ui::print_header("Miner Log");
-
-    let log_path = process::get_log_path("miner")
-        .ok_or_else(|| anyhow::anyhow!("cannot determine log path"))?;
-
-    if !log_path.exists() {
-        ui::print_warn(&format!("Log file not found: {}", log_path.display()));
-        ui::print_info("The miner may not have been started yet.");
-        return Ok(());
+    if let Some(candidate) = discover_miner_binary() {
+        return Ok(candidate.display().to_string());
     }
 
-    ui::print_row("Log file", &log_path.display().to_string());
-    println!();
+    anyhow::bail!(
+        "zion-miner binary not found. Build with:\n  cd V3 && cargo build -p zion-miner --release"
+    )
+}
 
-    if follow {
-        follow_log("miner")?;
+pub(crate) fn discover_miner_binary() -> Option<PathBuf> {
+    miner_binary_candidates()
+        .into_iter()
+        .find(|candidate| candidate.exists())
+}
+
+fn miner_binary_candidates() -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+
+    // Same-directory as the running zion CLI (for bundled desktop-agent installs)
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(dir) = exe.parent() {
+            push_unique_path(&mut candidates, dir.join(bin_name("zion-miner")));
+        }
+    }
+
+    for relative in [
+        PathBuf::from(format!("target/release/{}", bin_name("zion-miner"))),
+        PathBuf::from(format!("target/debug/{}", bin_name("zion-miner"))),
+        PathBuf::from(format!("V3/target/release/{}", bin_name("zion-miner"))),
+        PathBuf::from(format!("V3/target/debug/{}", bin_name("zion-miner"))),
+    ] {
+        push_unique_path(&mut candidates, relative);
+    }
+
+    let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
+    if let Some(workspace_root) = manifest_dir.parent() {
+        push_unique_path(
+            &mut candidates,
+            workspace_root.join(format!("target/release/{}", bin_name("zion-miner"))),
+        );
+        push_unique_path(
+            &mut candidates,
+            workspace_root.join(format!("target/debug/{}", bin_name("zion-miner"))),
+        );
+    }
+
+    candidates
+}
+
+fn bin_name(base: &str) -> String {
+    if cfg!(windows) {
+        format!("{}.exe", base)
     } else {
-        let n = lines.unwrap_or(50);
-        show_log_tail(&log_path, n)?;
+        base.to_string()
     }
-
-    Ok(())
 }
 
-/// Show the last N lines of a log file.
-fn show_log_tail(path: &std::path::Path, n: usize) -> Result<()> {
-    let output = std::process::Command::new("tail")
-        .args(["-n", &n.to_string()])
-        .arg(path)
-        .output();
-
-    match output {
-        Ok(o) => {
-            let stdout = String::from_utf8_lossy(&o.stdout);
-            if stdout.is_empty() {
-                ui::print_info("(log is empty)");
-            } else {
-                print!("{}", stdout);
-            }
-        }
-        Err(_) => {
-            // Fallback: read the whole file and show last N lines
-            let content = std::fs::read_to_string(path)?;
-            let lines: Vec<&str> = content.lines().collect();
-            let start = lines.len().saturating_sub(n);
-            for line in &lines[start..] {
-                println!("{}", line);
-            }
-        }
+fn push_unique_path(paths: &mut Vec<PathBuf>, candidate: PathBuf) {
+    if !paths.iter().any(|existing| existing == &candidate) {
+        paths.push(candidate);
     }
-    println!();
-    Ok(())
 }
 
-/// Follow a log file in real-time. Ctrl+C stops following but the process keeps running.
-fn follow_log(name: &str) -> Result<()> {
-    let log_path = process::get_log_path(name)
-        .ok_or_else(|| anyhow::anyhow!("cannot determine log path"))?;
-
-    if !log_path.exists() {
-        ui::print_warn(&format!("Log file not found: {}", log_path.display()));
-        return Ok(());
+fn which_bin(name: &str) -> Result<String> {
+    let (cmd, arg) = if cfg!(windows) {
+        ("where", name)
+    } else {
+        ("which", name)
+    };
+    let out = std::process::Command::new(cmd).arg(arg).output()?;
+    if out.status.success() {
+        Ok(String::from_utf8_lossy(&out.stdout).trim().to_string())
+    } else {
+        anyhow::bail!("not found")
     }
+}
 
-    ui::print_info(&format!("Following {} log (Ctrl+C to stop, {} keeps running)...", name, name));
-    println!();
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum BenchmarkMode {
+    CpuBlake3,
+    GpuBlake3,
+    EkamDeeksha,
+}
 
-    // Use `tail -f` on Unix; on Windows, we'd need a different approach.
-    #[cfg(unix)]
-    {
-        let status = std::process::Command::new("tail")
-            .args(["-n", "20", "-f"])
-            .arg(&log_path)
-            .status();
+fn determine_benchmark_mode(gpu: bool, ekam: bool) -> Result<BenchmarkMode> {
+    match (gpu, ekam) {
+        (true, true) => anyhow::bail!("Choose either --gpu or --ekam, not both."),
+        (true, false) => Ok(BenchmarkMode::GpuBlake3),
+        (false, true) => Ok(BenchmarkMode::EkamDeeksha),
+        (false, false) => Ok(BenchmarkMode::CpuBlake3),
+    }
+}
 
-        match status {
-            Ok(_) => {}
-            Err(e) => ui::print_warn(&format!("Could not follow log: {}", e)),
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum BackendMode {
+    Auto,
+    Cpu,
+    GpuAlias,
+    Metal,
+    OpenCl,
+    Cuda,
+}
+
+struct NormalizedBackend<'a> {
+    mode: BackendMode,
+    display_name: &'a str,
+    env_backend: Option<&'a str>,
+    cli_gpu_arg: Option<&'a str>,
+}
+
+#[derive(Debug)]
+struct ResolvedStartOptions {
+    pool_addr: String,
+    wallet_addr: String,
+    thread_count: String,
+    backend_display_name: String,
+    backend_env: Option<String>,
+    backend_cli_gpu_arg: Option<String>,
+    normalized_profile: String,
+    algorithm: Option<String>,
+}
+
+fn resolve_start_options(
+    cfg: &Config,
+    pool: Option<String>,
+    wallet: Option<String>,
+    threads: Option<String>,
+    backend: Option<String>,
+    profile: Option<String>,
+    algorithm: Option<String>,
+) -> Result<ResolvedStartOptions> {
+    let requested_profile = profile.as_deref().unwrap_or(cfg.miner.profile.as_str());
+    let normalized_profile = normalize_profile(requested_profile)?;
+    let pool_addr = pool.unwrap_or_else(|| {
+        let (host, port) = cfg.edge_pool();
+        format!("{}:{}", host, port)
+    });
+    let wallet_addr = wallet.unwrap_or_else(|| cfg.miner.wallet.clone());
+    if !wallet_addr.trim().is_empty() && !zion_core::crypto::is_valid_address(wallet_addr.trim()) {
+        anyhow::bail!(
+            "Invalid mining wallet '{}'. Expected a valid zion1... address.",
+            wallet_addr.trim()
+        );
+    }
+    let thread_count = threads.unwrap_or_else(|| cfg.miner.threads.clone());
+    let requested_backend = backend.unwrap_or_else(|| cfg.miner.backend.clone());
+    let normalized_backend = normalize_backend(&requested_backend, true)?;
+
+    let algorithm = algorithm.or_else(|| {
+        let cfg_algo = cfg.miner.algorithm.clone();
+        if cfg_algo.is_empty() {
+            None
+        } else {
+            Some(cfg_algo)
         }
+    });
+
+    Ok(ResolvedStartOptions {
+        pool_addr,
+        wallet_addr,
+        thread_count,
+        backend_display_name: normalized_backend.display_name.to_string(),
+        backend_env: normalized_backend.env_backend.map(ToString::to_string),
+        backend_cli_gpu_arg: normalized_backend.cli_gpu_arg.map(ToString::to_string),
+        normalized_profile: normalized_profile.to_string(),
+        algorithm,
+    })
+}
+
+fn normalize_backend<'a>(backend: &'a str, allow_cpu: bool) -> Result<NormalizedBackend<'a>> {
+    match backend.trim().to_ascii_lowercase().as_str() {
+        "auto" => Ok(NormalizedBackend {
+            mode: BackendMode::Auto,
+            display_name: "auto",
+            env_backend: Some("auto"),
+            cli_gpu_arg: None,
+        }),
+        "cpu" if allow_cpu => Ok(NormalizedBackend {
+            mode: BackendMode::Cpu,
+            display_name: "cpu",
+            env_backend: Some("cpu"),
+            cli_gpu_arg: None,
+        }),
+        "gpu" => Ok(NormalizedBackend {
+            mode: BackendMode::GpuAlias,
+            display_name: "gpu (auto)",
+            env_backend: Some("auto"),
+            cli_gpu_arg: Some("auto"),
+        }),
+        "metal" => Ok(NormalizedBackend {
+            mode: BackendMode::Metal,
+            display_name: "metal",
+            env_backend: Some("metal"),
+            cli_gpu_arg: Some("metal"),
+        }),
+        "opencl" | "ocl" => Ok(NormalizedBackend {
+            mode: BackendMode::OpenCl,
+            display_name: "opencl",
+            env_backend: Some("opencl"),
+            cli_gpu_arg: Some("opencl"),
+        }),
+        "cuda" => Ok(NormalizedBackend {
+            mode: BackendMode::Cuda,
+            display_name: "cuda",
+            env_backend: Some("cuda"),
+            cli_gpu_arg: Some("cuda"),
+        }),
+        "cpu" => anyhow::bail!("This command does not accept backend 'cpu' in GPU mode."),
+        other => anyhow::bail!(
+            "Unsupported backend '{}'. Supported backends: auto, cpu, gpu, metal, opencl, cuda",
+            other
+        ),
     }
+}
+
+fn normalize_profile(profile: &str) -> Result<&str> {
+    match profile.trim().to_ascii_lowercase().as_str() {
+        "pool" => Ok("pool"),
+        "solo" => Ok("solo"),
+        "benchmark" | "bench" => Ok("benchmark"),
+        "dual" => Ok("dual"),
+        other => anyhow::bail!(
+            "Unsupported miner profile '{}'. Supported profiles: pool, solo, benchmark, dual",
+            other
+        ),
+    }
+}
+
+/// Cross-platform miner process detection.
+/// On Unix: uses `pgrep -f zion-miner`.
+/// On Windows: uses `tasklist /FI "IMAGENAME eq zion-miner.exe"`.
+fn is_miner_running() -> bool {
     #[cfg(windows)]
     {
-        // On Windows, just show the last 50 lines (no real-time tail).
-        ui::print_info("(Real-time log follow is not available on Windows. Showing last 50 lines.)");
-        show_log_tail(&log_path, 50)?;
+        let out = std::process::Command::new("tasklist")
+            .args(["/FI", "IMAGENAME eq zion-miner.exe", "/NH"])
+            .output();
+        if let Ok(o) = out {
+            let stdout = String::from_utf8_lossy(&o.stdout);
+            return stdout.contains("zion-miner.exe");
+        }
+        false
+    }
+    #[cfg(not(windows))]
+    {
+        std::process::Command::new("pgrep")
+            .args(["-f", "zion-miner"])
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::{Config, MinerConfig, PoolConfig};
+
+    #[test]
+    fn bench_mode_rejects_conflicting_flags() {
+        assert!(determine_benchmark_mode(true, true).is_err());
     }
 
-    println!();
-    ui::print_ok(&format!("Stopped following. {} is still running in the background.", name));
-    Ok(())
+    #[test]
+    fn backend_normalization_supports_opencl_and_cuda() {
+        let opencl = normalize_backend("opencl", true).expect("opencl backend");
+        assert_eq!(opencl.env_backend, Some("opencl"));
+        assert_eq!(opencl.cli_gpu_arg, Some("opencl"));
+
+        let cuda = normalize_backend("cuda", true).expect("cuda backend");
+        assert_eq!(cuda.env_backend, Some("cuda"));
+        assert_eq!(cuda.cli_gpu_arg, Some("cuda"));
+    }
+
+    #[test]
+    fn profile_normalization_supports_bench_alias() {
+        assert_eq!(
+            normalize_profile("bench").expect("bench alias"),
+            "benchmark"
+        );
+    }
+
+    #[test]
+    fn cpu_benchmark_accepts_default_cpu_backend() {
+        let benchmark_mode = determine_benchmark_mode(false, false).expect("cpu benchmark mode");
+        let allow_cpu_backend = matches!(benchmark_mode, BenchmarkMode::CpuBlake3);
+        let normalized =
+            normalize_backend("cpu", allow_cpu_backend).expect("cpu backend should be accepted");
+
+        assert_eq!(normalized.mode, BackendMode::Cpu);
+    }
+
+    #[test]
+    fn miner_binary_candidates_include_workspace_target() {
+        let candidates = miner_binary_candidates();
+        // Check that paths end with "zion-miner" (cross-platform path separator handling)
+        let has_release = candidates.iter().any(|path| {
+            path.file_name()
+                .map(|n| n == "zion-miner.exe" || n == "zion-miner")
+                .unwrap_or(false)
+        });
+        assert!(
+            has_release,
+            "miner_binary_candidates should include zion-miner binary path"
+        );
+    }
+
+    #[test]
+    fn start_options_use_config_profile_when_flag_missing() {
+        let cfg = Config {
+            pool: PoolConfig {
+                host: "127.0.0.1".into(),
+                port: 3333,
+                metrics_port: 8455,
+            },
+            miner: MinerConfig {
+                wallet: "zion16853d8r885l4g4u8p8t7v5n8u6v7e0f445dr3f8".into(),
+                btc_wallet: String::new(),
+                threads: "auto".into(),
+                backend: "auto".into(),
+                profile: "dual".into(),
+                algorithm: "deeksha_lite_v1".into(),
+            },
+            ..Config::default()
+        };
+
+        let resolved = resolve_start_options(&cfg, None, None, None, None, None, None)
+            .expect("start options should resolve from config");
+
+        assert_eq!(resolved.normalized_profile, "dual");
+    }
+
+    #[test]
+    fn start_options_reject_invalid_wallet_address() {
+        let cfg = Config {
+            miner: MinerConfig {
+                wallet: "not-a-zion-address".into(),
+                ..MinerConfig::default()
+            },
+            ..Config::default()
+        };
+
+        let error = resolve_start_options(&cfg, None, None, None, None, None, None)
+            .expect_err("invalid wallet should fail preflight");
+
+        assert!(error.to_string().contains("Invalid mining wallet"));
+    }
 }

@@ -90,6 +90,11 @@ fn err(msg: impl Into<String>, code: StatusCode) -> (StatusCode, Json<serde_json
 // ─────────────────────────────────────────────────────────────────────────────
 
 fn check_api_key(headers: &HeaderMap, expected: &str) -> bool {
+    // Empty expected key means authentication is disabled in config; do not
+    // allow the empty-header bypass to be used as an auth credential.
+    if expected.is_empty() {
+        return false;
+    }
     headers
         .get("X-DAO-Key")
         .and_then(|v| v.to_str().ok())
