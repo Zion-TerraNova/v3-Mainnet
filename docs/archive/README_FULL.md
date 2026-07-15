@@ -58,7 +58,7 @@ A proof-of-work blockchain with dual-algo consensus, cross-chain bridge, DeFi la
 
 > **⚠️ MAINNET BETA — Mining at your own risk**
 
-ZION v3.0.4 is **live and running** as Mainnet Beta. The network is operational, blocks are being produced, and the genesis chain is established.
+ZION v3.0.5 is **live and running** as Mainnet Beta. The network is operational, blocks are being produced, and the genesis chain is established.
 
 **What this means:**
 - ✅ The network is live and producing blocks
@@ -79,7 +79,7 @@ The Mainnet Beta period runs until the official public launch on **31.12.2026**,
 | Parameter | Value |
 |-----------|-------|
 | Status | **Mainnet Beta** |
-| Protocol | 3.0.4 |
+| Protocol | 3.0.6 |
 | Genesis hash | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
 | Official launch | 2026-12-31 |
 | Mining | Active (at your own risk) |
@@ -322,7 +322,7 @@ v3-Mainnet/
 ├── Cargo.toml              # Rust workspace root
 ├── SECURITY.md             # Vulnerability reporting
 ├── CONTRIBUTING.md         # Contribution guide
-├── CHANGELOG.md            # Version history (v3.0.0 → v3.0.4-beta)
+├── CHANGELOG.md            # Version history (v3.0.0 → v3.0.5-beta)
 └── LICENSE                 # MIT
 ```
 
@@ -454,8 +454,8 @@ cargo run --release -p zion-core --bin zion-node
 
 | | |
 |---|---|
-| **Protocol** | 3.0.4 |
-| **Release** | v3.0.4-beta (Mainnet Beta) |
+| **Protocol** | 3.0.6 |
+| **Release** | v3.0.5-beta (Mainnet Beta) |
 | **Status** | Live — mining active (at your own risk) |
 | **Official launch** | 2026-12-31 |
 
@@ -465,8 +465,8 @@ ZION uses a modified semantic versioning scheme:
 
 | Component | Format | Example |
 |-----------|--------|---------|
-| Protocol | `MAJOR.MINOR.PATCH` | `3.0.4` |
-| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.4-beta` |
+| Protocol | `MAJOR.MINOR.PATCH` | `3.0.6` |
+| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.5-beta` |
 | Suffix | `-beta`, `-rc`, `-stable` | `v3.1.0-rc1` |
 
 - **MAJOR** — consensus-breaking changes (new genesis, hard fork)
@@ -480,22 +480,22 @@ ZION uses a modified semantic versioning scheme:
 
 | Version | Target | Status |
 |---------|--------|--------|
-| 3.0.4-beta | Mainnet Beta | ✅ Live (2026-07-09) |
-| 3.0.4-stable | Official Public Launch | 📅 2026-12-31 |
+| 3.0.5-beta | Mainnet Beta | ✅ Live (2026-07-09) |
+| 3.0.5-stable | Official Public Launch | 📅 2026-12-31 |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care hybrid (NPU mining) | 🔜 2027 |
 | 4.0.0 | Full Proof-of-Care consensus | 🔜 2028+ |
 
 ### Version History
 
-See [CHANGELOG.md](./CHANGELOG.md) for the full version history, including all changes from v3.0.0 through v3.0.4-beta.
+See [CHANGELOG.md](./CHANGELOG.md) for the full version history, including all changes from v3.0.0 through v3.0.5-beta.
 
 Key milestones:
 - **v3.0.0** (2026-05-20) — Initial V3 mainnet launch
 - **v3.0.1** (2026-06-05) — First genesis hard reset, Hiran v2.3, L2/L3 upgrades
 - **v3.0.2** (2026-06-15) — Fire algorithm optimization, explorer + dashboard upgrades
 - **v3.0.3** (2026-06-27) — Decimal fork (1e12→1e6), LI.FI DEX, WARP 12 chains, Stargate logo
-- **v3.0.4-beta** (2026-07-09) — Hard genesis reset, DeFi contracts, security hardening, Mainnet Beta
+- **v3.0.5-beta** (2026-07-10) — Hard genesis reset, DeFi contracts, security hardening, Mainnet Beta
 
 ## Development History
 
@@ -519,7 +519,7 @@ ZION v3 is the result of a long iterative journey across the v2.x experimental l
 | **v3.0.1** | 2026-06-05 | First genesis hard reset, Hiran v2.3, L2 big upgrade, L3 WARP expansion. |
 | **v3.0.2** | 2026-06-15 | Fire algorithm optimization, explorer + dashboard upgrades. |
 | **v3.0.3** | 2026-06-27 | Decimal fork (1e12 → 1e6), LI.FI DEX integration, WARP 12 chains, Stargate logo. |
-| **v3.0.4-beta** | 2026-07-09 | Hard genesis reset, DeFi contracts on Base, security hardening, public security disclosures, Mainnet Beta. |
+| **v3.0.5-beta** | 2026-07-10 | Hard genesis reset, DeFi contracts on Base, security hardening, public security disclosures, Mainnet Beta. |
 
 See [CHANGELOG.md](./CHANGELOG.md) for the detailed release notes.
 

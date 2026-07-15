@@ -58,7 +58,7 @@ Une blockchain avec consensus proof-of-work, algorithme dual, pont cross-chain, 
 
 > **⚠️ MAINNET BETA — Minage à vos risques et périls**
 
-ZION v3.0.4 est **en ligne et opérationnel** en tant que Mainnet Beta. Le réseau est opérationnel, les blocs sont produits et la chaîne de genèse est établie.
+ZION v3.0.5 est **en ligne et opérationnel** en tant que Mainnet Beta. Le réseau est opérationnel, les blocs sont produits et la chaîne de genèse est établie.
 
 **Ce que cela signifie :**
 - ✅ Le réseau est en ligne et produit des blocs
@@ -79,7 +79,7 @@ La période Mainnet Beta dure jusqu'au lancement public officiel du **31.12.2026
 | Paramètre | Valeur |
 |-----------|--------|
 | Statut | **Mainnet Beta** |
-| Protocole | 3.0.4 |
+| Protocole | 3.0.6 |
 | Hash de genèse | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
 | Lancement officiel | 2026-12-31 |
 | Minage | Actif (à vos risques et périls) |
@@ -320,7 +320,7 @@ v3-Mainnet/
 ├── Cargo.toml              # Racine du workspace Rust
 ├── SECURITY.md             # Signalement de vulnérabilités
 ├── CONTRIBUTING.md         # Guide de contribution
-├── CHANGELOG.md            # Historique des versions (v3.0.0 → v3.0.4-beta)
+├── CHANGELOG.md            # Historique des versions (v3.0.0 → v3.0.5-beta)
 └── LICENSE                 # MIT
 ```
 
@@ -452,8 +452,8 @@ cargo run --release -p zion-core --bin zion-node
 
 | | |
 |---|---|
-| **Protocole** | 3.0.4 |
-| **Release** | v3.0.4-beta (Mainnet Beta) |
+| **Protocole** | 3.0.6 |
+| **Release** | v3.0.5-beta (Mainnet Beta) |
 | **Statut** | En direct — minage actif (à vos risques et périls) |
 | **Lancement officiel** | 2026-12-31 |
 
@@ -463,8 +463,8 @@ ZION utilise un schéma de versioning sémantique modifié :
 
 | Composant | Format | Exemple |
 |-----------|--------|---------|
-| Protocole | `MAJOR.MINOR.PATCH` | `3.0.4` |
-| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.4-beta` |
+| Protocole | `MAJOR.MINOR.PATCH` | `3.0.6` |
+| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.5-beta` |
 | Suffixe | `-beta`, `-rc`, `-stable` | `v3.1.0-rc1` |
 
 - **MAJOR** — changements cassant le consensus (nouveau génesis, hard fork)
@@ -478,22 +478,22 @@ ZION utilise un schéma de versioning sémantique modifié :
 
 | Version | Objectif | Statut |
 |---------|----------|--------|
-| 3.0.4-beta | Mainnet Beta | ✅ En direct (2026-07-09) |
-| 3.0.4-stable | Lancement public officiel | 📅 2026-12-31 |
+| 3.0.5-beta | Mainnet Beta | ✅ En direct (2026-07-09) |
+| 3.0.5-stable | Lancement public officiel | 📅 2026-12-31 |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care hybride (minage NPU) | 🔜 2027 |
 | 4.0.0 | Consensus Proof-of-Care complet | 🔜 2028+ |
 
 ### Historique des versions
 
-Voir [CHANGELOG.md](../../CHANGELOG.md) pour l'historique complet des versions, y compris tous les changements de v3.0.0 à v3.0.4-beta.
+Voir [CHANGELOG.md](../../CHANGELOG.md) pour l'historique complet des versions, y compris tous les changements de v3.0.0 à v3.0.5-beta.
 
 Jalons clés :
 - **v3.0.0** (2026-05-20) — Lancement initial de V3 mainnet
 - **v3.0.1** (2026-06-05) — Premier hard genesis reset, Hiran v2.3, améliorations L2/L3
 - **v3.0.2** (2026-06-15) — Optimisation de l'algorithme Fire, améliorations de l'explorateur et du tableau de bord
 - **v3.0.3** (2026-06-27) — Decimal fork (1e12→1e6), LI.FI DEX, WARP 12 chaînes, logo Stargate
-- **v3.0.4-beta** (2026-07-09) — Hard genesis reset, contrats DeFi, durcissement de la sécurité, Mainnet Beta
+- **v3.0.5-beta** (2026-07-10) — Hard genesis reset, contrats DeFi, durcissement de la sécurité, Mainnet Beta
 
 ## Historique de développement
 
@@ -523,7 +523,7 @@ ZION v3 est le résultat d'un long parcours itératif à travers la ligne expér
 | **v3.0.1** | 2026-06-05 | Premier hard genesis reset, Hiran v2.3, grande mise à niveau L2, expansion L3 WARP. |
 | **v3.0.2** | 2026-06-15 | Optimisation de l'algorithme Fire, améliorations de l'explorateur et du tableau de bord. |
 | **v3.0.3** | 2026-06-27 | Decimal fork (1e12 → 1e6), intégration LI.FI DEX, WARP 12 chaînes, logo Stargate. |
-| **v3.0.4-beta** | 2026-07-09 | Hard genesis reset, contrats DeFi sur Base, durcissement de la sécurité, divulgations publiques de sécurité, Mainnet Beta. |
+| **v3.0.5-beta** | 2026-07-10 | Hard genesis reset, contrats DeFi sur Base, durcissement de la sécurité, divulgations publiques de sécurité, Mainnet Beta. |
 
 Voir [CHANGELOG.md](../../CHANGELOG.md) pour les notes de release détaillées.
 

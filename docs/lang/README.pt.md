@@ -14,7 +14,7 @@
 <p>
 
 ![Status: Mainnet Beta](https://img.shields.io/badge/Status-Mainnet_Beta-orange?style=for-the-badge)
-![Protocol](https://img.shields.io/badge/Protocol-3.0.4-blue?style=for-the-badge)
+![Protocol](https://img.shields.io/badge/Protocol-3.0.6-blue?style=for-the-badge)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Rust](https://img.shields.io/badge/Rust-2021-orange?style=for-the-badge)
 ![PoW](https://img.shields.io/badge/Consensus-PoW-purple?style=for-the-badge)
@@ -88,7 +88,7 @@
 | Parâmetro | Valor |
 |:----------|:------|
 | **Estado** | Mainnet Beta |
-| **Protocolo** | 3.0.4 |
+| **Protocolo** | 3.0.6 |
 | **Genesis hash** | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
 | **Lançamento oficial** | 2026-12-31 |
 | **Tempo de bloco** | ~60 segundos |

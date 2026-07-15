@@ -58,7 +58,7 @@ Blockchain s proof-of-work konsenzem, dual-algoritmem, cross-chain bridge, DeFi 
 
 > **⚠️ MAINNET BETA — Těžba na vlastní nebezpečí**
 
-ZION v3.0.4 je **živý a běží** jako Mainnet Beta. Síť je operační, bloky jsou produkovány a genesis řetězec je ustaven.
+ZION v3.0.5 je **živý a běží** jako Mainnet Beta. Síť je operační, bloky jsou produkovány a genesis řetězec je ustaven.
 
 **Co to znamená:**
 - ✅ Síť je živá a produkuje bloky
@@ -79,7 +79,7 @@ Období Mainnet Beta trvá do oficiálního veřejného spuštění **31.12.2026
 | Parametr | Hodnota |
 |-----------|---------|
 | Status | **Mainnet Beta** |
-| Protokol | 3.0.4 |
+| Protokol | 3.0.6 |
 | Genesis hash | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
 | Oficiální launch | 2026-12-31 |
 | Těžba | Aktivní (na vlastní nebezpečí) |
@@ -320,7 +320,7 @@ v3-Mainnet/
 ├── Cargo.toml              # Root Rust workspace
 ├── SECURITY.md             # Hlášení zranitelností
 ├── CONTRIBUTING.md         # Průvodce příspěvky
-├── CHANGELOG.md            # Historie verzí (v3.0.0 → v3.0.4-beta)
+├── CHANGELOG.md            # Historie verzí (v3.0.0 → v3.0.5-beta)
 └── LICENSE                 # MIT
 ```
 
@@ -452,8 +452,8 @@ cargo run --release -p zion-core --bin zion-node
 
 | | |
 |---|---|
-| **Protokol** | 3.0.4 |
-| **Release** | v3.0.4-beta (Mainnet Beta) |
+| **Protokol** | 3.0.5 |
+| **Release** | v3.0.5-beta (Mainnet Beta) |
 | **Status** | Live — těžba aktivní (na vlastní nebezpečí) |
 | **Oficiální launch** | 2026-12-31 |
 
@@ -463,8 +463,8 @@ ZION používá modifikovaný semantic versioning:
 
 | Komponent | Formát | Příklad |
 |-----------|--------|---------|
-| Protokol | `MAJOR.MINOR.PATCH` | `3.0.4` |
-| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.4-beta` |
+| Protokol | `MAJOR.MINOR.PATCH` | `3.0.6` |
+| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.5-beta` |
 | Suffix | `-beta`, `-rc`, `-stable` | `v3.1.0-rc1` |
 
 - **MAJOR** — consensus-breaking změny (nový genesis, hard fork)
@@ -478,22 +478,22 @@ ZION používá modifikovaný semantic versioning:
 
 | Verze | Cíl | Status |
 |---------|--------|--------|
-| 3.0.4-beta | Mainnet Beta | ✅ Live (2026-07-09) |
-| 3.0.4-stable | Oficiální veřejný launch | 📅 2026-12-31 |
+| 3.0.5-beta | Mainnet Beta | ✅ Live (2026-07-09) |
+| 3.0.5-stable | Oficiální veřejný launch | 📅 2026-12-31 |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care hybrid (NPU těžba) | 🔜 2027 |
 | 4.0.0 | Plný Proof-of-Care konsensus | 🔜 2028+ |
 
 ### Historie verzí
 
-Viz [CHANGELOG.md](../../CHANGELOG.md) pro plnou historii verzí, včetně všech změn z v3.0.0 až po v3.0.4-beta.
+Viz [CHANGELOG.md](../../CHANGELOG.md) pro plnou historii verzí, včetně všech změn z v3.0.0 až po v3.0.5-beta.
 
 Klíčové milníky:
 - **v3.0.0** (2026-05-20) — Initial V3 mainnet launch
 - **v3.0.1** (2026-06-05) — První hard genesis reset, Hiran v2.3, L2/L3 upgrady
 - **v3.0.2** (2026-06-15) — Optimalizace Fire algoritmu, upgrade exploreru a dashboardu
 - **v3.0.3** (2026-06-27) — Decimal fork (1e12→1e6), LI.FI DEX, WARP 12 chainů, Stargate logo
-- **v3.0.4-beta** (2026-07-09) — Hard genesis reset, DeFi kontrakty, bezpečnostní hardening, Mainnet Beta
+- **v3.0.5-beta** (2026-07-10) — Hard genesis reset, DeFi kontrakty, bezpečnostní hardening, Mainnet Beta
 
 ## Vývojová historie
 
@@ -523,7 +523,7 @@ ZION v3 je výsledkem dlouhé iterativní cesty napříč experimentální v2.x 
 | **v3.0.1** | 2026-06-05 | První hard genesis reset, Hiran v2.3, velký L2 upgrade, rozšíření L3 WARP. |
 | **v3.0.2** | 2026-06-15 | Optimalizace Fire algoritmu, upgrade exploreru a dashboardu. |
 | **v3.0.3** | 2026-06-27 | Decimal fork (1e12 → 1e6), LI.FI DEX integrace, WARP 12 chainů, Stargate logo. |
-| **v3.0.4-beta** | 2026-07-09 | Hard genesis reset, DeFi kontrakty na Base, bezpečnostní hardening, veřejná bezpečnostní oznámení, Mainnet Beta. |
+| **v3.0.5-beta** | 2026-07-10 | Hard genesis reset, DeFi kontrakty na Base, bezpečnostní hardening, veřejná bezpečnostní oznámení, Mainnet Beta. |
 
 Viz [CHANGELOG.md](../../CHANGELOG.md) pro detailní release notes.
 

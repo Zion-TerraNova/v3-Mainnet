@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.0.6-beta] — 2026-07-15 (Protocol + Pool + Docs Sync)
+
+### Added
+- **AuxPow B2b stream profit system** — RVN kawpow live on Edge pool, auto coin switching, revenue tracking
+- **GPU-native Pearl PoUW pipeline** — Merkle proof reconstruction, E2E verification
+- **PearlStratum protocol** — PRL (Pearl) external coin support
+- **BridgeValidator contract tracking** — Base Mainnet 5/5 guardian multisig address
+
+### Fixed
+- **Pool CLI earnings** — switched from non-existent JSON-RPC to pool HTTP API
+- **Edge environment** — added missing `ZION_POOL_AUXPOW_*` and stream-profit env vars
+- **Protocol version** — synced live node, code, and docs to `zion-v3-node/3.0.6`
+- **Backup node documentation** — noted offline status and seed peers
+
+---
+
 ## [3.0.5-beta] — 2026-07-10 (Community CLI)
 
 ### Added
@@ -143,7 +159,7 @@ ZION uses a modified semantic versioning scheme:
 
 | Component | Format | Example |
 |-----------|--------|---------|
-| Protocol | `MAJOR.MINOR.PATCH` | `3.0.4` |
+| Protocol | `MAJOR.MINOR.PATCH` | `3.0.6` |
 | Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.4-beta` |
 | Suffix | `-beta`, `-rc`, `-stable` | `v3.1.0-rc1` |
 
