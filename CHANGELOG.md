@@ -41,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Visual README redesign** — Stargate hero, shields.io badges, emoji portal, footer
 
 ### Fixed
-- **Server addresses** — replaced decommissioned `77.42.71.94` with `62.171.141.136` / `pool.zionterranova.com` in all config defaults, menu prompts, and help text
+- **Server addresses** — replaced decommissioned old Edge server IP with domain `pool.zionterranova.com` in all config defaults, menu prompts, and help text
 - **Wallet send** — sender address now read from wallet file (was broken using `cfg.miner.wallet`)
 - **Wallet address/balance** — fallback to `zion-wallet.json` when config `miner.wallet` is empty
 - **Doctor on Linux** — searches for `zion-miner` (not `zion-miner.exe`)
@@ -50,9 +50,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **CLI package** — renamed `V3/cli/` → `V3/community-cli/` (package `zion-public`)
-- **Pool default** — `pool.zionterranova.com:8444` (resolves to `62.171.141.136`)
-- **Seed peers** — `62.171.141.136:8333`
-- **AI endpoint** — `http://62.171.141.136:8080`
+- **Pool default** — `stratum.zionterranova.com:8444`
+- **Seed peers** — `rpc.zionterranova.com:8333`
+- **AI endpoint** — `http://ai.zionterranova.com:8080`
 
 ---
 
@@ -81,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **USB backup audit** — SHA256 verified, GPG signatures verified, 19/19 addresses cross-checked with genesis.rs
 
 ### Changed
-- **Server migration** — old Edge server (77.42.71.94) decommissioned, new server at 62.171.141.136
+- **Server migration** — old Edge server decommissioned, new Edge server deployed
 - **Label rename** — "Genesis Creator" replaced with neutral label across 40 files
 - **Canonical topology** — hardcoded seed peers moved to new server, Tailscale removed
 - **L2 security patch** — claimant guard, threshold 5/5, reorg safety, key hygiene, escrow key zeroing, memo cap

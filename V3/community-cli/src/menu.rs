@@ -668,7 +668,7 @@ fn config_menu() -> Result<Option<Vec<String>>> {
                 Some(args_owned(vec!["config".into(), "set".into(), "node.p2p_bind".into(), val]))
             }
             3 => {
-                let val = required_input("Seed peers", Some("62.171.141.136:8333"))?;
+                let val = required_input("Seed peers", Some("rpc.zionterranova.com:8333"))?;
                 Some(args_owned(vec!["config".into(), "set".into(), "node.seed_peers".into(), val]))
             }
             4 => {

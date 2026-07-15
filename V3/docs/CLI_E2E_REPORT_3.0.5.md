@@ -9,7 +9,7 @@
 
 ## Summary
 
-The community CLI was broken — all config defaults pointed to the decommissioned server `77.42.71.94`, `wallet send` used the wrong sender address, and `doctor` searched for Windows binaries on Linux. This report documents the fixes and E2E verification.
+The community CLI was broken — all config defaults pointed to the decommissioned old Edge server, `wallet send` used the wrong sender address, and `doctor` searched for Windows binaries on Linux. This report documents the fixes and E2E verification.
 
 ---
 
@@ -17,7 +17,7 @@ The community CLI was broken — all config defaults pointed to the decommission
 
 ### 1. Decommissioned Server Addresses (Critical)
 
-**Problem:** All config defaults, menu prompts, and help text referenced `77.42.71.94` (old Edge server, decommissioned 2026-07-07). New users could not connect to anything.
+**Problem:** All config defaults, menu prompts, and help text referenced the old Edge server IP (decommissioned 2026-07-07). New users could not connect to anything.
 
 **Files affected:**
 - `src/config.rs` — `seed_peers`, `pool.host`, `ai.url` defaults
@@ -27,9 +27,9 @@ The community CLI was broken — all config defaults pointed to the decommission
 **Fix:**
 | Setting | Old | New |
 |---------|-----|-----|
-| Seed peers | `77.42.71.94:8333` | `62.171.141.136:8333` |
-| Pool host | `77.42.71.94` | `pool.zionterranova.com` |
-| AI URL | `http://77.42.71.94:8080` | `http://62.171.141.136:8080` |
+| Seed peers | old Edge server IP | `rpc.zionterranova.com:8333` |
+| Pool host | old Edge server IP | `pool.zionterranova.com` |
+| AI URL | `http://[old Edge server]:8080` | `http://ai.zionterranova.com:8080` |
 
 ### 2. Wallet Send — Wrong Sender Address (Critical)
 

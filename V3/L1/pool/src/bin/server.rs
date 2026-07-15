@@ -6371,7 +6371,7 @@ mod tests {
 
     #[test]
     fn oasis_target_rejects_remote_without_override() {
-        let err = parse_oasis_http_target("http://77.42.71.94:8094", false)
+        let err = parse_oasis_http_target("http://example.com:8094", false)
             .expect_err("remote URL must be blocked by default");
         assert!(
             err.to_string().contains("remote OASIS target blocked"),
@@ -6381,9 +6381,9 @@ mod tests {
 
     #[test]
     fn oasis_target_allows_remote_with_override() {
-        let (authority, path) = parse_oasis_http_target("http://77.42.71.94:8094/base", true)
+        let (authority, path) = parse_oasis_http_target("http://example.com:8094/base", true)
             .expect("remote URL should be allowed when override is enabled");
-        assert_eq!(authority, "77.42.71.94:8094");
+        assert_eq!(authority, "example.com:8094");
         assert_eq!(path, "/base");
     }
 

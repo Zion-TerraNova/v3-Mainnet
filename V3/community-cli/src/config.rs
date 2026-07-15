@@ -199,7 +199,7 @@ impl Default for NodeConfig {
 impl Default for PoolConfig {
     fn default() -> Self {
         Self {
-            host: "62.171.141.136".into(),
+            host: "stratum.zionterranova.com".into(),
             port: 8444,
             metrics_port: 8455,
         }
@@ -228,13 +228,13 @@ impl Default for TopologyConfig {
                 p2p_port: 8333,
                 pool_host: "127.0.0.1".into(),
                 pool_port: 8444,
-                vpn_ip: Some("100.86.102.5".into()),
+                vpn_ip: None,
             },
             edge: TopologyHostConfig {
-                rpc_host: "62.171.141.136".into(),
+                rpc_host: "rpc.zionterranova.com".into(),
                 rpc_port: 8443,
                 p2p_port: 8333,
-                pool_host: "62.171.141.136".into(),
+                pool_host: "stratum.zionterranova.com".into(),
                 pool_port: 8444,
                 vpn_ip: None,
             },
@@ -282,7 +282,7 @@ impl Default for DeployConfig {
     fn default() -> Self {
         Self {
             default_server: "edge".into(),
-            ssh_key: "~/.ssh/ssh-key-zion-edge".into(),
+            ssh_key: "~/.ssh/id_ed25519".into(),
             ssh_user: "root".into(),
         }
     }

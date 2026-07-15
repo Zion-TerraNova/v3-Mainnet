@@ -91,7 +91,7 @@ Or do it manually:
 
 Or just use the menu: `./zion menu` → "Mine" → "Start"
 
-> **Pool vs Solo:** By default, the CLI mines to the official pool (`62.171.141.136:8444`). In pool mode, you earn a share of every block. Solo mode only pays when *you* find a block — which is rare. **Pool mode is recommended.**
+> **Pool vs Solo:** By default, the CLI mines to the official pool (`stratum.zionterranova.com:8444`). In pool mode, you earn a share of every block. Solo mode only pays when *you* find a block — which is rare. **Pool mode is recommended.**
 >
 > **GPU mining:** The CLI auto-detects your GPU. On macOS it uses Metal, on Linux it uses OpenCL or CUDA. You can force a backend with `--backend cpu|opencl|cuda|metal`.
 
@@ -144,7 +144,7 @@ The Windows CLI has the node embedded — just run:
 | Block target | 60 seconds | New block every ~60 seconds |
 | Total supply | 144 billion ZION | Maximum ZION that will ever exist |
 | Decimals | 6 (1 ZION = 1,000,000 flowers) | Smallest unit: 0.000001 ZION (a "flower") |
-| Pool | `62.171.141.136:8444` | Official mining pool |
+| Pool | `stratum.zionterranova.com:8444` | Official mining pool |
 | RPC (localhost) | `127.0.0.1:8443` | Local node RPC port |
 
 ---
