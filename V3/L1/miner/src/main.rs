@@ -2097,6 +2097,23 @@ fn run_remote_session(
     // when the profit coin changes.
     let (ext_gpu_tx, ext_gpu_rx) = std::sync::mpsc::channel::<zion_pool::ExternalStreamJob>();
     let (ext_gpu_share_tx, ext_gpu_share_rx) = std::sync::mpsc::channel::<ExternalShareResult>();
+    // Adaptive duty-cycle channel: main loop sends (burst, gap_ms) updates
+    // to the external GPU thread. Enabled when ZION_ADAPTIVE_DUTY_CYCLE=1
+    // (default ON). The scheduler rebalances Stream 1 (Deeksha) vs Stream 2
+    // (ProgPow/KawPow) GPU time-slicing every ZION_ADAPTIVE_UPDATE_INTERVAL_S
+    // seconds based on observed hashrates.
+    let adaptive_enabled = std::env::var("ZION_ADAPTIVE_DUTY_CYCLE")
+        .map(|v| v != "0" && !v.eq_ignore_ascii_case("false"))
+        .unwrap_or(true);
+    let (adaptive_tx, adaptive_rx) = if adaptive_enabled {
+        let (tx, rx) = std::sync::mpsc::channel::<(u64, u64)>();
+        (Some(tx), Some(rx))
+    } else {
+        (None, None)
+    };
+    // Timestamp of last adaptive duty-cycle update sent to the external GPU
+    // thread. Used to throttle recomputation to ZION_ADAPTIVE_UPDATE_INTERVAL_S.
+    let last_adaptive_update = std::sync::Mutex::new(std::time::Instant::now());
 
     let dual_gpu_enabled = gpu_available
         && effective_gpu_backend != gpu_backend::GpuBackendKind::Cpu
@@ -2123,7 +2140,7 @@ fn run_remote_session(
         let shared_cuda: Option<()> = None;
         thread::spawn(move || {
             println!("[{}] external_gpu_thread_spawned", log_timestamp());
-            external_gpu_thread(ext_gpu_rx, ext_gpu_share_tx, ws, hr, bk, shared_cuda);
+            external_gpu_thread(ext_gpu_rx, ext_gpu_share_tx, ws, hr, bk, adaptive_rx, shared_cuda);
         });
         println!(
             "[{}] stream2_gpu_external_started work_size={}",
@@ -2182,7 +2199,10 @@ fn run_remote_session(
         .context("failed to set pool socket read timeout")?;
     let reader_stream = stream.try_clone().context("failed to clone pool stream")?;
     let mut reader = BufReader::new(reader_stream);
-    let mut writer = stream;
+    // Writer is shared between the main loop and the dedicated ext-share
+    // submission thread.  Arc<Mutex> prevents interleaved writes.
+    let writer = Arc::new(Mutex::new(stream));
+    let writer_ext = Arc::clone(&writer);
 
     let backend_str = tri_gpu.primary_backend_kind().as_str();
     // BUG #2 fix: use current control.algorithm (user may have pressed 'a' to switch)
@@ -2197,7 +2217,7 @@ fn run_remote_session(
         payout_address: config.payout_address.clone(),
         backend: backend_str.to_string(),
     };
-    let hello_line = write_wire_message(&mut writer, &hello_message)?;
+    let hello_line = write_wire_message(&mut *writer.lock().unwrap(), &hello_message)?;
     println!("wire_hello={hello_line}");
 
     let (welcome_line_raw, welcome_message) = read_wire_message(&mut reader)?;
@@ -2216,11 +2236,30 @@ fn run_remote_session(
     // The main thread keeps the writer for sending submit/no-solution messages.
     let (job_tx, job_rx) = std::sync::mpsc::channel::<PoolIncoming>();
     let (result_tx, result_rx) = std::sync::mpsc::channel::<PoolIncoming>();
+    let ext_gpu_tx_for_io = ext_gpu_tx.clone();
+    let ext_cpu_tx_for_io = ext_cpu_tx.clone();
     std::thread::Builder::new()
         .name("pool-io".to_string())
-        .spawn(move || pool_io_thread(reader, job_tx, result_tx))
+        .spawn(move || pool_io_thread(reader, job_tx, result_tx, ext_gpu_tx_for_io, ext_cpu_tx_for_io))
         .context("failed to spawn pool I/O thread")?;
     println!("[{}] pool_io_thread_started — job pre-fetch + async submit enabled", log_timestamp());
+
+    // ── Dedicated external share submission thread ──────────────────────
+    // Reads from ext_cpu_share_rx and ext_gpu_share_rx and submits shares
+    // IMMEDIATELY via the shared writer, without waiting for the main loop.
+    // This eliminates the ~10s main-loop lag that caused LuckPool "Job not
+    // found" rejects on VRSC (VerusHash) shares.
+    //
+    // The pool's ExternalResult response comes back through pool_io_thread
+    // → result_rx, and is handled by the main loop as "late_external_result".
+    let config_for_ext = config.clone();
+    std::thread::Builder::new()
+        .name("ext-submit".to_string())
+        .spawn(move || {
+            ext_share_submitter_thread(writer_ext, ext_gpu_share_rx, ext_cpu_share_rx, &config_for_ext);
+        })
+        .context("failed to spawn ext-share submitter thread")?;
+    println!("[{}] ext_share_submitter_thread_started — immediate ext share submission", log_timestamp());
     sync_miner_metrics(
         metrics,
         &telemetry,
@@ -2241,13 +2280,36 @@ fn run_remote_session(
 
     let mut current_algorithm = String::new();
 
-    // ── Send initial CoinPreference to pool (autonomous mode) ──
+    // ── Send initial CoinPreference to pool ──
+    // Two sources:
+    //   1. Autonomous mode: profit_router builds preference from profit estimates
+    //   2. Manual --cpu-coin / --gpu-coin CLI flags: build preference directly
     if let Some(pref_msg) = profit_router.build_coin_preference(&config.miner_id) {
         let pref_line = zion_pool::encode_message(&pref_msg)
             .map_err(|e| anyhow!("failed to encode CoinPreference: {e}"))?;
-        writer.write_all(pref_line.as_bytes())?;
-        writer.flush()?;
+        writer.lock().unwrap().write_all(pref_line.as_bytes())?;
+        writer.lock().unwrap().flush()?;
         println!("[{}] autonomous_coin_preference_sent {}", log_timestamp(), pref_line.trim());
+    } else if config.cpu_coin.is_some() || config.gpu_coin.is_some() {
+        // Manual coin preference from CLI flags — send even without autonomous mode.
+        // Pool will use this to select the CPU/GPU coin for external_stream(_cpu).
+        let pref_msg = zion_pool::PoolMessage::CoinPreference {
+            miner_id: config.miner_id.clone(),
+            gpu_coin: config.gpu_coin.clone().unwrap_or_default(),
+            cpu_coin: config.cpu_coin.clone().unwrap_or_default(),
+            gpu_profit_usd_day: 0.0,
+            cpu_profit_usd_day: 0.0,
+        };
+        let pref_line = zion_pool::encode_message(&pref_msg)
+            .map_err(|e| anyhow!("failed to encode CoinPreference: {e}"))?;
+        writer.lock().unwrap().write_all(pref_line.as_bytes())?;
+        writer.lock().unwrap().flush()?;
+        println!(
+            "[{}] manual_coin_preference_sent cpu_coin={} gpu_coin={}",
+            log_timestamp(),
+            config.cpu_coin.as_deref().unwrap_or(""),
+            config.gpu_coin.as_deref().unwrap_or(""),
+        );
     }
 
     for iteration in 0..config.loop_count {
@@ -2276,8 +2338,8 @@ fn run_remote_session(
             if profit_router.coins_changed(last_s2_coin, last_s3_coin) {
                 if let Some(pref_msg) = profit_router.build_coin_preference(&config.miner_id) {
                     if let Ok(pref_line) = zion_pool::encode_message(&pref_msg) {
-                        let _ = writer.write_all(pref_line.as_bytes());
-                        let _ = writer.flush();
+                        let _ = writer.lock().unwrap().write_all(pref_line.as_bytes());
+                        let _ = writer.lock().unwrap().flush();
                         println!(
                             "[{}] autonomous_coin_preference_updated {}",
                             log_timestamp(),
@@ -2356,7 +2418,7 @@ fn run_remote_session(
                 attempted_hashes: Some(0),
                 elapsed_ms: Some(0),
             };
-            let _ = write_wire_message(&mut writer, &no_solution_message);
+            let _ = write_wire_message(&mut *writer.lock().unwrap(), &no_solution_message);
             let _ = result_rx.recv();
             thread::sleep(Duration::from_millis(100));
             continue;
@@ -2452,6 +2514,12 @@ fn run_remote_session(
             }
         }
 
+        // NOTE: External share submission is now handled by the dedicated
+        // ext_share_submitter_thread (spawned below), which reads from
+        // ext_cpu_share_rx and ext_gpu_share_rx and submits immediately
+        // via the shared writer.  This eliminates the ~10s main-loop lag
+        // that caused LuckPool "Job not found" rejects.
+
         // GPU-first, CPU-fallback nonce scan (respect interactive overrides)
         let can_gpu = gpu_ref.is_some() && gpu_on;
         let mut gpu_nonces_tested = 0u64;
@@ -2501,49 +2569,10 @@ fn run_remote_session(
             None
         };
 
-        // ── Collect GPU external share from persistent thread (non-blocking) ──
-        let ext_gpu_share = match ext_gpu_share_rx.try_recv() {
-            Ok(share) => Some(share),
-            Err(_) => None,
-        };
-
-        // ── Collect CPU external share from persistent thread (non-blocking) ──
-        let ext_cpu_share = match ext_cpu_share_rx.try_recv() {
-            Ok(share) => Some(share),
-            Err(_) => None,
-        };
-
-        // ── Submit GPU external share (if found by persistent thread) ────
-        if let Some(share) = ext_gpu_share {
-            println!(
-                "[{}] external_gpu_share_found  coin={}  algo={}  job_id={}  nonce={}",
-                log_timestamp(),
-                share.coin,
-                share.algorithm,
-                share.external_job_id,
-                share.nonce,
-            );
-            submit_external_share(
-                &mut writer, &result_rx, &config, &share, &hashrate, VERBOSE.load(Ordering::Relaxed),
-                |accepted| hashrate.record_gpu_ext_share(accepted),
-            );
-        }
-
-        // ── Submit CPU external share (VerusHash/RandomX, if found) ────
-        if let Some(share) = ext_cpu_share {
-            println!(
-                "[{}] external_cpu_share_found  coin={}  algo={}  job_id={}  nonce={}",
-                log_timestamp(),
-                share.coin,
-                share.algorithm,
-                share.external_job_id,
-                share.nonce,
-            );
-            submit_external_share(
-                &mut writer, &result_rx, &config, &share, &hashrate, VERBOSE.load(Ordering::Relaxed),
-                |accepted| hashrate.record_cpu_ext_share(accepted),
-            );
-        }
+        // NOTE: External share collection and submission is now handled by
+        // the dedicated ext_share_submitter_thread.  The main loop no longer
+        // collects or submits ext shares — it only handles ZION share
+        // submission and drains late ExternalResult responses from result_rx.
 
         hashrate.record_gpu_hashes(gpu_nonces_tested);
         hashrate.record_cpu_hashes(cpu_nonces_tested);
@@ -2585,7 +2614,7 @@ fn run_remote_session(
                 attempted_hashes: Some(tested),
                 elapsed_ms: Some(job_started_at.elapsed().as_millis() as u64),
             };
-            let no_solution_line = write_wire_message(&mut writer, &no_solution_message)?;
+            let no_solution_line = write_wire_message(&mut *writer.lock().unwrap(), &no_solution_message)?;
             // ── FIX #8: Drain late ExternalResult if present (from timed-out submit_external_share) ──
             let (result_line_raw, result_message) = loop {
                 match result_rx.recv() {
@@ -2610,8 +2639,22 @@ fn run_remote_session(
                         println!("pool_status={status}");
                     }
                 }
-                // Late ExternalResult from a timed-out submit_external_share — log and continue
+                // Late ExternalResult from ext_share_submitter_thread — log and continue
                 PoolMessage::ExternalResult { accepted, status, coin } => {
+                    // Record hashrate for the ext share result
+                    let is_cpu = coin.eq_ignore_ascii_case("VRSC")
+                        || coin.eq_ignore_ascii_case("XMR")
+                        || coin.eq_ignore_ascii_case("RTM");
+                    if is_cpu {
+                        hashrate.record_cpu_ext_share(accepted);
+                    } else {
+                        hashrate.record_gpu_ext_share(accepted);
+                    }
+                    if accepted {
+                        println!("[{}] external_share_accepted coin={} status={}", log_timestamp(), coin, status);
+                    } else {
+                        println!("[{}] external_share_rejected coin={} status={}", log_timestamp(), coin, status);
+                    }
                     println!(
                         "[{}] late_external_result_drained coin={} accepted={} status={} — waiting for no_solution result",
                         log_timestamp(), coin, accepted, status,
@@ -2666,6 +2709,40 @@ fn run_remote_session(
                 true,
                 "running",
             );
+
+            // ── Adaptive GPU duty-cycle scheduler (Fáze 4) ──
+            // Every ZION_ADAPTIVE_UPDATE_INTERVAL_S seconds, recompute the
+            // optimal (burst, gap_ms) for the external GPU thread based on
+            // observed Stream 1 (Deeksha) vs Stream 2 (ProgPow) hashrates.
+            // The scheduler targets equal expected share rates between the
+            // two streams, weighted by their respective share difficulties.
+            if let Some(ref atx) = adaptive_tx {
+                let now = std::time::Instant::now();
+                let update_interval = std::env::var("ZION_ADAPTIVE_UPDATE_INTERVAL_S")
+                    .ok()
+                    .and_then(|v| v.parse::<u64>().ok())
+                    .unwrap_or(30);
+                let last = last_adaptive_update.lock().unwrap();
+                if now.duration_since(*last).as_secs() >= update_interval {
+                    drop(last);
+                    *last_adaptive_update.lock().unwrap() = now;
+                    let zion_hps = hashrate.zion_hps_60s();
+                    let ext_hps = hashrate.gpu_ext_hps_60s();
+                    let (burst, gap_ms) = compute_adaptive_duty_cycle(zion_hps, ext_hps);
+                    let _ = atx.send((burst, gap_ms));
+                    println!(
+                        "[{}] adaptive_duty_cycle_computed zion_hps={:.1} ext_hps={:.1} burst={} gap_ms={} duty={:.0}%",
+                        log_timestamp(),
+                        zion_hps,
+                        ext_hps,
+                        burst,
+                        gap_ms,
+                        if burst > 0 { 100.0 * burst as f64 / (burst as f64 + gap_ms as f64 / 50.0) } else { 0.0 }
+                    );
+                } else {
+                    drop(last);
+                }
+            }
             continue;
         };
         let search_depth = solution.candidate.nonce.saturating_sub(job.start_nonce) + 1;
@@ -2722,7 +2799,7 @@ fn run_remote_session(
             elapsed_ms: Some(job_started_at.elapsed().as_millis() as u64),
             mix_hash_hex,
         };
-        let submit_line = write_wire_message(&mut writer, &submit_message)?;
+        let submit_line = write_wire_message(&mut *writer.lock().unwrap(), &submit_message)?;
         // ── FIX #8: Drain late ExternalResult if present (from timed-out submit_external_share) ──
         let (result_line_raw, result_message) = loop {
             match result_rx.recv() {
@@ -2776,8 +2853,22 @@ fn run_remote_session(
                 }
                 status
             }
-            // Late ExternalResult from a timed-out submit_external_share — drain and recv again
+            // Late ExternalResult from ext_share_submitter_thread — drain and recv again
             PoolMessage::ExternalResult { accepted, status: ext_status, coin } => {
+                // Record hashrate for the ext share result
+                let is_cpu = coin.eq_ignore_ascii_case("VRSC")
+                    || coin.eq_ignore_ascii_case("XMR")
+                    || coin.eq_ignore_ascii_case("RTM");
+                if is_cpu {
+                    hashrate.record_cpu_ext_share(accepted);
+                } else {
+                    hashrate.record_gpu_ext_share(accepted);
+                }
+                if accepted {
+                    println!("[{}] external_share_accepted coin={} status={}", log_timestamp(), coin, ext_status);
+                } else {
+                    println!("[{}] external_share_rejected coin={} status={}", log_timestamp(), coin, ext_status);
+                }
                 println!(
                     "[{}] late_external_result_drained coin={} accepted={} status={} — waiting for submit result",
                     log_timestamp(), coin, accepted, ext_status,
@@ -3304,6 +3395,71 @@ fn submit_external_share(
     }
 }
 
+/// Compute an adaptive (burst, gap_ms) duty-cycle for the external GPU
+/// thread (Stream 2 = ProgPow/KawPow) based on observed hashrates of the
+/// two GPU streams.
+///
+/// - `zion_hps`: Stream 1 (Deeksha) hashrate over the last 60 s (H/s).
+/// - `ext_hps`:  Stream 2 (ProgPow/KawPow) hashrate over the last 60 s (H/s).
+///
+/// The scheduler targets a balanced share rate between the two streams.
+/// Because Stream 1 runs in the main loop and only gets GPU time during
+/// the "gap" of Stream 2's duty cycle, while Stream 2 runs during the
+/// "burst", the duty cycle fraction is derived from the ratio of the
+/// two hashrates. Higher Stream 2 hashrate → shorter bursts / longer
+/// gaps (Stream 1 needs relatively more time to match share output).
+/// Lower Stream 2 hashrate → longer bursts / shorter gaps.
+///
+/// Bounds are enforced via env vars (with safe defaults) so the
+/// scheduler can never starve either stream.
+fn compute_adaptive_duty_cycle(zion_hps: f64, ext_hps: f64) -> (u64, u64) {
+    let min_burst = std::env::var("ZION_ADAPTIVE_MIN_BURST")
+        .ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(1);
+    let max_burst = std::env::var("ZION_ADAPTIVE_MAX_BURST")
+        .ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(10);
+    let min_gap_ms = std::env::var("ZION_ADAPTIVE_MIN_GAP_MS")
+        .ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(50);
+    let max_gap_ms = std::env::var("ZION_ADAPTIVE_MAX_GAP_MS")
+        .ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(2000);
+
+    // Default static duty cycle when either stream has no observed hashrate.
+    let default_burst = std::env::var("ZION_EXT_GPU_BURST")
+        .ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(3);
+    let default_gap_ms = std::env::var("ZION_EXT_GPU_GAP_MS")
+        .ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(300);
+
+    if zion_hps <= 0.0 && ext_hps <= 0.0 {
+        return (default_burst, default_gap_ms);
+    }
+    if zion_hps <= 0.0 {
+        // Stream 1 idle — give all GPU time to Stream 2.
+        return (max_burst, min_gap_ms);
+    }
+    if ext_hps <= 0.0 {
+        // Stream 2 idle — give minimal time to it, prioritize Stream 1.
+        return (min_burst, max_gap_ms);
+    }
+
+    // Target duty fraction for Stream 2:
+    //   f2 = zion_hps / (zion_hps + ext_hps)
+    // This gives each stream a share of GPU time proportional to the
+    // other stream's hashrate (so the slower stream gets more time).
+    // Combined with burst+gap timing where burst ≈ f2 * (burst + gap/50ms)
+    // we solve for gap given a fixed burst unit:
+    //   burst / (burst + gap_ms/50) = f2
+    //   gap_ms = 50 * burst * (1 - f2) / f2
+    let f2 = zion_hps / (zion_hps + ext_hps);
+    let burst = default_burst.clamp(min_burst, max_burst);
+    let gap_ms = if f2 >= 0.999 {
+        min_gap_ms
+    } else {
+        let g = 50.0 * burst as f64 * (1.0 - f2) / f2;
+        (g as u64).clamp(min_gap_ms, max_gap_ms)
+    };
+
+    (burst, gap_ms)
+}
+
 /// Persistent external GPU miner thread for the single GPU profit coin.
 ///
 /// Runs in a separate thread with its own GPU context/command queue.
@@ -3315,12 +3471,17 @@ fn external_gpu_thread(
     work_size: usize,
     hashrate: Arc<HashrateTracker>,
     backend_kind: gpu_backend::GpuBackendKind,
+    // Adaptive duty-cycle update channel. The main loop sends new (burst,
+    // gap_ms) tuples here every ZION_ADAPTIVE_UPDATE_INTERVAL_S seconds
+    // based on observed Stream 1 vs Stream 2 hashrates. When None (no
+    // adaptive scheduler), falls back to env-var defaults.
+    adaptive_rx: Option<std::sync::mpsc::Receiver<(u64, u64)>>,
     #[cfg(feature = "gpu-cuda")]
     shared_cuda_dev: Option<std::sync::Arc<cudarc::driver::CudaDevice>>,
     #[cfg(not(feature = "gpu-cuda"))]
     shared_cuda_dev: Option<()>,
 ) {
-    println!("[{}] external_gpu_thread_entered backend={} shared_cuda={}", log_timestamp(), backend_kind.as_str(), shared_cuda_dev.is_some());
+    println!("[{}] external_gpu_thread_entered backend={} shared_cuda={} adaptive={}", log_timestamp(), backend_kind.as_str(), shared_cuda_dev.is_some(), adaptive_rx.is_some());
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
 
@@ -3337,6 +3498,12 @@ fn external_gpu_thread(
     let mut batch_count: u64 = 0;
     let mut last_heartbeat = std::time::Instant::now();
     let mut last_epoch: Option<u32> = None;
+
+    // Adaptive duty-cycle state. Updated from the main loop via the
+    // adaptive_rx channel. Falls back to env-var defaults until the
+    // first adaptive update arrives.
+    let mut adaptive_burst: u64 = 0;
+    let mut adaptive_gap_ms: u64 = 0;
 
     fn epoch_for_algorithm(algorithm: &str, height: u64) -> Option<u32> {
         match algorithm {
@@ -3605,6 +3772,14 @@ fn external_gpu_thread(
             let mut bytes = [0u8; 80];
             let len = header_bytes.len().min(80);
             bytes[..len].copy_from_slice(&header_bytes[..len]);
+            // For KAS kheavyhash: the pool sends timestamp in the
+            // ExternalStreamJob.timestamp field.  Store it in the MiningHeader
+            // timestamp slot (bytes 68..76) so the GPU kernel picks it up.
+            // For other algorithms, header.timestamp is already set from the
+            // header bytes (if present) or remains 0 (which is fine).
+            if algo == "kheavyhash" || algo == "kheavyhash_kas" {
+                bytes[68..76].copy_from_slice(&job.timestamp.to_le_bytes());
+            }
             let header = MiningHeader::from_bytes(bytes);
             gpu_miner.mine_batch(header, target, nonce, batch_size)
         };
@@ -3670,18 +3845,47 @@ fn external_gpu_thread(
         // be long enough for Stream 1 to complete one deeksha batch
         // (~270ms on RX 5600 XT at work_size=8192).
         //
-        // Defaults: burst=3 batches, gap=300ms → ~75% Stream2 duty cycle.
-        // Tuning:
-        //   ZION_EXT_GPU_BURST=N  (batches per burst, 0=no limit)
-        //   ZION_EXT_GPU_GAP_MS=M (sleep after burst, 0=disabled)
-        let burst = std::env::var("ZION_EXT_GPU_BURST")
-            .ok()
-            .and_then(|v| v.parse::<u64>().ok())
-            .unwrap_or(3);
-        let gap_ms = std::env::var("ZION_EXT_GPU_GAP_MS")
-            .ok()
-            .and_then(|v| v.parse::<u64>().ok())
-            .unwrap_or(300);
+        // Two modes:
+        //   1. ADAPTIVE (default when ZION_ADAPTIVE_DUTY_CYCLE=1):
+        //      Main loop computes optimal burst/gap from observed
+        //      Stream 1 vs Stream 2 hashrates and sends updates via
+        //      the adaptive_rx channel. Falls back to env defaults
+        //      if no update has been received yet.
+        //   2. STATIC (env vars):
+        //      ZION_EXT_GPU_BURST=N  (batches per burst, 0=no limit)
+        //      ZION_EXT_GPU_GAP_MS=M (sleep after burst, 0=disabled)
+        // Check for adaptive scheduler update (non-blocking)
+        if let Some(ref arx) = adaptive_rx {
+            while let Ok((new_burst, new_gap_ms)) = arx.try_recv() {
+                adaptive_burst = new_burst;
+                adaptive_gap_ms = new_gap_ms;
+                println!(
+                    "[{}] ext_gpu_adaptive_update burst={} gap_ms={} (duty_cycle={:.0}%)",
+                    log_timestamp(),
+                    new_burst,
+                    new_gap_ms,
+                    if new_burst > 0 {
+                        100.0 * new_burst as f64
+                            / (new_burst as f64 + new_gap_ms as f64 / 50.0)
+                    } else { 0.0 }
+                );
+            }
+        }
+        let (burst, gap_ms) = if adaptive_burst > 0 || adaptive_gap_ms > 0 {
+            (adaptive_burst, adaptive_gap_ms)
+        } else {
+            // Fall back to env defaults until first adaptive update
+            (
+                std::env::var("ZION_EXT_GPU_BURST")
+                    .ok()
+                    .and_then(|v| v.parse::<u64>().ok())
+                    .unwrap_or(3),
+                std::env::var("ZION_EXT_GPU_GAP_MS")
+                    .ok()
+                    .and_then(|v| v.parse::<u64>().ok())
+                    .unwrap_or(300),
+            )
+        };
         if burst > 0 && gap_ms > 0 && batch_count % burst == 0 {
             thread::sleep(Duration::from_millis(gap_ms));
         }
@@ -3994,6 +4198,108 @@ enum PoolIncoming {
 /// triggers reconnect logic.
 ///
 /// This eliminates both GPU idle gaps:
+/// Dedicated external share submission thread.
+///
+/// Reads from `ext_gpu_share_rx` and `ext_cpu_share_rx` and submits shares
+/// IMMEDIATELY to the pool via the shared writer, without waiting for the
+/// main loop.  This is critical for VRSC (VerusHash) where LuckPool expires
+/// jobs ~12s after issuance — the main loop's ~10s iteration would cause
+/// shares to arrive too late.
+///
+/// The pool's `ExternalResult` response comes back through `pool_io_thread`
+/// → `result_rx`, and is handled by the main loop as `late_external_result`.
+fn ext_share_submitter_thread(
+    writer: Arc<Mutex<std::net::TcpStream>>,
+    ext_gpu_share_rx: std::sync::mpsc::Receiver<ExternalShareResult>,
+    ext_cpu_share_rx: std::sync::mpsc::Receiver<ExternalShareResult>,
+    config: &MinerConfig,
+) {
+    println!("[{}] ext_share_submitter_thread: started", log_timestamp());
+    loop {
+        // Check CPU channel first (VerusHash shares are time-critical)
+        let share = match ext_cpu_share_rx.recv_timeout(Duration::from_millis(500)) {
+            Ok(s) => Some(s),
+            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
+                // Check GPU channel (non-blocking)
+                match ext_gpu_share_rx.try_recv() {
+                    Ok(s) => Some(s),
+                    Err(_) => None,
+                }
+            }
+            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => {
+                println!("[{}] ext_share_submitter_thread: CPU channel closed, exiting", log_timestamp());
+                return;
+            }
+        };
+
+        if let Some(share) = share {
+            let ext_submit = PoolMessage::ExternalSubmit {
+                miner_id: config.miner_id.clone(),
+                worker_name: config.worker_name.clone(),
+                coin: share.coin.clone(),
+                algorithm: share.algorithm.clone(),
+                external_job_id: share.external_job_id.clone(),
+                nonce: share.nonce,
+                hash_hex: hex::encode(&share.hash),
+                mix_hash_hex: share.mix_hash.map(|m| hex::encode(&m)),
+                extranonce1_hex: share.extranonce1_hex.clone(),
+            };
+            // Lock writer, send share, flush, unlock — all within the lock scope
+            let send_result = {
+                let mut w = writer.lock().unwrap();
+                match zion_pool::encode_message(&ext_submit) {
+                    Ok(line) => {
+                        let r1 = w.write_all(line.as_bytes());
+                        let r2 = w.flush();
+                        if r1.is_err() || r2.is_err() {
+                            Err("write/flush failed")
+                        } else {
+                            Ok(())
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("[{}] ext_share_submitter: encode error: {}", log_timestamp(), e);
+                        Err("encode failed")
+                    }
+                }
+            };
+            if let Err(e) = send_result {
+                eprintln!("[{}] ext_share_submitter: send error: {}", log_timestamp(), e);
+            } else {
+                println!(
+                    "[{}] ext_share_submitted  coin={}  algo={}  job_id={}  nonce={}",
+                    log_timestamp(),
+                    share.coin,
+                    share.algorithm,
+                    share.external_job_id,
+                    share.nonce,
+                );
+            }
+            // Also drain any GPU share that might be pending (non-blocking)
+            if let Ok(gpu_share) = ext_gpu_share_rx.try_recv() {
+                let ext_submit = PoolMessage::ExternalSubmit {
+                    miner_id: config.miner_id.clone(),
+                    worker_name: config.worker_name.clone(),
+                    coin: gpu_share.coin.clone(),
+                    algorithm: gpu_share.algorithm.clone(),
+                    external_job_id: gpu_share.external_job_id.clone(),
+                    nonce: gpu_share.nonce,
+                    hash_hex: hex::encode(&gpu_share.hash),
+                    mix_hash_hex: gpu_share.mix_hash.map(|m| hex::encode(&m)),
+                    extranonce1_hex: gpu_share.extranonce1_hex.clone(),
+                };
+                let mut w = writer.lock().unwrap();
+                if let Ok(line) = zion_pool::encode_message(&ext_submit) {
+                    let _ = w.write_all(line.as_bytes());
+                    let _ = w.flush();
+                }
+            }
+        }
+    }
+}
+
+/// Pool I/O thread — reads messages from the pool TCP stream and routes them.
+///
 /// - **Job pre-fetch**: jobs are read continuously, so `job_rx.recv()` is
 ///   non-blocking when a job is already queued (eliminates ~400ms job wait)
 /// - **Async submit response**: submit results are read continuously, so
@@ -4003,6 +4309,8 @@ fn pool_io_thread(
     mut reader: std::io::BufReader<std::net::TcpStream>,
     job_tx: std::sync::mpsc::Sender<PoolIncoming>,
     result_tx: std::sync::mpsc::Sender<PoolIncoming>,
+    ext_gpu_tx: std::sync::mpsc::Sender<zion_pool::ExternalStreamJob>,
+    ext_cpu_tx: std::sync::mpsc::Sender<zion_pool::ExternalStreamJob>,
 ) {
     loop {
         let (line, message) = match read_wire_message(&mut reader) {
@@ -4035,6 +4343,25 @@ fn pool_io_thread(
                             job_id, ext.coin, ext.algorithm
                         );
                     }
+                    // Forward external stream jobs DIRECTLY to the GPU/CPU
+                    // thread here, without waiting for the main loop. The main
+                    // loop processes one job per iteration (~10-15s), which is
+                    // too slow for EPIC ProgPow — the EPIC pool's job window
+                    // is ~10-15s, so shares for old jobs are rejected as
+                    // "submitted too late". Forwarding here ensures the
+                    // external GPU thread gets new jobs immediately.
+                    // The external GPU thread handles duplicates gracefully
+                    // (checks is_new_job), so the main loop's forwarding is
+                    // still safe as a fallback.
+                    if !ext.coin.eq_ignore_ascii_case("PRL")
+                        && !ext.algorithm.eq_ignore_ascii_case("pearlhash")
+                    {
+                        if gpu_backend::is_cpu_only_algorithm(&ext.algorithm) {
+                            let _ = ext_cpu_tx.send(ext.clone());
+                        } else if gpu_backend::is_external_algorithm(&ext.algorithm) {
+                            let _ = ext_gpu_tx.send(ext.clone());
+                        }
+                    }
                 }
                 if let Some(ref ext_cpu) = external_stream_cpu {
                     if !QUIET.load(Ordering::Relaxed) {
@@ -4043,6 +4370,9 @@ fn pool_io_thread(
                             job_id, ext_cpu.coin, ext_cpu.algorithm, ext_cpu.target_hex
                         );
                     }
+                    // Forward CPU external stream jobs directly too (same
+                    // rationale as above — avoid main-loop latency).
+                    let _ = ext_cpu_tx.send(ext_cpu.clone());
                 }
                 let raw_header_bytes =
                     hex::decode(header_hex.trim_start_matches("0x")).unwrap_or_default();
@@ -4374,6 +4704,12 @@ struct MinerConfig {
     auto_mode: bool,
     /// Detected GPU VRAM in bytes (from autotune, used by autonomous router)
     gpu_vram_bytes: u64,
+    /// Manual CPU coin preference (from --cpu-coin CLI flag). When set,
+    /// the miner sends a CoinPreference message to the pool on connect,
+    /// requesting this CPU coin. Pool switches without restart.
+    cpu_coin: Option<String>,
+    /// Manual GPU coin preference (from --gpu-coin CLI flag).
+    gpu_coin: Option<String>,
 }
 
 impl MinerConfig {
@@ -4417,6 +4753,14 @@ impl MinerConfig {
                 }
                 "--algorithm" if i + 1 < args.len() => {
                     std::env::set_var("ZION_MINER_ALGORITHM", &args[i + 1]);
+                    i += 2;
+                }
+                "--cpu-coin" if i + 1 < args.len() => {
+                    std::env::set_var("ZION_MINER_CPU_COIN", &args[i + 1]);
+                    i += 2;
+                }
+                "--gpu-coin" if i + 1 < args.len() => {
+                    std::env::set_var("ZION_MINER_GPU_COIN", &args[i + 1]);
                     i += 2;
                 }
                 "--pearl" if i + 1 < args.len() => {
@@ -4509,6 +4853,8 @@ impl MinerConfig {
                     println!("  --loops N           Iteration count (default: 1)");
                     println!("  --profile NAME      Profile: pool, solo, benchmark, dual");
                     println!("  --algorithm ALGO    Mining algorithm (see list below)");
+                    println!("  --cpu-coin TICKER   CPU coin preference (RTM, XMR, VRSC) — runtime switch, no pool restart");
+                    println!("  --gpu-coin TICKER   GPU coin preference (RVN, ERG, ETC, etc.) — runtime switch");
                     println!("  --pearl H:P:W       Pearl PoUW stratum stream (host:port:wallet)");
                     println!("  --detect-hardware   Detect GPU/CPU hardware and exit (for zion mine auto)");
                     println!("  --auto-tune         Detect hardware, print recommended settings, and exit");
@@ -4516,7 +4862,7 @@ impl MinerConfig {
                     println!("  ZION algorithms:  deeksha_lite_v1, cosmic_harmony_ekam_deeksha_v2, deeksha_lite_fire");
                     println!("  External GPU:      blake3 (ALPH/DCR), kheavyhash (KAS), autolykos (ERG),");
                     println!("                     kawpow (RVN/CLORE/EVR/MEWC), ethash (ETC), zelhash (FLUX)");
-                    println!("  External CPU:      verushash (VRSC), randomx (XMR)");
+                    println!("  External CPU:      verushash (VRSC), randomx (XMR), ghostrider (RTM)");
                     println!("  Special:           auto (autotune — benchmark all and pick best)");
                 println!("  --no-tui            Disable interactive TUI and log to stdout");
                     println!();
@@ -4704,6 +5050,12 @@ impl MinerConfig {
                 }),
             auto_mode: parse_bool_env("ZION_AUTO_MODE", false),
             gpu_vram_bytes: autotune.gpu_vram_bytes,
+            cpu_coin: std::env::var("ZION_MINER_CPU_COIN")
+                .ok()
+                .filter(|v| !v.trim().is_empty()),
+            gpu_coin: std::env::var("ZION_MINER_GPU_COIN")
+                .ok()
+                .filter(|v| !v.trim().is_empty()),
         })
     }
 }
@@ -4874,6 +5226,90 @@ mod tests {
             .get_or_init(|| Mutex::new(()))
             .lock()
             .expect("env test lock")
+    }
+
+    #[test]
+    fn adaptive_duty_cycle_both_idle_uses_defaults() {
+        let _g = env_test_guard();
+        std::env::remove_var("ZION_ADAPTIVE_MIN_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MIN_GAP_MS");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_GAP_MS");
+        std::env::remove_var("ZION_EXT_GPU_BURST");
+        std::env::remove_var("ZION_EXT_GPU_GAP_MS");
+        let (burst, gap_ms) = compute_adaptive_duty_cycle(0.0, 0.0);
+        assert_eq!(burst, 3);
+        assert_eq!(gap_ms, 300);
+    }
+
+    #[test]
+    fn adaptive_duty_cycle_zion_idle_max_burst() {
+        let _g = env_test_guard();
+        std::env::remove_var("ZION_ADAPTIVE_MIN_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MIN_GAP_MS");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_GAP_MS");
+        let (burst, _) = compute_adaptive_duty_cycle(0.0, 5_000_000.0);
+        assert_eq!(burst, 10); // max_burst default
+    }
+
+    #[test]
+    fn adaptive_duty_cycle_ext_idle_min_burst() {
+        let _g = env_test_guard();
+        std::env::remove_var("ZION_ADAPTIVE_MIN_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MIN_GAP_MS");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_GAP_MS");
+        let (burst, gap_ms) = compute_adaptive_duty_cycle(5_000_000.0, 0.0);
+        assert_eq!(burst, 1); // min_burst default
+        // max_gap_ms default = 2000
+        assert_eq!(gap_ms, 2000);
+    }
+
+    #[test]
+    fn adaptive_duty_cycle_balanced_hashrates_yields_moderate_gap() {
+        let _g = env_test_guard();
+        std::env::remove_var("ZION_ADAPTIVE_MIN_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MIN_GAP_MS");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_GAP_MS");
+        std::env::remove_var("ZION_EXT_GPU_BURST");
+        std::env::remove_var("ZION_EXT_GPU_GAP_MS");
+        // Equal hashrates → f2 = 0.5 → gap = 50 * 3 * 0.5/0.5 = 150 ms
+        let (burst, gap_ms) = compute_adaptive_duty_cycle(1_000_000.0, 1_000_000.0);
+        assert_eq!(burst, 3);
+        assert_eq!(gap_ms, 150);
+    }
+
+    #[test]
+    fn adaptive_duty_cycle_higher_zion_hps_yields_longer_gap() {
+        let _g = env_test_guard();
+        std::env::remove_var("ZION_ADAPTIVE_MIN_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MIN_GAP_MS");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_GAP_MS");
+        std::env::remove_var("ZION_EXT_GPU_BURST");
+        std::env::remove_var("ZION_EXT_GPU_GAP_MS");
+        // zion_hps = 4x ext_hps → f2 = 4/5 = 0.8 → gap = 50*3*0.2/0.8 = 37.5 → clamped to min_gap_ms=50
+        let (burst, gap_ms) = compute_adaptive_duty_cycle(4_000_000.0, 1_000_000.0);
+        assert_eq!(burst, 3);
+        // gap_ms = 37 → clamped to min_gap_ms = 50
+        assert_eq!(gap_ms, 50);
+    }
+
+    #[test]
+    fn adaptive_duty_cycle_lower_zion_hps_yields_shorter_burst_relative() {
+        let _g = env_test_guard();
+        std::env::remove_var("ZION_ADAPTIVE_MIN_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_BURST");
+        std::env::remove_var("ZION_ADAPTIVE_MIN_GAP_MS");
+        std::env::remove_var("ZION_ADAPTIVE_MAX_GAP_MS");
+        std::env::remove_var("ZION_EXT_GPU_BURST");
+        std::env::remove_var("ZION_EXT_GPU_GAP_MS");
+        // zion_hps = 1/4 ext_hps → f2 = 1/5 = 0.2 → gap = 50*3*0.8/0.2 = 600 ms
+        let (burst, gap_ms) = compute_adaptive_duty_cycle(1_000_000.0, 4_000_000.0);
+        assert_eq!(burst, 3);
+        assert_eq!(gap_ms, 600);
     }
 
     #[test]
