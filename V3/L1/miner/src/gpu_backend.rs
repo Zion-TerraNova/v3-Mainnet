@@ -414,9 +414,14 @@ fn tri_gpu_timestamp() -> String {
 /// This is the 3.0.6 canonical replacement for `GpuBackendManager`. The
 /// legacy manager remains for backward compatibility.
 pub struct TriGpuManager {
-    /// Stream 1: ZION Deeksha — created at startup, never switched.
+    /// Stream 1: ZION Deeksha — created at startup, switched if pool sends
+    /// a different Deeksha variant (e.g. pool sends v1 but miner inits fire).
     primary: Option<Box<dyn GpuMiner>>,
     kind: GpuBackendKind,
+    /// Work size used to create the primary backend (needed for recreation).
+    primary_work_size: usize,
+    /// Current algorithm of the primary backend.
+    primary_algo: String,
 }
 
 impl TriGpuManager {
@@ -428,6 +433,8 @@ impl TriGpuManager {
             return Ok(Self {
                 primary: None,
                 kind,
+                primary_work_size,
+                primary_algo: String::new(),
             });
         }
         let primary_algo = std::env::var("ZION_MINER_ALGORITHM")
@@ -437,6 +444,8 @@ impl TriGpuManager {
         Ok(Self {
             primary: Some(primary),
             kind,
+            primary_work_size,
+            primary_algo,
         })
     }
 
@@ -462,6 +471,54 @@ impl TriGpuManager {
             Some(b) => Ok(b.as_mut()),
             None => Err(anyhow::anyhow!("primary GPU backend not initialized")),
         }
+    }
+
+    /// Optimization #3: Ensure the primary GPU backend matches the requested
+    /// algorithm. If the pool sends a different Deeksha variant (e.g. pool
+    /// sends `deeksha_lite_v1` but the miner initialized with
+    /// `deeksha_lite_fire`), recreate the primary backend with the correct
+    /// algorithm. This fixes the algorithm mismatch where fire hashes
+    /// (with thermal loop) were being submitted for v1 jobs (no thermal loop).
+    ///
+    /// Only switches between Deeksha-family algorithms (v1, chv3, fire).
+    /// External/CPU-only algorithms are ignored (handled by other streams).
+    /// Returns Ok(()) if no switch was needed or the switch succeeded.
+    pub fn ensure_primary_algorithm(&mut self, algorithm: &str) -> Result<()> {
+        // No GPU backend — nothing to switch.
+        if self.primary.is_none() {
+            return Ok(());
+        }
+        // Already matches — no switch needed.
+        if self.primary_algo == algorithm {
+            return Ok(());
+        }
+        // Only switch for Deeksha-family algorithms.
+        let is_deeksha = matches!(
+            algorithm,
+            "deeksha_lite_v1" | "deeksha_lite" | "deeksha_chv3" | "deeksha_lite_fire"
+        );
+        if !is_deeksha {
+            return Ok(());
+        }
+
+        println!(
+            "gpu_primary_switch_algorithm from={} to={} reason=pool_job_mismatch",
+            self.primary_algo, algorithm
+        );
+
+        // Drop the old backend first (releases GPU resources).
+        self.primary = None;
+        // Create the new backend with the pool's algorithm.
+        let new_backend = create_gpu_backend(self.kind, self.primary_work_size, algorithm)?;
+        self.primary = Some(new_backend);
+        self.primary_algo = algorithm.to_string();
+
+        println!(
+            "gpu_primary_switch_complete algorithm={} backend={:?}",
+            self.primary_algo, self.kind
+        );
+
+        Ok(())
     }
 
     /// Primary backend kind string (for hello message / telemetry).
@@ -3410,8 +3467,19 @@ pub mod opencl_deeksha_lite {
         tuning: GpuTuning,
         recovery_attempts: u32,
         max_recovery_attempts: u32,
-        /// FIX #9: Pending batch result from launch_batch, returned by collect_batch.
-        pending: Option<GpuBatchResult>,
+        /// Optimization #2/#3: Pending async batch state for pipelined
+        /// launch/collect. Same pattern as the fire backend.
+        pending: Option<PendingAsyncBatch>,
+    }
+
+    /// Async batch state stored by launch_batch, consumed by collect_batch.
+    struct PendingAsyncBatch {
+        host_a: Vec<u8>,
+        host_b: Vec<u8>,
+        read_events: Vec<Event>,
+        chunk_meta: Vec<(usize, u64, usize)>,
+        target: DifficultyTarget,
+        total_tested: u64,
     }
 
     impl OpenClDeekshaLiteMiner {
@@ -3994,7 +4062,9 @@ pub mod opencl_deeksha_lite {
             Ok((total_hashes, elapsed, khps))
         }
 
-        /// FIX #9: Override default launch_batch which discards mine_batch results.
+        /// Optimization #2: True async launch — queue all kernel chunks + async
+        /// reads without syncing. Host returns immediately after queueing.
+        /// Same pattern as the fire backend. collect_batch waits for reads.
         fn launch_batch(
             &mut self,
             header: MiningHeader,
@@ -4005,16 +4075,160 @@ pub mod opencl_deeksha_lite {
             if self.pending.is_some() {
                 self.pending = None;
             }
-            let result = self.mine_batch(header, target, nonce_start, batch_size)?;
-            self.pending = Some(result);
+
+            let header_bytes = header.to_bytes();
+            let header_80 = &header_bytes[..80.min(header_bytes.len())];
+            let precomputed_state = Self::precompute_header_keccak_state(header_80);
+
+            {
+                let guard = GpuGuard::new();
+                self.header_state_buf.write(&precomputed_state[..]).enq()?;
+                if guard.was_caught() {
+                    self.recovery_attempts += 1;
+                    anyhow::bail!(
+                        "GPU access violation during header state buffer write (attempt {}/{}). AMD driver crash detected — try reducing ZION_GPU_WORK_SIZE or ZION_OCL_VRAM_PCT.",
+                        self.recovery_attempts,
+                        self.max_recovery_attempts
+                    );
+                }
+            }
+
+            let out_bufs = [&self.output_hashes_buf, &self.output_hashes_buf_b];
+            let mut host_a = vec![0u8; self.work_size * 32];
+            let mut host_b = vec![0u8; self.work_size * 32];
+
+            let mut read_events: Vec<Event> = Vec::new();
+            let mut chunk_meta: Vec<(usize, u64, usize)> = Vec::new();
+            let mut total_tested = 0u64;
+            let mut current_nonce = nonce_start;
+            let mut left = batch_size;
+            let mut buf_idx = 0usize;
+
+            let mut last_read_per_buf: [Option<Event>; 2] = [None, None];
+
+            while left > 0 {
+                let chunk = (left as usize).min(self.work_size);
+                let local_size = self.local_work_size.min(chunk);
+                let global_size = ((chunk + local_size - 1) / local_size) * local_size;
+                let out_buf = out_bufs[buf_idx];
+
+                self.kernel.set_arg(1, current_nonce)?;
+                self.kernel.set_arg(2, chunk as u32)?;
+                self.kernel.set_arg(3, out_buf)?;
+
+                let mut k_event = Event::empty();
+                let prev_read_for_buf = last_read_per_buf[buf_idx].take();
+                {
+                    let guard = GpuGuard::new();
+                    unsafe {
+                        let mut cmd = self.kernel
+                            .cmd()
+                            .global_work_size(global_size)
+                            .local_work_size(local_size)
+                            .enew(&mut k_event);
+                        if let Some(ref prev_read) = prev_read_for_buf {
+                            cmd = cmd.ewait(prev_read);
+                        }
+                        cmd.enq()?;
+                    }
+                    if guard.was_caught() {
+                        self.recovery_attempts += 1;
+                        anyhow::bail!(
+                            "GPU access violation during kernel enqueue (attempt {}/{}). AMD driver crash detected.",
+                            self.recovery_attempts,
+                            self.max_recovery_attempts
+                        );
+                    }
+                }
+
+                let mut r_event = Event::empty();
+                {
+                    let guard = GpuGuard::new();
+                    let dst = if buf_idx == 0 { &mut host_a[..] } else { &mut host_b[..] };
+                    unsafe {
+                        out_buf
+                            .read(&mut dst[..chunk * 32])
+                            .queue(&self.read_queue)
+                            .ewait(&k_event)
+                            .enew(&mut r_event)
+                            .block(false)
+                            .enq()?;
+                    }
+                    if guard.was_caught() {
+                        self.recovery_attempts += 1;
+                        anyhow::bail!(
+                            "GPU access violation during async hash buffer read (attempt {}/{}). AMD driver crash detected.",
+                            self.recovery_attempts,
+                            self.max_recovery_attempts
+                        );
+                    }
+                }
+
+                let _ = self.pro_que.queue().flush();
+
+                last_read_per_buf[buf_idx] = Some(r_event.clone());
+                read_events.push(r_event);
+                chunk_meta.push((chunk, current_nonce, buf_idx));
+                total_tested += chunk as u64;
+                current_nonce = current_nonce.wrapping_add(chunk as u64);
+                left -= chunk as u64;
+                buf_idx = 1 - buf_idx;
+            }
+
+            self.pending = Some(PendingAsyncBatch {
+                host_a,
+                host_b,
+                read_events,
+                chunk_meta,
+                target,
+                total_tested,
+            });
+
             Ok(0)
         }
 
-        /// FIX #9: Return the pending batch result stored by launch_batch.
+        /// Optimization #2: Collect results from a previously launched async batch.
         fn collect_batch(&mut self, _token: u64) -> Result<GpuBatchResult> {
-            self.pending
+            let pending = self
+                .pending
                 .take()
-                .ok_or_else(|| anyhow::anyhow!("no pending OpenCL lite batch to collect"))
+                .ok_or_else(|| anyhow::anyhow!("no pending OpenCL lite batch to collect"))?;
+
+            let mut all_solutions = Vec::new();
+            let mut total_tested = 0u64;
+
+            for (i, r_event) in pending.read_events.into_iter().enumerate() {
+                let (chunk, nonce_base, buf_idx) = pending.chunk_meta[i];
+
+                {
+                    let guard = GpuGuard::new();
+                    r_event.wait_for()?;
+                    if guard.was_caught() {
+                        self.recovery_attempts += 1;
+                        anyhow::bail!(
+                            "GPU access violation during read event wait (attempt {}/{}). AMD driver crash detected.",
+                            self.recovery_attempts,
+                            self.max_recovery_attempts
+                        );
+                    }
+                }
+
+                let host = if buf_idx == 0 { &pending.host_a[..] } else { &pending.host_b[..] };
+                for j in 0..chunk {
+                    let hash: [u8; 32] = host[j * 32..(j + 1) * 32].try_into().unwrap();
+                    if pending.target.allows(&hash) {
+                        let nonce = nonce_base.wrapping_add(j as u64);
+                        all_solutions.push((nonce, hash, None));
+                        break;
+                    }
+                }
+                total_tested += chunk as u64;
+            }
+
+            Ok(GpuBatchResult {
+                solutions: all_solutions,
+                nonces_tested: total_tested,
+            })
         }
     }
 }
