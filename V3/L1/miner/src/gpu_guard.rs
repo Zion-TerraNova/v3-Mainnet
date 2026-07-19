@@ -286,15 +286,19 @@ impl GpuTuning {
         let (work_size, local_ws, build_opts, vram_pct, gcn_s4_mode) = match (algo, family) {
             // ── DeekshaLite v1 ──────────────────────────────────────────
             (GpuAlgorithm::DeekshaLiteV1, GpuDeviceFamily::AmdGcn) => {
-                // GCN Vega 64: 8GB HBM2 → 16384, stable local_ws=256
+                // GCN Vega 64: 8GB HBM2 → 16384, local_ws=64 (wave64 optimal)
+                // NOTE: local_ws=256 causes kernel compilation/execution hangs on
+                // SMOS OpenCL compiler for gfx900 (see VEGA_GPU_MINING_DEBUG_REPORT_2026-04-09.md)
                 let ws = (max_by_vram.min(16384).max(256)).next_power_of_two();
                 let opts = "-cl-std=CL1.2".to_string();
-                (ws, 256, opts, 85, false)
+                (ws, 64, opts, 85, false)
             }
             (GpuAlgorithm::DeekshaLiteV1, GpuDeviceFamily::AmdRdna) => {
                 // RDNA: fast ulong-width path, smaller local size for better occupancy
                 // NO -cl-fast-relaxed-math: causes AMD driver crashes on integer
                 // code paths (Keccak scratchpad, AES) on some RDNA driver versions.
+                // NO -cl-uniform-work-group-size: rejected with CL_INVALID_COMPILER_OPTIONS
+                // on ROCm 3581.0 / gfx1010 (RDNA1) — OpenCL 2.0 flag but driver rejects it.
                 let ws = (max_by_vram.min(8192).max(512)).next_power_of_two();
                 let opts = "-cl-std=CL1.2 -cl-mad-enable".to_string();
                 (ws, 128, opts, 85, false)
@@ -313,9 +317,10 @@ impl GpuTuning {
             // ── DeekshaLite Fire (thermal-intensive) ────────────────────
             // 256 KiB scratchpad (same as v1) + 65536-iter integer thermal loop.
             (GpuAlgorithm::DeekshaLiteFire, GpuDeviceFamily::AmdGcn) => {
+                // GCN Vega 64: local_ws=64 (wave64), 256 causes hangs on SMOS gfx900
                 let ws = (max_by_vram.min(16384).max(128)).next_power_of_two();
                 let opts = "-cl-std=CL1.2".to_string();
-                (ws, 256, opts, 85, false)
+                (ws, 64, opts, 85, false)
             }
             (GpuAlgorithm::DeekshaLiteFire, GpuDeviceFamily::AmdRdna) => {
                 let ws = (max_by_vram.min(8192).max(512)).next_power_of_two();

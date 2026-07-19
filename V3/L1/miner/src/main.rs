@@ -6,23 +6,79 @@
 use anyhow::{anyhow, Context, Result};
 use std::collections::VecDeque;
 use std::fmt::Write as _;
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 use zion_core::{CoreRuntime, DifficultyTarget, MiningHeader, MiningJob, RevenueSource};
-use zion_pool::{decode_message, encode_message, MiningPool, PoolMessage, ShareStatus};
+use zion_pool::{
+    decode_message, encode_message, ExternalStreamJob, MiningPool, PoolMessage, ShareStatus,
+};
 
+mod autonomous;
 mod banner;
+mod cpu_features;
+#[cfg(feature = "gpu-cuda")]
+mod cuda_external;
 mod gpu_backend;
 mod gpu_guard;
 mod interactive;
 mod parallel;
+mod thread_affinity;
 mod ui;
 
 use interactive::{HashrateTracker, MinerControl, TUI_ACTIVE};
+
+// ── Crash protection: signal handler for SIGABRT/SIGSEGV ──────────────────
+// AMD OpenCL driver crashes on Linux manifest as SIGABRT (exit 134) or
+// SIGSEGV (exit 139). We install a handler that logs the crash to a file
+// so the watchdog script can detect it and restart the miner.
+#[cfg(unix)]
+mod crash_handler {
+    use std::os::raw::c_int;
+
+    const SIGABRT: c_int = 6;
+    const SIGSEGV: c_int = 11;
+    const SIG_DFL: usize = 0;
+
+    extern "C" {
+        fn signal(signum: c_int, handler: usize) -> usize;
+        fn raise(signum: c_int) -> c_int;
+    }
+
+    extern "C" fn handler(sig: c_int) {
+        let crash_file = std::env::var("ZION_CRASH_LOG")
+            .unwrap_or_else(|_| "/tmp/zion-miner-crash.log".to_string());
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        let msg = format!(
+            "CRASH signal={} pid={} timestamp={}\n",
+            sig, std::process::id(), timestamp,
+        );
+        let _ = std::fs::write(&crash_file, &msg);
+        eprintln!("[CRASH] signal={} — miner will exit. Watchdog should restart.", sig);
+        unsafe {
+            signal(sig, SIG_DFL);
+            raise(sig);
+        }
+    }
+
+    pub fn install() {
+        unsafe {
+            signal(SIGABRT, handler as *const () as usize);
+            signal(SIGSEGV, handler as *const () as usize);
+        }
+    }
+}
+
+#[cfg(not(unix))]
+mod crash_handler {
+    pub fn install() {}
+}
 
 fn flush_stdout() {
     use std::io::Write;
@@ -31,8 +87,24 @@ fn flush_stdout() {
 
 /// Gate verbose wire_* / iteration= debug output (--verbose or ZION_MINER_VERBOSE=1).
 static VERBOSE: AtomicBool = AtomicBool::new(false);
+/// Suppress verbose log lines when sticky header is active (Claymore-style clean display).
+/// Only status box + share notifications are shown.
+static QUIET: AtomicBool = AtomicBool::new(false);
 static CURRENT_POOL_DIFFICULTY: AtomicU64 = AtomicU64::new(1);
 mod reconnect;
+
+/// Log a line only if not in quiet mode (sticky header active).
+fn log_line(msg: &str) {
+    if QUIET.load(Ordering::Relaxed) {
+        return;
+    }
+    println!("{}", msg);
+}
+
+/// Log a line always (even in quiet mode) — for important events like shares.
+fn log_always(msg: &str) {
+    println!("{}", msg);
+}
 
 #[derive(Debug, Clone)]
 struct MinerMetricsSnapshot {
@@ -523,10 +595,6 @@ fn write_stats_file(path: &str, snapshot: &MinerMetricsSnapshot) {
         "status": snapshot.status,
         "miner_id": snapshot.miner_id,
         "pool_addr": snapshot.pool_addr,
-        // Batch info — lets the user see the miner is working even mid-batch
-        "current_iteration": snapshot.current_iteration,
-        "best_batch_ms": snapshot.best_batch_ms,
-        "last_job_id": snapshot.last_job_id,
     });
 
     // Atomic write: write to temp then rename (prevents partial reads by agent)
@@ -555,6 +623,123 @@ fn log_timestamp() -> String {
     // Simple date from days since epoch (good enough for logging)
     let (y, m, d) = days_to_ymd(days);
     format!("{y:04}-{m:02}-{d:02} {hours:02}:{mins:02}:{secs:02}")
+}
+
+/// Return the backend label string for the autonomous router.
+fn effective_gpu_backend_label(backend: gpu_backend::GpuBackendKind) -> &'static str {
+    match backend {
+        gpu_backend::GpuBackendKind::OpenCL => "opencl",
+        gpu_backend::GpuBackendKind::Cuda => "cuda",
+        gpu_backend::GpuBackendKind::Metal => "metal",
+        gpu_backend::GpuBackendKind::Cpu => "cpu",
+        gpu_backend::GpuBackendKind::Auto => "auto",
+    }
+}
+
+/// Check current system memory pressure.
+/// Returns (free_bytes, total_bytes) by querying the OS.
+/// On macOS, uses `vm_stat` and `sysctl`. On Linux, reads `/proc/meminfo`.
+fn check_memory_pressure() -> (u64, u64) {
+    let total = gpu_backend::detect_system_memory_bytes();
+
+    #[cfg(target_os = "macos")]
+    {
+        // vm_stat gives page counts; page size is typically 4096 on macOS
+        if let Ok(out) = std::process::Command::new("vm_stat")
+            .output()
+        {
+            let s = String::from_utf8_lossy(&out.stdout);
+            let page_size = 4096u64;
+            let mut free_pages: u64 = 0;
+            let mut inactive_pages: u64 = 0;
+            let mut purgeable_pages: u64 = 0;
+            for line in s.lines() {
+                if let Some(rest) = line.strip_prefix("Pages free:") {
+                    let n: String = rest.chars().filter(|c| c.is_ascii_digit()).collect();
+                    if let Ok(n) = n.parse::<u64>() { free_pages = n; }
+                }
+                if let Some(rest) = line.strip_prefix("Pages inactive:") {
+                    let n: String = rest.chars().filter(|c| c.is_ascii_digit()).collect();
+                    if let Ok(n) = n.parse::<u64>() { inactive_pages = n; }
+                }
+                if let Some(rest) = line.strip_prefix("Pages purgeable:") {
+                    let n: String = rest.chars().filter(|c| c.is_ascii_digit()).collect();
+                    if let Ok(n) = n.parse::<u64>() { purgeable_pages = n; }
+                }
+            }
+            let available = (free_pages + inactive_pages + purgeable_pages) * page_size;
+            return (available, total);
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(content) = std::fs::read_to_string("/proc/meminfo") {
+            let mut mem_available: u64 = 0;
+            for line in content.lines() {
+                if let Some(rest) = line.strip_prefix("MemAvailable:") {
+                    let kb: String = rest.chars().filter(|c| c.is_ascii_digit()).collect();
+                    if let Ok(kb_val) = kb.parse::<u64>() {
+                        mem_available = kb_val * 1024;
+                    }
+                }
+            }
+            if mem_available > 0 {
+                return (mem_available, total);
+            }
+        }
+    }
+
+    // Fallback: assume 50% available
+    (total / 2, total)
+}
+
+/// Spawn a memory pressure watchdog thread.
+/// Monitors system memory every 30 seconds. If available memory drops
+/// below a critical threshold, logs a warning. The watchdog is advisory
+/// only — it logs warnings but does not kill GPU streams (the budget
+/// system handles prevention). This helps diagnose OOM issues post-mortem.
+///
+/// Note: On macOS, "free" memory is typically very low (<500 MiB) even
+/// under normal load because macOS aggressively caches file data in
+/// "inactive" pages. We include inactive + purgeable pages in our
+/// "available" calculation. The thresholds are set lower for macOS.
+fn spawn_memory_watchdog() {
+    std::thread::spawn(move || {
+        let check_interval = std::time::Duration::from_secs(30);
+
+        // Platform-specific thresholds
+        // macOS: inactive/purgeable pages are counted as available, so
+        //   the "available" number is more accurate. But macOS still caches
+        //   aggressively, so we use lower thresholds.
+        // Linux: MemAvailable is accurate (includes reclaimable slab).
+        #[cfg(target_os = "macos")]
+        let (critical_mib, warning_mib) = (128, 256); // 128 MiB / 256 MiB
+        #[cfg(not(target_os = "macos"))]
+        let (critical_mib, warning_mib) = (512, 1024); // 512 MiB / 1 GiB
+
+        loop {
+            std::thread::sleep(check_interval);
+            let (available, total) = check_memory_pressure();
+            let avail_mib = available / (1024 * 1024);
+            let total_mib = total / (1024 * 1024);
+            if avail_mib < critical_mib {
+                eprintln!(
+                    "[{}] MEMORY_CRITICAL available_mib={} total_mib={} — system may freeze! Consider reducing GPU batch size or disabling GPU streams",
+                    log_timestamp(),
+                    avail_mib,
+                    total_mib,
+                );
+            } else if avail_mib < warning_mib {
+                eprintln!(
+                    "[{}] MEMORY_WARNING available_mib={} total_mib={} — low memory, GPU mining may be unstable",
+                    log_timestamp(),
+                    avail_mib,
+                    total_mib,
+                );
+            }
+        }
+    });
 }
 
 fn days_to_ymd(days_since_epoch: u64) -> (u64, u64, u64) {
@@ -587,6 +772,246 @@ fn format_hashrate(hps: f64) -> String {
 }
 
 fn main() -> Result<()> {
+    // Install crash handler (SIGABRT/SIGSEGV from AMD OpenCL driver)
+    crash_handler::install();
+
+    // Enable verbose logging via env var or --verbose flag
+    if std::env::var("ZION_MINER_VERBOSE").map(|v| v == "1" || v == "true").unwrap_or(false)
+        || std::env::args().any(|a| a == "--verbose")
+    {
+        VERBOSE.store(true, Ordering::Relaxed);
+    }
+
+    // ── Auto mode banner ──
+    let auto_mode = std::env::var("ZION_AUTO_MODE")
+        .map(|v| v == "1" || v == "true")
+        .unwrap_or(false);
+    if auto_mode {
+        let s1 = std::env::var("ZION_STREAM1_ENABLED").map(|v| v != "0").unwrap_or(true);
+        let s2 = std::env::var("ZION_STREAM2_ENABLED").map(|v| v != "0").unwrap_or(true);
+        let s3 = std::env::var("ZION_STREAM3_ENABLED").map(|v| v != "0").unwrap_or(true);
+        println!("=== ZION Auto Mode ===");
+        println!("  Stream 1 (ZION primary):  {}", if s1 { "ON" } else { "OFF" });
+        println!("  Stream 2 (GPU external):  {}", if s2 { "ON" } else { "OFF" });
+        println!("  Stream 3 (CPU external):  {}", if s3 { "ON" } else { "OFF" });
+        println!("======================");
+    }
+
+    // ── VerusHash CPU benchmark: `zion-miner --verus-bench` ──
+    if std::env::args().any(|a| a == "--verus-bench") {
+        let secs: f64 = std::env::var("ZION_BENCH_SECS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(5.0);
+        let threads: usize = std::env::var("ZION_THREADS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(4);
+
+        println!("=== VerusHash v2.2 CPU Benchmark ===");
+        println!("threads={}", threads);
+        println!("duration={}s", secs);
+        println!();
+
+        // Initialize VerusHash lookup tables
+        #[cfg(any(feature = "native-verushash", feature = "native-hashers"))]
+        {
+            zion_auxpow::init_verushash();
+            println!("verushash_init: OK (native C++ sse2neon)");
+        }
+        #[cfg(not(any(feature = "native-verushash", feature = "native-hashers")))]
+        {
+            println!("verushash_init: WARNING — using Blake3 fallback (NOT real VerusHash!)");
+        }
+
+        // Simulate a 1487-byte VRSC header
+        let mut header = vec![0u8; 1487];
+        header[0..4].copy_from_slice(&0x02000000u32.to_le_bytes());
+        // Set solution version > 6 to trigger PBaaS path
+        header[143] = 0x07;
+
+        let total_hashes = std::sync::Arc::new(std::sync::atomic::AtomicU64::new(0));
+        let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let start = std::time::Instant::now();
+
+        let mut handles = Vec::new();
+        for t in 0..threads {
+            let hdr = header.clone();
+            let total = std::sync::Arc::clone(&total_hashes);
+            let stop = std::sync::Arc::clone(&stop);
+            handles.push(std::thread::spawn(move || {
+                // Pin thread to physical core for VerusHash
+                thread_affinity::maybe_pin_thread(t, threads, "verushash");
+                let mut local_hdr = hdr;
+                let mut nonce: u64 = (t as u64) * 1_000_000_000;
+                let nonce_space_blob_offset = 1472usize;
+                loop {
+                    if stop.load(std::sync::atomic::Ordering::Relaxed) {
+                        break;
+                    }
+                    let nonce_le = (nonce as u32).to_le_bytes();
+                    if nonce_space_blob_offset + 4 <= local_hdr.len() {
+                        local_hdr[nonce_space_blob_offset..nonce_space_blob_offset + 4]
+                            .copy_from_slice(&nonce_le);
+                    }
+                    let _hash = zion_auxpow::hash_verushash_header(&local_hdr);
+                    total.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                    nonce += 1;
+                }
+            }));
+        }
+
+        std::thread::sleep(std::time::Duration::from_secs_f64(secs));
+        stop.store(true, std::sync::atomic::Ordering::Relaxed);
+
+        for h in handles {
+            let _ = h.join();
+        }
+
+        let elapsed = start.elapsed().as_secs_f64();
+        let hashes = total_hashes.load(std::sync::atomic::Ordering::Relaxed);
+        let hps = hashes as f64 / elapsed;
+
+        println!();
+        println!("=== Results ===");
+        println!("hashes={}", hashes);
+        println!("elapsed={:.2}s", elapsed);
+        println!("throughput={:.0} H/s", hps);
+        println!("throughput={:.2} KH/s", hps / 1000.0);
+        println!("throughput={:.4} MH/s", hps / 1_000_000.0);
+        println!("per_thread={:.0} H/s", hps / threads as f64);
+
+        // Estimate time to find a share at 26-bit difficulty
+        let diff_26bit = 67_108_864u64;
+        let secs_per_share = diff_26bit as f64 / hps;
+        println!();
+        println!("=== Share Estimate (VRSC 26-bit target) ===");
+        println!("difficulty={}", diff_26bit);
+        println!("expected_time={:.0}s = {:.1}min = {:.1}h = {:.1}days",
+            secs_per_share, secs_per_share / 60.0, secs_per_share / 3600.0, secs_per_share / 86400.0);
+
+        // At 16-bit difficulty (easy target)
+        let diff_16bit = 65_536u64;
+        let secs_per_share_easy = diff_16bit as f64 / hps;
+        println!();
+        println!("=== Share Estimate (easy 16-bit target) ===");
+        println!("difficulty={}", diff_16bit);
+        println!("expected_time={:.1}s = {:.1}min",
+            secs_per_share_easy, secs_per_share_easy / 60.0);
+
+        return Ok(());
+    }
+
+    // ── RandomX CPU benchmark: `zion-miner --randomx-bench` ──
+    if std::env::args().any(|a| a == "--randomx-bench") {
+        let secs: f64 = std::env::var("ZION_BENCH_SECS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(10.0);
+        let threads: usize = std::env::var("ZION_THREADS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(num_cpus::get());
+
+        println!("=== RandomX (Monero/XMR) CPU Benchmark ===");
+        println!("threads={}", threads);
+        println!("duration={}s", secs);
+        println!();
+
+        // Initialize RandomX with a zero seed (epoch 0)
+        #[cfg(feature = "native-randomx")]
+        {
+            let zero_seed = [0u8; 32];
+            zion_native_ffi::randomx::init_with_seed(&zero_seed);
+            println!("randomx_init: OK (tevador/RandomX real, seed=epoch0)");
+            #[cfg(all(target_arch = "aarch64", target_os = "macos"))]
+            println!("mode: JIT + hardware AES + secure (Apple Silicon, auto-detected)");
+            #[cfg(all(target_arch = "aarch64", not(target_os = "macos")))]
+            println!("mode: JIT + hardware AES (ARM64, auto-detected)");
+            #[cfg(not(target_arch = "aarch64"))]
+            println!("mode: JIT + hardware AES (if available)");
+        }
+        #[cfg(not(feature = "native-randomx"))]
+        {
+            println!("randomx_init: WARNING — native-randomx feature NOT enabled!");
+            println!("Rebuild with: cargo build --features native-randomx");
+            return Ok(());
+        }
+
+        #[cfg(feature = "native-randomx")]
+        {
+        // Monero block header is 76 bytes
+        let mut header = vec![0u8; 76];
+        header[0..4].copy_from_slice(&0x12000000u32.to_le_bytes()); // Monero version
+        // Rest is zeros (zero prev-hash, zero merkle root, etc.)
+
+        let total_hashes = std::sync::Arc::new(std::sync::atomic::AtomicU64::new(0));
+        let stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let start = std::time::Instant::now();
+
+        let mut handles = Vec::new();
+        for t in 0..threads {
+            let hdr = header.clone();
+            let total = std::sync::Arc::clone(&total_hashes);
+            let stop = std::sync::Arc::clone(&stop);
+            handles.push(std::thread::spawn(move || {
+                // Pin thread to physical core for RandomX (cache-sensitive)
+                thread_affinity::maybe_pin_thread(t, threads, "randomx");
+                let mut local_hdr = hdr;
+                let mut nonce: u64 = (t as u64) * 1_000_000_000;
+                loop {
+                    if stop.load(std::sync::atomic::Ordering::Relaxed) {
+                        break;
+                    }
+                    // Embed nonce in header (bytes 39..43 in Monero format)
+                    let nonce_le = (nonce as u32).to_le_bytes();
+                    local_hdr[39..43].copy_from_slice(&nonce_le);
+                    let _hash = zion_native_ffi::randomx::hash(&local_hdr, nonce);
+                    total.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                    nonce += 1;
+                }
+            }));
+        }
+
+        std::thread::sleep(std::time::Duration::from_secs_f64(secs));
+        stop.store(true, std::sync::atomic::Ordering::Relaxed);
+
+        for h in handles {
+            let _ = h.join();
+        }
+
+        let elapsed = start.elapsed().as_secs_f64();
+        let hashes = total_hashes.load(std::sync::atomic::Ordering::Relaxed);
+        let hps = hashes as f64 / elapsed;
+
+        println!();
+        println!("=== Results ===");
+        println!("hashes={}", hashes);
+        println!("elapsed={:.2}s", elapsed);
+        println!("throughput={:.0} H/s", hps);
+        println!("throughput={:.2} KH/s", hps / 1000.0);
+        println!("per_thread={:.0} H/s", hps / threads as f64);
+
+        // XMR network difficulty estimate (varies, ~350G as of 2024)
+        let xmr_diff = 350_000_000_000u64;
+        let secs_per_block = xmr_diff as f64 / hps;
+        println!();
+        println!("=== XMR Network Estimate (diff ~350G) ===");
+        println!("expected_time={:.0}s = {:.1}min = {:.1}h = {:.1}days",
+            secs_per_block, secs_per_block / 60.0, secs_per_block / 3600.0, secs_per_block / 86400.0);
+
+        // Pool share at 1M difficulty
+        let pool_diff = 1_000_000u64;
+        let secs_per_share = pool_diff as f64 / hps;
+        println!();
+        println!("=== Pool Share Estimate (diff 1M) ===");
+        println!("expected_time={:.1}s = {:.1}min",
+            secs_per_share, secs_per_share / 60.0);
+
+        return Ok(());
+        } // end native-randomx cfg
+    }
+
     // ── Ekam Deeksha GPU benchmark: `zion-miner --ekam-bench` ──
     if std::env::args().any(|a| a == "--ekam-bench") {
         let work_size: usize = std::env::var("ZION_GPU_WORK_SIZE")
@@ -663,6 +1088,57 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
+    // ── CUDA external kernel test: `zion-miner --test-cuda-kernel <algo>` ──
+    #[cfg(feature = "gpu-cuda")]
+    {
+        use gpu_backend::GpuMiner;
+        let args: Vec<String> = std::env::args().collect();
+        if let Some(pos) = args.iter().position(|a| a == "--test-cuda-kernel") {
+            let algo = args.get(pos + 1).cloned().unwrap_or_else(|| {
+                eprintln!("Usage: zion-miner --test-cuda-kernel <algorithm>");
+                eprintln!("Algorithms: kheavyhash, blake3_alph, blake3_dcr, autolykos, zelhash");
+                std::process::exit(1);
+            });
+            let work_size: usize = std::env::var("ZION_GPU_WORK_SIZE")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(262144);
+            let secs: f64 = std::env::var("ZION_BENCH_SECS")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(5.0);
+
+            println!("=== CUDA External Kernel Test ===");
+            println!("algorithm={} work_size={} bench_secs={}", algo, work_size, secs);
+
+            match cuda_external::CudaExternalMiner::new(&algo, work_size) {
+                Ok(mut miner) => {
+                    println!("init_ok device=\"{}\" algorithm={}", miner.device_name(), algo);
+                    println!("running_benchmark...");
+                    match miner.benchmark(secs) {
+                        Ok((total, elapsed, hps)) => {
+                            println!("benchmark_result algorithm={} total_nonces={} elapsed={:.2}s hps={:.2}", algo, total, elapsed, hps);
+                            if hps > 0.0 {
+                                println!("status=PASS");
+                            } else {
+                                println!("status=WARN (zero hashrate — kernel may not be producing solutions)");
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("benchmark_failed algorithm={} error=\"{}\"", algo, e);
+                            println!("status=FAIL");
+                        }
+                    }
+                }
+                Err(e) => {
+                    eprintln!("init_failed algorithm={} error=\"{}\"", algo, e);
+                    println!("status=FAIL");
+                }
+            }
+            return Ok(());
+        }
+    }
+
     let mut config = MinerConfig::from_env_and_args()?;
 
     // ── Autotune: if algorithm=auto, benchmark and pick best ──
@@ -697,6 +1173,7 @@ fn main() -> Result<()> {
 
     // ── Startup banner + hardware detection ──
     banner::print_banner(config.threads);
+    cpu_features::log_features();
     println!("miner_id={}", config.miner_id);
     println!("worker_name={}", config.worker_name);
     println!("loop_count={}", config.loop_count);
@@ -708,93 +1185,13 @@ fn main() -> Result<()> {
     let metrics = Arc::new(Mutex::new(MinerMetricsSnapshot::from_config(&config)));
 
     // ── Interactive control + hashrate tracker ──
-    // Auto-detect TTY: if stdin or stdout is not a terminal (e.g. launched
-    // by the CLI with redirected stdio), force non-interactive headless mode.
-    // The TUI requires a real terminal for crossterm raw mode + alternate screen.
-    let tty_available = std::io::IsTerminal::is_terminal(&std::io::stdin())
-        && std::io::IsTerminal::is_terminal(&std::io::stdout());
-    let interactive = parse_bool_env("ZION_INTERACTIVE", true) && tty_available;
-    if !tty_available && parse_bool_env("ZION_INTERACTIVE", true) {
-        println!("headless=enabled reason=stdin_or_stdout_not_tty");
-    }
+    let interactive = parse_bool_env("ZION_INTERACTIVE", false);
     let control = Arc::new(Mutex::new(MinerControl::new(
         &config.algorithm,
         config.threads,
         config.gpu_backend != gpu_backend::GpuBackendKind::Cpu,
     )));
     let hashrate = HashrateTracker::new();
-
-    // ── Background stats writer thread ──
-    // Writes miner-stats.json every 5 seconds independently of batch completion.
-    // This ensures the CLI's 'mine status' and 'mine monitor' always see fresh data,
-    // even during long GPU batches (which can take 40-80 seconds on Apple Silicon).
-    if let Some(stats_path) = config.stats_file.as_deref() {
-        let stats_metrics = Arc::clone(&metrics);
-        let stats_path = stats_path.to_string();
-        let stats_control = Arc::clone(&control);
-        let stats_hashrate = Arc::clone(&hashrate);
-        thread::spawn(move || {
-            loop {
-                thread::sleep(Duration::from_secs(5));
-                // Check if miner is quitting
-                if stats_control.lock().map(|c| c.requested_quit).unwrap_or(false) {
-                    break;
-                }
-                // Write current stats snapshot, enriched with real-time hashrate data
-                if let Ok(mut snapshot) = stats_metrics.lock() {
-                    // Pull real-time rates from HashrateTracker (works mid-batch)
-                    let rates = stats_hashrate.compute_rates();
-                    let total_hashes_now = stats_hashrate.total_hashes.load(Ordering::Relaxed);
-                    let accepted_now = stats_hashrate.accepted_shares.load(Ordering::Relaxed);
-                    let rejected_now = stats_hashrate.rejected_shares.load(Ordering::Relaxed);
-                    let pool_height_now = stats_hashrate.pool_height.load(Ordering::Relaxed);
-
-                    // Detect "GPU batch in progress": miner is running but no new
-                    // hashes have been recorded recently (hashrate_10s == 0).
-                    // This happens during long GPU batches (40-80s on Apple Silicon).
-                    let batch_in_progress = rates.total_10s_hps == 0.0
-                        && (snapshot.backend == "metal"
-                            || snapshot.backend == "opencl"
-                            || snapshot.backend == "cuda");
-
-                    // Update hashrate from real-time tracker
-                    if rates.total_10s_hps > 0.0 {
-                        snapshot.hashrate_10s_hps = rates.total_10s_hps;
-                    }
-                    if rates.total_60s_hps > 0.0 {
-                        snapshot.hashrate_60s_hps = rates.total_60s_hps;
-                    }
-                    if rates.total_15m_hps > 0.0 {
-                        snapshot.hashrate_15m_hps = rates.total_15m_hps;
-                    }
-                    // Update shares from tracker (atomic, real-time)
-                    snapshot.accepted_shares = accepted_now;
-                    snapshot.rejected_shares = rejected_now;
-                    // Update peak if current is higher
-                    let current_peak = if rates.total_10s_hps > 0.0 {
-                        rates.total_10s_hps
-                    } else {
-                        snapshot.hashrate_hps
-                    };
-                    if current_peak > snapshot.hashrate_max {
-                        snapshot.hashrate_max = current_peak;
-                    }
-                    // Update total hashes from tracker (atomic, real-time)
-                    snapshot.attempted_hashes = total_hashes_now;
-                    // Update pool height from tracker
-                    snapshot.pool_height = pool_height_now;
-                    // Status: show "gpu_batch_in_progress" during GPU batches, "running" otherwise
-                    if batch_in_progress {
-                        snapshot.status = "gpu_batch_in_progress".to_string();
-                    } else if snapshot.status == "starting" || snapshot.status == "gpu_batch_in_progress" {
-                        snapshot.status = "running".to_string();
-                    }
-                    snapshot.last_update_at = Instant::now();
-                    write_stats_file(&stats_path, &snapshot);
-                }
-            }
-        });
-    }
 
     let outcome = match config.pool_addr.as_deref() {
         Some(pool_addr) => {
@@ -916,6 +1313,9 @@ fn main() -> Result<()> {
         println!("wire_bye_parsed={parsed:?}");
     }
 
+    // Exit sticky header (leave alternate screen buffer)
+    ui::exit_sticky_header();
+
     Ok(())
 }
 
@@ -943,15 +1343,72 @@ fn run_local_session(
         c.algorithm.clone()
     };
 
-    // ── GPU backend init (multi-algo manager — lazy per-algorithm) ──
-    let mut gpu_manager =
-        gpu_backend::GpuBackendManager::new(config.gpu_backend, config.gpu_work_size);
-    let mut gpu_available = config.gpu_backend != gpu_backend::GpuBackendKind::Cpu;
+    // ── GPU memory budget auto-tune (must run before any GPU backend init) ──
+    // On Apple Silicon (unified memory), this detects actual available memory
+    // and calculates a safe GPU budget, preventing OOM system freezes.
+    // Reset on each session entry to clear claimed bytes from previous session.
+    gpu_backend::reset_gpu_memory_budget();
+    ui::reset_sticky_header();
+    let gpu_safe = gpu_backend::init_gpu_memory_budget_with_threads(config.threads);
+
+    // Spawn memory pressure watchdog (advisory logging every 30s)
+    spawn_memory_watchdog();
+
+    // ── Auto-tune kill switch: if available memory < 200 MB, disable GPU ──
+    let sys_ram = gpu_backend::detect_system_memory_bytes();
+    let resolved_backend = match config.gpu_backend {
+        gpu_backend::GpuBackendKind::Auto => gpu_backend::resolve_auto_backend(),
+        other => other,
+    };
+    let _is_unified_memory = resolved_backend == gpu_backend::GpuBackendKind::Metal;
+
+    if !gpu_safe {
+        // Auto-tune killed GPU — CPU only mode
+        println!(
+            "gpu_disabled_by_autotune sys_ram_mib={} backend={} — switching to CPU only mode \
+             (available memory too low for safe GPU mining)",
+            sys_ram / (1024 * 1024),
+            resolved_backend.as_str(),
+        );
+    } else if _is_unified_memory {
+        println!(
+            "gpu_stream2_info sys_ram_mib={} backend={} — Stream 2 enabled, per-algorithm guard active",
+            sys_ram / (1024 * 1024),
+            resolved_backend.as_str(),
+        );
+    }
+
+    // If auto-tune killed GPU, force CPU backend
+    let effective_gpu_backend = if !gpu_safe {
+        gpu_backend::GpuBackendKind::Cpu
+    } else {
+        config.gpu_backend
+    };
+
+    // ── GPU backend init (TriGpuManager — 3-stream Claymore-style) ──
+    let mut gpu_available = effective_gpu_backend != gpu_backend::GpuBackendKind::Cpu
+        && config.stream1_enabled;
+    let mut tri_gpu = match gpu_backend::TriGpuManager::with_work_sizes(
+        effective_gpu_backend,
+        config.gpu_work_size,
+        config.pearl_gpu_work_size,
+        config.secondary_gpu_work_size,
+    ) {
+        Ok(t) => t,
+        Err(e) => {
+            println!("gpu_init_fallback reason=\"{e}\" using=cpu");
+            gpu_available = false;
+            gpu_backend::TriGpuManager::with_work_sizes(
+                gpu_backend::GpuBackendKind::Cpu,
+                1, 1, 1,
+            )?
+        }
+    };
     if gpu_available {
-        match gpu_manager.ensure_algorithm(&initial_algorithm) {
+        match tri_gpu.primary() {
             Ok(g) => {
                 println!(
-                    "gpu_init backend={} device=\"{}\" work_size={} algorithm={}",
+                    "gpu_init backend={} device=\"{}\" work_size={} algorithm={} streams=3",
                     g.backend_kind().as_str(),
                     g.device_name(),
                     config.gpu_work_size,
@@ -1031,6 +1488,7 @@ fn run_local_session(
         }
 
         let header = session_header(config, iteration);
+        let raw_header_bytes = header.to_bytes().to_vec();
         let start_nonce = config
             .start_nonce
             .wrapping_add((iteration as u64).wrapping_mul(config.nonce_stride));
@@ -1042,14 +1500,19 @@ fn run_local_session(
                 job.job_id, job.nonce_count, job.start_nonce, current_algorithm
             );
         }
-        // Ensure GPU backend matches current algorithm (lazy create / switch)
+        // Primary GPU backend (Deeksha) — never switches algorithm.
+        // TriGpuManager keeps the primary backend alive for the entire session.
+        // Skip GPU for CPU-only algorithms (verushash, randomx) — they have no
+        // GPU kernel and must use CPU mining.
         let mut gpu_ref: Option<&mut dyn gpu_backend::GpuMiner> = None;
-        if config.gpu_backend != gpu_backend::GpuBackendKind::Cpu {
-            match gpu_manager.ensure_algorithm(&current_algorithm) {
+        if effective_gpu_backend != gpu_backend::GpuBackendKind::Cpu
+            && !gpu_backend::is_cpu_only_algorithm(&current_algorithm)
+        {
+            match tri_gpu.primary() {
                 Ok(g) => gpu_ref = Some(g),
                 Err(e) => {
                     println!(
-                        "gpu_algo_fallback job={} algorithm={} reason=\"{e}\" using=cpu",
+                        "gpu_primary_error job={} algorithm={} reason=\"{e}\" using=cpu",
                         job.job_id, current_algorithm
                     );
                 }
@@ -1059,6 +1522,7 @@ fn run_local_session(
         let can_gpu = gpu_ref.is_some();
         let mut gpu_nonces_tested = 0u64;
         let mut cpu_nonces_tested = 0u64;
+        let mut gpu_mix_hash: Option<[u8; 32]> = None;
         let scan_result = if can_gpu {
             let g = gpu_ref.unwrap();
             if let Err(e) = g.update_epoch(job.height) {
@@ -1069,8 +1533,9 @@ fn run_local_session(
                 cpu_nonces_tested = job.nonce_count;
                 parallel::parallel_scan_nonce_range(job, threads, &current_algorithm)
             } else {
-                let result = gpu_backend::gpu_scan_job(g, job, &current_algorithm);
+                let result = gpu_backend::gpu_scan_job(g, job, &current_algorithm, &raw_header_bytes);
                 gpu_nonces_tested = result.nonces_tested;
+                gpu_mix_hash = result.mix_hash;
                 result.solution
             }
         } else {
@@ -1079,6 +1544,7 @@ fn run_local_session(
         };
         hashrate.record_gpu_hashes(gpu_nonces_tested);
         hashrate.record_cpu_hashes(cpu_nonces_tested);
+        hashrate.record_zion_hashes(gpu_nonces_tested.saturating_add(cpu_nonces_tested));
         let Some(solution) = scan_result else {
             let tested = if can_gpu {
                 gpu_nonces_tested
@@ -1129,6 +1595,7 @@ fn run_local_session(
                 true,
                 "running",
             );
+            let stream_stats = hashrate.build_stream_stats(&telemetry.algorithm);
             telemetry.maybe_print_status(
                 iteration + 1,
                 config.loop_count,
@@ -1138,6 +1605,8 @@ fn run_local_session(
                 None,
                 config.stats_file.as_deref(),
                 metrics,
+                "local",
+                &stream_stats,
             );
             continue;
         };
@@ -1184,11 +1653,20 @@ fn run_local_session(
         let submit_started_at = Instant::now();
 
         let job_line = encode_message(&pool.job_message(job, &current_algorithm))?;
-        let submit_line = encode_message(&pool.solution_message(
-            &config.miner_id,
-            &config.worker_name,
-            solution,
-        ))?;
+        let submit_line = if let Some(mh) = gpu_mix_hash {
+            encode_message(&pool.solution_message_with_mix(
+                &config.miner_id,
+                &config.worker_name,
+                solution,
+                &mh,
+            ))?
+        } else {
+            encode_message(&pool.solution_message(
+                &config.miner_id,
+                &config.worker_name,
+                solution,
+            ))?
+        };
         let result_line = encode_message(&pool.result_message(&decision))?;
         telemetry.record_submit_latency(submit_started_at.elapsed());
         last_result_line = Some(result_line.clone());
@@ -1244,6 +1722,7 @@ fn run_local_session(
             "running",
         );
 
+        let stream_stats = hashrate.build_stream_stats(&telemetry.algorithm);
         telemetry.maybe_print_status(
             iteration + 1,
             config.loop_count,
@@ -1253,6 +1732,8 @@ fn run_local_session(
             None,
             config.stats_file.as_deref(),
             metrics,
+            "local",
+            &stream_stats,
         );
     }
 
@@ -1302,6 +1783,120 @@ fn run_local_session(
     })
 }
 
+// ── Pool stream config fetch (dynamic config from pool HTTP API) ──────────
+
+/// Simplified stream config snapshot received from the pool's HTTP API.
+#[derive(Debug, Clone, serde::Deserialize)]
+struct PoolStreamConfig {
+    gpu: PoolGpuStreamConfig,
+    cpu: PoolCpuStreamConfig,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+struct PoolGpuStreamConfig {
+    enabled: bool,
+    #[serde(default)]
+    coin: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+struct PoolCpuStreamConfig {
+    enabled: bool,
+    #[serde(default)]
+    coin: String,
+}
+
+/// Fetch the pool's stream config via HTTP GET `/api/v1/config/streams`.
+/// API address from ZION_POOL_API_ADDR env var, or derived from stratum
+/// address by adding 11 to the port (8444 → 8455, Edge convention).
+/// Returns None if unreachable (non-fatal, falls back to env vars).
+fn fetch_pool_stream_config(pool_addr: &str) -> Option<PoolStreamConfig> {
+    let api_addr = std::env::var("ZION_POOL_API_ADDR")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .unwrap_or_else(|| {
+            if let Some(colon) = pool_addr.rfind(':') {
+                let host = &pool_addr[..colon];
+                if let Ok(port) = pool_addr[colon + 1..].parse::<u16>() {
+                    format!("{}:{}", host, port.saturating_add(11))
+                } else {
+                    format!("{}:8455", host)
+                }
+            } else {
+                format!("{}:8455", pool_addr)
+            }
+        });
+
+    let socket_addrs: Vec<std::net::SocketAddr> = std::net::ToSocketAddrs::to_socket_addrs(&api_addr)
+        .ok()?
+        .collect();
+    if socket_addrs.is_empty() { return None; }
+
+    let mut stream = match std::net::TcpStream::connect_timeout(
+        &socket_addrs[0],
+        std::time::Duration::from_secs(3),
+    ) {
+        Ok(s) => s,
+        Err(_) => return None,
+    };
+
+    let request = format!(
+        "GET /api/v1/config/streams HTTP/1.1\r\nHost: {}\r\nConnection: close\r\n\r\n",
+        api_addr
+    );
+    if stream.write_all(request.as_bytes()).is_err() { return None; }
+
+    let mut response = Vec::new();
+    let mut buf = [0u8; 4096];
+    loop {
+        match stream.read(&mut buf) {
+            Ok(0) => break,
+            Ok(n) => response.extend_from_slice(&buf[..n]),
+            Err(_) => break,
+        }
+        if response.len() > 65536 { break; }
+    }
+
+    let response_str = String::from_utf8_lossy(&response);
+    let body_start = response_str.find("\r\n\r\n").map(|p| p + 4)
+        .or_else(|| response_str.find("\n\n").map(|p| p + 2))?;
+    let body = &response_str[body_start..];
+
+    serde_json::from_str::<PoolStreamConfig>(body).ok()
+}
+
+/// Periodically poll the pool's stream config and log changes.
+fn spawn_pool_config_poller(pool_addr: String, stop_flag: std::sync::Arc<std::sync::atomic::AtomicBool>) {
+    let poll_interval = std::env::var("ZION_POOL_CONFIG_POLL_SECS")
+        .ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(30);
+
+    std::thread::spawn(move || {
+        let mut last_gpu_enabled: Option<bool> = None;
+        let mut last_gpu_coin: Option<String> = None;
+        let mut last_cpu_enabled: Option<bool> = None;
+        let mut last_cpu_coin: Option<String> = None;
+
+        while !stop_flag.load(std::sync::atomic::Ordering::Relaxed) {
+            if let Some(cfg) = fetch_pool_stream_config(&pool_addr) {
+                let gpu_coin = cfg.gpu.coin.clone().unwrap_or_else(|| "auto".to_string());
+                let changed = last_gpu_enabled != Some(cfg.gpu.enabled)
+                    || last_gpu_coin.as_deref() != Some(gpu_coin.as_str())
+                    || last_cpu_enabled != Some(cfg.cpu.enabled)
+                    || last_cpu_coin.as_deref() != Some(cfg.cpu.coin.as_str());
+                if changed {
+                    println!("[{}] pool_config_update gpu_enabled={} gpu_coin={} cpu_enabled={} cpu_coin={}",
+                        log_timestamp(), cfg.gpu.enabled, gpu_coin, cfg.cpu.enabled, cfg.cpu.coin);
+                    last_gpu_enabled = Some(cfg.gpu.enabled);
+                    last_gpu_coin = Some(gpu_coin);
+                    last_cpu_enabled = Some(cfg.cpu.enabled);
+                    last_cpu_coin = Some(cfg.cpu.coin.clone());
+                }
+            }
+            std::thread::sleep(std::time::Duration::from_secs(poll_interval));
+        }
+    });
+}
+
 #[allow(unused_assignments)] // gpu_available / current_algorithm carry fallback state
 fn run_remote_session(
     config: &MinerConfig,
@@ -1320,21 +1915,135 @@ fn run_remote_session(
     let mut threads = config.threads;
     let mut remote_nonce_window = config.nonce_count;
 
+    // ── Fetch pool stream config (dynamic auto-configuration) ──────────
+    let mut stream2_enabled = config.stream2_enabled;
+    let mut stream3_enabled = config.stream3_enabled;
+
+    if let Some(pool_cfg) = fetch_pool_stream_config(pool_addr) {
+        println!(
+            "[{}] pool_config_received gpu_enabled={} gpu_coin={} cpu_enabled={} cpu_coin={}",
+            log_timestamp(),
+            pool_cfg.gpu.enabled,
+            pool_cfg.gpu.coin.as_deref().unwrap_or("auto"),
+            pool_cfg.cpu.enabled,
+            pool_cfg.cpu.coin,
+        );
+        if config.stream2_enabled && !pool_cfg.gpu.enabled {
+            println!("[{}] pool_config_override stream2=disabled (pool GPU stream disabled)", log_timestamp());
+            stream2_enabled = false;
+        }
+        if config.stream3_enabled && !pool_cfg.cpu.enabled {
+            println!("[{}] pool_config_override stream3=disabled (pool CPU stream disabled)", log_timestamp());
+            stream3_enabled = false;
+        }
+    } else {
+        println!("[{}] pool_config_unreachable — using env-var stream config (stream2={} stream3={})",
+            log_timestamp(), stream2_enabled, stream3_enabled);
+    }
+
+    let config_stop = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+    spawn_pool_config_poller(pool_addr.to_string(), std::sync::Arc::clone(&config_stop));
+
+    // ── Autonomous profit router ──
+    // When ZION_AUTONOMOUS=1, auto-selects Stream 2 (GPU) and Stream 3 (CPU)
+    // coins based on hardware compatibility and profitability data.
+    let cpu_feats = cpu_features::detect();
+    let hw_profile = autonomous::HardwareProfile {
+        gpu_vram_bytes: config.gpu_vram_bytes,
+        gpu_backend: effective_gpu_backend_label(config.gpu_backend).to_string(),
+        has_gpu: config.gpu_backend != gpu_backend::GpuBackendKind::Cpu,
+        cpu_has_aes: cpu_feats.has_aes,
+        cpu_has_avx2: cpu_feats.has_avx2,
+        cpu_threads: config.threads,
+    };
+    let mut profit_router = autonomous::AutonomousProfitRouter::new(hw_profile);
+    let mut last_s2_coin: Option<zion_cosmic_harmony::profit_router::ExternalCoin> = None;
+    let mut last_s3_coin: Option<zion_cosmic_harmony::profit_router::ExternalCoin> = None;
+    if profit_router.is_enabled() {
+        println!("[{}] autonomous_mode_enabled — running initial coin selection", log_timestamp());
+        profit_router.initial_selection();
+        profit_router.print_log();
+        println!("[{}] {}", log_timestamp(), profit_router.summary());
+        last_s2_coin = profit_router.stream2_coin;
+        last_s3_coin = profit_router.stream3_coin;
+    }
+
     // ── Read initial algorithm from interactive control ──
     let initial_algorithm = {
         let c = control.lock().unwrap();
         c.algorithm.clone()
     };
 
-    // ── GPU backend init (multi-algo manager — lazy per-algorithm) ──
-    let mut gpu_manager =
-        gpu_backend::GpuBackendManager::new(config.gpu_backend, config.gpu_work_size);
-    let mut gpu_available = config.gpu_backend != gpu_backend::GpuBackendKind::Cpu;
+    // ── GPU memory budget auto-tune (must run before any GPU backend init) ──
+    // On Apple Silicon (unified memory), this detects actual available memory
+    // and calculates a safe GPU budget, preventing OOM system freezes.
+    // Reset on each session entry to clear claimed bytes from previous session.
+    gpu_backend::reset_gpu_memory_budget();
+    ui::reset_sticky_header();
+    let gpu_safe = gpu_backend::init_gpu_memory_budget_with_threads(config.threads);
+
+    // Spawn memory pressure watchdog (advisory logging every 30s)
+    spawn_memory_watchdog();
+
+    // ── Auto-tune kill switch + Stream 2 info ──
+    let sys_ram = gpu_backend::detect_system_memory_bytes();
+    let resolved_backend = match config.gpu_backend {
+        gpu_backend::GpuBackendKind::Auto => gpu_backend::resolve_auto_backend(),
+        other => other,
+    };
+    let is_unified_memory = resolved_backend == gpu_backend::GpuBackendKind::Metal;
+
+    if !gpu_safe {
+        println!(
+            "gpu_disabled_by_autotune sys_ram_mib={} backend={} — switching to CPU only mode \
+             (available memory too low for safe GPU mining)",
+            sys_ram / (1024 * 1024),
+            resolved_backend.as_str(),
+        );
+    } else if is_unified_memory {
+        println!(
+            "gpu_stream2_info sys_ram_mib={} backend={} — Stream 2 enabled, per-algorithm guard active (DAG/memory-hard algo will be skipped on Metal)",
+            sys_ram / (1024 * 1024),
+            resolved_backend.as_str(),
+        );
+    }
+
+    // If auto-tune killed GPU, force CPU backend
+    let effective_gpu_backend = if !gpu_safe {
+        gpu_backend::GpuBackendKind::Cpu
+    } else {
+        config.gpu_backend
+    };
+    let stream2_effective = stream2_enabled && gpu_safe;
+
+    // ── GPU backend init (TriGpuManager — 3-stream Claymore-style) ──
+    // Primary (Deeksha) is created immediately. Pearl + secondary are
+    // lazy-created by their respective persistent threads on demand.
+    let mut gpu_available = effective_gpu_backend != gpu_backend::GpuBackendKind::Cpu
+        && config.stream1_enabled;
+    let mut tri_gpu = match gpu_backend::TriGpuManager::with_work_sizes(
+        effective_gpu_backend,
+        config.gpu_work_size,
+        config.pearl_gpu_work_size,
+        config.secondary_gpu_work_size,
+    ) {
+        Ok(t) => t,
+        Err(e) => {
+            println!("gpu_init_fallback reason=\"{e}\" using=cpu");
+            gpu_available = false;
+            // Fallback: CPU dummy — primary() will error but is never called
+            // when gpu_available is false.
+            gpu_backend::TriGpuManager::with_work_sizes(
+                gpu_backend::GpuBackendKind::Cpu,
+                1, 1, 1,
+            )?
+        }
+    };
     if gpu_available {
-        match gpu_manager.ensure_algorithm(&initial_algorithm) {
+        match tri_gpu.primary() {
             Ok(g) => {
                 println!(
-                    "gpu_init backend={} device=\"{}\" work_size={} algorithm={}",
+                    "gpu_init backend={} device=\"{}\" work_size={} algorithm={} streams=3",
                     g.backend_kind().as_str(),
                     g.device_name(),
                     config.gpu_work_size,
@@ -1368,6 +2077,73 @@ fn run_remote_session(
         }
     }
 
+    // ── GPU pipeline state for overlapping pool I/O with GPU compute ──
+    // When the CUDA backend supports async launch_batch/collect_batch,
+    // this enables overlapping the previous batch's solution submission
+    // (network I/O) with the current batch's GPU computation.
+    let mut gpu_pipeline = gpu_backend::GpuPipelineState::new();
+
+    // ── Persistent GPU external thread (Stream 2: one GPU profit coin) ──
+    // The pool sends jobs for exactly one GPU-capable AuxPoW coin at a time.
+    // The thread creates the appropriate OpenCL backend on demand and switches
+    // when the profit coin changes.
+    let (ext_gpu_tx, ext_gpu_rx) = std::sync::mpsc::channel::<zion_pool::ExternalStreamJob>();
+    let (ext_gpu_share_tx, ext_gpu_share_rx) = std::sync::mpsc::channel::<ExternalShareResult>();
+
+    let dual_gpu_enabled = gpu_available
+        && effective_gpu_backend != gpu_backend::GpuBackendKind::Cpu
+        && stream2_effective;
+    println!(
+        "[{}] dual_gpu_check gpu_available={} gpu_backend={:?} effective_backend={:?} stream2_enabled={} stream2_effective={} => dual_gpu_enabled={}",
+        log_timestamp(),
+        gpu_available,
+        config.gpu_backend,
+        effective_gpu_backend,
+        stream2_enabled,
+        stream2_effective,
+        dual_gpu_enabled
+    );
+    if dual_gpu_enabled {
+        let ws = config.secondary_gpu_work_size;
+        let hr = Arc::clone(hashrate);
+        let bk = effective_gpu_backend;
+        thread::spawn(move || {
+            println!("[{}] external_gpu_thread_spawned", log_timestamp());
+            external_gpu_thread(ext_gpu_rx, ext_gpu_share_tx, ws, hr, bk);
+        });
+        println!(
+            "[{}] stream2_gpu_external_started work_size={}",
+            log_timestamp(),
+            config.secondary_gpu_work_size
+        );
+    } else {
+        println!("[{}] stream2_gpu_external_disabled (gpu_available={})", log_timestamp(), gpu_available);
+    }
+
+    // ── Persistent CPU external thread (Stream 3: VerusHash/RandomX) ──
+    // Claymore-style: persistent thread instead of per-iteration spawn.
+    // Receives CPU-only external jobs via channel, mines continuously.
+    let (ext_cpu_tx, ext_cpu_rx) = std::sync::mpsc::channel::<zion_pool::ExternalStreamJob>();
+    let (ext_cpu_share_tx, ext_cpu_share_rx) = std::sync::mpsc::channel::<ExternalShareResult>();
+    if stream3_enabled {
+        let ext_cpu_threads = config.threads.max(1);
+        let ext_cpu_nonce_count = config.verushash_nonce_count;
+        let hashrate_ext_cpu = Arc::clone(hashrate);
+        thread::spawn(move || {
+            ext_cpu_thread(ext_cpu_rx, ext_cpu_share_tx, ext_cpu_threads, ext_cpu_nonce_count, hashrate_ext_cpu);
+        });
+        println!(
+            "[{}] stream3c_ext_cpu_started threads={}",
+            log_timestamp(),
+            config.threads
+        );
+    } else {
+        println!(
+            "[{}] stream3c_ext_cpu_disabled (stream3_enabled=false)",
+            log_timestamp()
+        );
+    }
+
     sync_miner_metrics(
         metrics,
         &telemetry,
@@ -1394,7 +2170,7 @@ fn run_remote_session(
     let mut reader = BufReader::new(reader_stream);
     let mut writer = stream;
 
-    let backend_str = gpu_manager.current_backend_name().unwrap_or("cpu");
+    let backend_str = tri_gpu.primary_backend_kind().as_str();
     // BUG #2 fix: use current control.algorithm (user may have pressed 'a' to switch)
     let hello_algorithm = {
         let c = control.lock().unwrap();
@@ -1416,6 +2192,21 @@ fn run_remote_session(
         PoolMessage::Welcome { job_ttl_ms, .. } => job_ttl_ms,
         other => return Err(anyhow!("expected welcome from pool, got {other:?}")),
     };
+
+    // ── Spawn pool I/O thread ──────────────────────────────────────
+    // The I/O thread owns the reader and continuously reads from the pool,
+    // routing Job messages to job_rx and Result/ExternalResult to result_rx.
+    // This eliminates both GPU idle gaps:
+    //   1. Job pre-fetch (~400ms → ~0ms): jobs are already queued when needed
+    //   2. Async submit response (~297ms → ~0ms): results are already queued
+    // The main thread keeps the writer for sending submit/no-solution messages.
+    let (job_tx, job_rx) = std::sync::mpsc::channel::<PoolIncoming>();
+    let (result_tx, result_rx) = std::sync::mpsc::channel::<PoolIncoming>();
+    std::thread::Builder::new()
+        .name("pool-io".to_string())
+        .spawn(move || pool_io_thread(reader, job_tx, result_tx))
+        .context("failed to spawn pool I/O thread")?;
+    println!("[{}] pool_io_thread_started — job pre-fetch + async submit enabled", log_timestamp());
     sync_miner_metrics(
         metrics,
         &telemetry,
@@ -1436,6 +2227,15 @@ fn run_remote_session(
 
     let mut current_algorithm = String::new();
 
+    // ── Send initial CoinPreference to pool (autonomous mode) ──
+    if let Some(pref_msg) = profit_router.build_coin_preference(&config.miner_id) {
+        let pref_line = zion_pool::encode_message(&pref_msg)
+            .map_err(|e| anyhow!("failed to encode CoinPreference: {e}"))?;
+        writer.write_all(pref_line.as_bytes())?;
+        writer.flush()?;
+        println!("[{}] autonomous_coin_preference_sent {}", log_timestamp(), pref_line.trim());
+    }
+
     for iteration in 0..config.loop_count {
         // ── Check interactive control state at top of iteration ──
         {
@@ -1452,9 +2252,56 @@ fn run_remote_session(
             VERBOSE.store(c.verbose, Ordering::Relaxed);
         }
 
-        let (job_line, mut job, algorithm) = read_next_job(&mut reader)?;
+        // ── Autonomous profit router: periodic re-evaluation ──
+        if profit_router.should_reevaluate() {
+            profit_router.reevaluate();
+            profit_router.print_log();
+            println!("[{}] {}", log_timestamp(), profit_router.summary());
+
+            // Send CoinPreference to pool if selection changed
+            if profit_router.coins_changed(last_s2_coin, last_s3_coin) {
+                if let Some(pref_msg) = profit_router.build_coin_preference(&config.miner_id) {
+                    if let Ok(pref_line) = zion_pool::encode_message(&pref_msg) {
+                        let _ = writer.write_all(pref_line.as_bytes());
+                        let _ = writer.flush();
+                        println!(
+                            "[{}] autonomous_coin_preference_updated {}",
+                            log_timestamp(),
+                            pref_line.trim()
+                        );
+                    }
+                }
+                last_s2_coin = profit_router.stream2_coin;
+                last_s3_coin = profit_router.stream3_coin;
+            }
+        }
+
+        let (job_line, mut job, algorithm, raw_header_bytes, stream_weights_str, external_stream, external_stream_cpu) =
+            match job_rx.recv() {
+                Ok(PoolIncoming::Job(line, j, algo, raw, sw, ext, ext_cpu)) => {
+                    (line, j, algo, raw, sw, ext, ext_cpu)
+                }
+                Ok(PoolIncoming::Result(line, msg)) => {
+                    // Unexpected: a result arrived while we were waiting for a job.
+                    // This can happen if the pool sends a late result from a previous
+                    // submit. Log and continue waiting for the next job.
+                    println!("pool_unexpected_result_while_waiting_for_job: {line}");
+                    continue;
+                }
+                Err(_) => {
+                    println!("pool_io_channel_closed — reconnecting");
+                    break;
+                }
+            };
+        if !QUIET.load(Ordering::Relaxed) {
+            println!(">> new job #{} height={} algo={}", job.job_id, job.height, algorithm);
+        }
         let current_diff = CURRENT_POOL_DIFFICULTY.load(Ordering::Relaxed);
-        job.target = zion_core::difficulty::difficulty_to_target(current_diff);
+        // Only override target for ZION jobs. External AuxPoW jobs carry
+        // their own share target from the external pool (e.g. KAS).
+        if !gpu_backend::is_external_algorithm(&algorithm) {
+            job.target = zion_core::difficulty::difficulty_to_target(current_diff);
+        }
         current_algorithm = algorithm.clone();
         remote_nonce_window = job.nonce_count;
         let job_started_at = Instant::now();
@@ -1482,7 +2329,7 @@ fn run_remote_session(
                 elapsed_ms: Some(0),
             };
             let _ = write_wire_message(&mut writer, &no_solution_message);
-            let _ = read_next_result(&mut reader);
+            let _ = result_rx.recv();
             thread::sleep(Duration::from_millis(100));
             continue;
         }
@@ -1493,23 +2340,96 @@ fn run_remote_session(
             (c.cpu_enabled, c.gpu_enabled, c.dual_mode)
         };
 
-        // Ensure GPU backend matches current algorithm (lazy create / switch)
+        // Primary GPU backend (Deeksha) — never switches algorithm.
+        // TriGpuManager keeps the primary backend alive for the entire session.
+        // Skip GPU for CPU-only algorithms (verushash, randomx) — they have no
+        // GPU kernel and must use CPU mining.
         let mut gpu_ref: Option<&mut dyn gpu_backend::GpuMiner> = None;
-        if config.gpu_backend != gpu_backend::GpuBackendKind::Cpu && gpu_on {
-            match gpu_manager.ensure_algorithm(&current_algorithm) {
+        if config.gpu_backend != gpu_backend::GpuBackendKind::Cpu && gpu_on
+            && !gpu_backend::is_cpu_only_algorithm(&current_algorithm)
+        {
+            match tri_gpu.primary() {
                 Ok(g) => gpu_ref = Some(g),
                 Err(e) => {
                     println!(
-                        "gpu_algo_fallback job={} algorithm={} reason=\"{e}\" using=cpu",
+                        "gpu_primary_error job={} algorithm={} reason=\"{e}\" using=cpu",
                         job.job_id, current_algorithm
                     );
                 }
             }
         }
+
+        // ── Send external stream jobs BEFORE GPU mining / stream weights ──
+        // This must happen before set_stream_weights() and gpu_scan_job()
+        // because those calls can block on OpenCL queue.finish(), which
+        // would delay the external GPU thread from receiving its job.
+        // Send external stream job to the appropriate persistent thread.
+        // GPU-capable external algorithms go to the generic external GPU thread.
+        // CPU-only algorithms (VerusHash, RandomX) go to the persistent CPU thread.
+        // Pearl (PRL) jobs are ignored in v3.0.6 canonical mode because the Pearl
+        // GPU thread is not yet debugged.
+        if let Some(ref ext) = external_stream {
+            if ext.coin.eq_ignore_ascii_case("PRL") || ext.algorithm.eq_ignore_ascii_case("pearlhash") {
+                if VERBOSE.load(Ordering::Relaxed) {
+                    println!("external_stream_ignore coin={} algo={} reason=pearl_disabled", ext.coin, ext.algorithm);
+                }
+            } else if gpu_backend::is_cpu_only_algorithm(&ext.algorithm) {
+                let _ = ext_cpu_tx.send(ext.clone());
+            } else if gpu_backend::is_external_algorithm(&ext.algorithm) {
+                let send_result = ext_gpu_tx.send(ext.clone());
+                if !QUIET.load(Ordering::Relaxed) {
+                    println!(
+                        "[{}] ext_gpu_tx_send coin={} algo={} job_id={} result={:?}",
+                        log_timestamp(),
+                        ext.coin,
+                        ext.algorithm,
+                        ext.job_id,
+                        send_result
+                    );
+                }
+            } else {
+                println!(
+                    "external_stream_unknown_routing coin={} algo={}",
+                    ext.coin, ext.algorithm
+                );
+            }
+        }
+
+        // ── Claymore Triple Parallel: CPU external stream (VRSC, RandomX) ──
+        // The pool sends CPU-only external jobs in a separate `external_stream_cpu`
+        // field so they don't conflict with the GPU `external_stream`.
+        if let Some(ref ext_cpu) = external_stream_cpu {
+            let _ = ext_cpu_tx.send(ext_cpu.clone());
+        }
+
+        // Propagate stream-profit weights to the GPU backend so it can
+        // distribute work across Deeksha pipeline steps.
+        // NOTE: Disabled on OpenCL because set_stream_weights() calls
+        // queue.finish() which can block, and on some CPUs the f32
+        // conversion triggers SIGILL (Illegal instruction).
+        // The external_stream job is already sent above, so the external
+        // GPU thread can start working immediately.
+        if let Some(g) = gpu_ref.as_mut() {
+            if !stream_weights_str.is_empty() && config.gpu_backend == gpu_backend::GpuBackendKind::Metal {
+                match zion_cosmic_harmony::stream_profit::StreamWeights::parse(&stream_weights_str) {
+                    Ok(weights) => {
+                        if let Err(e) = g.set_stream_weights(&weights) {
+                            println!("stream_weights_apply_error job={} err=\"{e}\"", job.job_id);
+                        }
+                    }
+                    Err(e) => {
+                        println!("stream_weights_parse_error job={} err=\"{e}\" raw=\"{}\"", job.job_id, stream_weights_str);
+                    }
+                }
+            }
+        }
+
         // GPU-first, CPU-fallback nonce scan (respect interactive overrides)
         let can_gpu = gpu_ref.is_some() && gpu_on;
         let mut gpu_nonces_tested = 0u64;
         let mut cpu_nonces_tested = 0u64;
+        let mut gpu_mix_hash: Option<[u8; 32]> = None;
+
         let scan_result = if can_gpu {
             let g = gpu_ref.unwrap();
             if let Err(e) = g.update_epoch(job.height) {
@@ -1520,9 +2440,29 @@ fn run_remote_session(
                 cpu_nonces_tested = job.nonce_count;
                 parallel::parallel_scan_nonce_range(job, threads, &current_algorithm)
             } else {
-                let result = gpu_backend::gpu_scan_job(g, job, &current_algorithm);
-                gpu_nonces_tested = result.nonces_tested;
-                result.solution
+                // ── PIPELINED GPU SCAN ──
+                // step() collects the PREVIOUS batch's results (if any) and
+                // launches the CURRENT batch asynchronously. This overlaps
+                // GPU compute with the pool I/O that follows (external share
+                // collection, solution submission, reading next job).
+                //
+                // On the first iteration, step() returns None (no previous batch)
+                // but STILL launches the current batch. The solution (if any)
+                // will be collected on the NEXT iteration.
+                // This means the first iteration always has scan_result=None,
+                // which triggers a NoSolution message to the pool — correct behavior.
+                let prev_outcome = gpu_pipeline.step(g, job, &current_algorithm, &raw_header_bytes);
+
+                if let Some(outcome) = prev_outcome {
+                    // Use previous batch's results
+                    gpu_nonces_tested = outcome.nonces_tested;
+                    gpu_mix_hash = outcome.mix_hash;
+                    outcome.solution
+                } else {
+                    // First iteration: batch launched but no results yet
+                    gpu_nonces_tested = 0;
+                    None
+                }
             }
         } else if cpu_on {
             cpu_nonces_tested = job.nonce_count;
@@ -1532,8 +2472,54 @@ fn run_remote_session(
             cpu_nonces_tested = 0;
             None
         };
+
+        // ── Collect GPU external share from persistent thread (non-blocking) ──
+        let ext_gpu_share = match ext_gpu_share_rx.try_recv() {
+            Ok(share) => Some(share),
+            Err(_) => None,
+        };
+
+        // ── Collect CPU external share from persistent thread (non-blocking) ──
+        let ext_cpu_share = match ext_cpu_share_rx.try_recv() {
+            Ok(share) => Some(share),
+            Err(_) => None,
+        };
+
+        // ── Submit GPU external share (if found by persistent thread) ────
+        if let Some(share) = ext_gpu_share {
+            println!(
+                "[{}] external_gpu_share_found  coin={}  algo={}  job_id={}  nonce={}",
+                log_timestamp(),
+                share.coin,
+                share.algorithm,
+                share.external_job_id,
+                share.nonce,
+            );
+            submit_external_share(
+                &mut writer, &result_rx, &config, &share, &hashrate, VERBOSE.load(Ordering::Relaxed),
+                |accepted| hashrate.record_gpu_ext_share(accepted),
+            );
+        }
+
+        // ── Submit CPU external share (VerusHash/RandomX, if found) ────
+        if let Some(share) = ext_cpu_share {
+            println!(
+                "[{}] external_cpu_share_found  coin={}  algo={}  job_id={}  nonce={}",
+                log_timestamp(),
+                share.coin,
+                share.algorithm,
+                share.external_job_id,
+                share.nonce,
+            );
+            submit_external_share(
+                &mut writer, &result_rx, &config, &share, &hashrate, VERBOSE.load(Ordering::Relaxed),
+                |accepted| hashrate.record_cpu_ext_share(accepted),
+            );
+        }
+
         hashrate.record_gpu_hashes(gpu_nonces_tested);
         hashrate.record_cpu_hashes(cpu_nonces_tested);
+        hashrate.record_zion_hashes(gpu_nonces_tested.saturating_add(cpu_nonces_tested));
         let batch_ms = job_started_at.elapsed().as_millis() as u64;
         if can_gpu {
             telemetry.record_gpu_hashes(gpu_nonces_tested);
@@ -1572,7 +2558,16 @@ fn run_remote_session(
                 elapsed_ms: Some(job_started_at.elapsed().as_millis() as u64),
             };
             let no_solution_line = write_wire_message(&mut writer, &no_solution_message)?;
-            let (result_line_raw, result_message) = read_next_result(&mut reader)?;
+            // ── FIX #8: Drain late ExternalResult if present (from timed-out submit_external_share) ──
+            let (result_line_raw, result_message) = loop {
+                match result_rx.recv() {
+                    Ok(PoolIncoming::Result(line, msg)) => break (line, msg),
+                    Ok(PoolIncoming::Job(line, _, _, _, _, _, _)) => {
+                        return Err(anyhow!("expected result from pool, got Job: {line}"));
+                    }
+                    Err(_) => return Err(anyhow!("pool I/O channel closed during no_solution result")),
+                }
+            };
             last_result_line = Some(result_line_raw.clone());
             if VERBOSE.load(Ordering::Relaxed) {
                 println!("wire_no_solution={no_solution_line}");
@@ -1587,10 +2582,37 @@ fn run_remote_session(
                         println!("pool_status={status}");
                     }
                 }
+                // Late ExternalResult from a timed-out submit_external_share — log and continue
+                PoolMessage::ExternalResult { accepted, status, coin } => {
+                    println!(
+                        "[{}] late_external_result_drained coin={} accepted={} status={} — waiting for no_solution result",
+                        log_timestamp(), coin, accepted, status,
+                    );
+                    // Recv again for the actual no_solution result
+                    let (line2, msg2) = match result_rx.recv() {
+                        Ok(PoolIncoming::Result(l, m)) => (l, m),
+                        Ok(PoolIncoming::Job(l, _, _, _, _, _, _)) => {
+                            return Err(anyhow!("expected result from pool, got Job: {l}"));
+                        }
+                        Err(_) => return Err(anyhow!("pool I/O channel closed during no_solution result (after late external)")),
+                    };
+                    last_result_line = Some(line2.clone());
+                    if let PoolMessage::Result { accepted, status } = msg2 {
+                        if accepted {
+                            accepted_iterations += 1;
+                        }
+                        if VERBOSE.load(Ordering::Relaxed) {
+                            println!("pool_status={status}");
+                        }
+                    } else {
+                        return Err(anyhow!("expected Result after late ExternalResult, got {msg2:?}"));
+                    }
+                }
                 other => return Err(anyhow!("expected result from pool, got {other:?}")),
             }
             let total_accepted = hashrate.accepted_shares.load(Ordering::Relaxed);
             let total_rejected = hashrate.rejected_shares.load(Ordering::Relaxed);
+            let stream_stats = hashrate.build_stream_stats(&telemetry.algorithm);
             telemetry.maybe_print_status(
                 iteration + 1,
                 config.loop_count,
@@ -1600,6 +2622,8 @@ fn run_remote_session(
                 Some(remote_job_ttl_ms),
                 config.stats_file.as_deref(),
                 metrics,
+                pool_addr,
+                &stream_stats,
             );
             sync_miner_metrics(
                 metrics,
@@ -1657,6 +2681,9 @@ fn run_remote_session(
         }
 
         let submit_started_at = Instant::now();
+        let mix_hash_hex = gpu_mix_hash.map(|mh| {
+            mh.iter().map(|b| format!("{:02x}", b)).collect::<String>()
+        });
         let submit_message = PoolMessage::Submit {
             job_id: solution.job_id,
             miner_id: config.miner_id.clone(),
@@ -1665,9 +2692,19 @@ fn run_remote_session(
             hash_hex: hex(&solution.hash),
             attempted_hashes: Some(tested),
             elapsed_ms: Some(job_started_at.elapsed().as_millis() as u64),
+            mix_hash_hex,
         };
         let submit_line = write_wire_message(&mut writer, &submit_message)?;
-        let (result_line_raw, result_message) = read_next_result(&mut reader)?;
+        // ── FIX #8: Drain late ExternalResult if present (from timed-out submit_external_share) ──
+        let (result_line_raw, result_message) = loop {
+            match result_rx.recv() {
+                Ok(PoolIncoming::Result(line, msg)) => break (line, msg),
+                Ok(PoolIncoming::Job(line, _, _, _, _, _, _)) => {
+                    return Err(anyhow!("expected result from pool, got Job: {line}"));
+                }
+                Err(_) => return Err(anyhow!("pool I/O channel closed during submit result")),
+            }
+        };
         telemetry.record_submit_latency(submit_started_at.elapsed());
         last_result_line = Some(result_line_raw.clone());
 
@@ -1676,7 +2713,7 @@ fn run_remote_session(
                 let latency_ms = submit_started_at.elapsed().as_millis();
                 if accepted {
                     accepted_iterations += 1;
-                    hashrate.record_share(true);
+                    hashrate.record_zion_share(true);
                     ui::log_accepted(
                         job.job_id,
                         job.height,
@@ -1694,7 +2731,7 @@ fn run_remote_session(
                     );
                 } else {
                     rejected_iterations += 1;
-                    hashrate.record_share(false);
+                    hashrate.record_zion_share(false);
                     ui::log_rejected(
                         job.job_id,
                         job.height,
@@ -1710,6 +2747,44 @@ fn run_remote_session(
                     );
                 }
                 status
+            }
+            // Late ExternalResult from a timed-out submit_external_share — drain and recv again
+            PoolMessage::ExternalResult { accepted, status: ext_status, coin } => {
+                println!(
+                    "[{}] late_external_result_drained coin={} accepted={} status={} — waiting for submit result",
+                    log_timestamp(), coin, accepted, ext_status,
+                );
+                let (line2, msg2) = match result_rx.recv() {
+                    Ok(PoolIncoming::Result(l, m)) => (l, m),
+                    Ok(PoolIncoming::Job(l, _, _, _, _, _, _)) => {
+                        return Err(anyhow!("expected result from pool, got Job: {l}"));
+                    }
+                    Err(_) => return Err(anyhow!("pool I/O channel closed during submit result (after late external)")),
+                };
+                last_result_line = Some(line2.clone());
+                if let PoolMessage::Result { accepted, status } = msg2 {
+                    let latency_ms = submit_started_at.elapsed().as_millis();
+                    if accepted {
+                        accepted_iterations += 1;
+                        hashrate.record_zion_share(true);
+                        ui::log_accepted(job.job_id, job.height, solution.candidate.nonce, latency_ms as u64);
+                        println!(
+                            "[{}] SHARE_ACCEPTED  job={}  height={}  nonce={}  algo={}  latency_ms={}",
+                            log_timestamp(), job.job_id, job.height, solution.candidate.nonce, current_algorithm, latency_ms,
+                        );
+                    } else {
+                        rejected_iterations += 1;
+                        hashrate.record_zion_share(false);
+                        ui::log_rejected(job.job_id, job.height, solution.candidate.nonce, latency_ms as u64, &status);
+                        println!(
+                            "[{}] SHARE_REJECTED  job={}  height={}  nonce={}  algo={}  reason=\"{}\"  hash={}",
+                            log_timestamp(), job.job_id, job.height, solution.candidate.nonce, current_algorithm, status, hex(&solution.hash),
+                        );
+                    }
+                    status
+                } else {
+                    return Err(anyhow!("expected Result after late ExternalResult, got {msg2:?}"));
+                }
             }
             other => return Err(anyhow!("expected result from pool, got {other:?}")),
         };
@@ -1741,6 +2816,7 @@ fn run_remote_session(
             true,
             "running",
         );
+        let stream_stats = hashrate.build_stream_stats(&telemetry.algorithm);
         telemetry.maybe_print_status(
             iteration + 1,
             config.loop_count,
@@ -1750,6 +2826,8 @@ fn run_remote_session(
             Some(remote_job_ttl_ms),
             config.stats_file.as_deref(),
             metrics,
+            pool_addr,
+            &stream_stats,
         );
     }
 
@@ -1776,6 +2854,9 @@ fn run_remote_session(
         false,
         "complete",
     );
+
+    // Stop the pool config poller thread
+    config_stop.store(true, std::sync::atomic::Ordering::Relaxed);
 
     Ok(SessionOutcome {
         last_job_id,
@@ -1972,6 +3053,8 @@ impl SessionTelemetry {
         remote_job_ttl_ms: Option<u64>,
         stats_file: Option<&str>,
         metrics: &Arc<Mutex<MinerMetricsSnapshot>>,
+        pool_addr: &str,
+        stream_stats: &[ui::StreamStats],
     ) {
         let now = Instant::now();
         let is_final = loop_count > 0 && iteration_done >= loop_count;
@@ -2018,7 +3101,9 @@ impl SessionTelemetry {
         // Always print session_status for external parsers (SMOS, agents) even when TUI is active.
         // print_speed_table is suppressed during TUI to avoid screen corruption.
         // ── Machine-parseable status line (for desktop agent / SMOS stdout parser) ──
-        println!(
+        // In QUIET/sticky mode: write to stderr so external parsers still work
+        //   (alt screen buffer would hide stdout from pipe readers)
+        let status_line = format!(
             "session_status iter={}/{} uptime_s={:.1} accepted={} rejected={} accept_pct={:.2} no_solution={} local_skip={} hps_overall={:.2} hps_10s={:.2} hps_60s={:.2} hps_15m={:.2} attempted_hashes={} submit_avg_ms={:.2} submit_max_ms={} remote_ttl_ms={} gpu_backend={} gpu_hps={:.2} epoch={} pool_height={} best_batch_ms={}",
             iteration_done,
             loop_count,
@@ -2042,9 +3127,17 @@ impl SessionTelemetry {
             self.pool_height,
             self.best_batch_ms,
         );
+        if QUIET.load(Ordering::Relaxed) {
+            eprintln!("{status_line}");
+        } else {
+            println!("{status_line}");
+        }
 
         if !TUI_ACTIVE.load(Ordering::Relaxed) {
-            // ── Professional colored UI table ──
+            // ── Claymore-style sticky triple-stream stats (alt screen + full redraw) ──
+            // Activate quiet mode to suppress verbose log lines (clean metrics display)
+            QUIET.store(true, Ordering::Relaxed);
+            std::env::set_var("ZION_QUIET", "1");
             let uptime_secs = uptime as u64;
             let gpu_ui: Vec<(String, u32, u64, u32, Option<u32>, Option<u32>)> = self
                 .gpu_infos
@@ -2060,20 +3153,15 @@ impl SessionTelemetry {
                     )
                 })
                 .collect();
-            ui::print_speed_table(
+            ui::print_triple_stream_stats_sticky(
                 uptime_secs,
-                hr_10s,
-                hr_60s,
-                hr_15m,
-                self.hashrate_max,
+                stream_stats,
                 accepted,
                 rejected,
-                attempted_hashes,
+                pool_addr,
+                self.pool_height,
                 submit_avg,
                 self.submit_max_latency_ms,
-                self.pool_height,
-                self.current_epoch,
-                &self.algorithm,
                 &gpu_ui,
             );
         }
@@ -2093,7 +3181,892 @@ impl SessionTelemetry {
     }
 }
 
-fn read_next_job(reader: &mut impl BufRead) -> Result<(String, MiningJob, String)> {
+/// Result of mining an external stream job in parallel.
+struct ExternalShareResult {
+    coin: String,
+    algorithm: String,
+    external_job_id: String,
+    nonce: u64,
+    hash: [u8; 32],
+    /// Mix hash for Ethash/KawPow/ProgPow shares (needed by upstream pool).
+    mix_hash: Option<[u8; 32]>,
+    extranonce1_hex: String,
+}
+
+/// Submit an external share to the pool and read the result.
+/// Used by both CPU (VerusHash) and GPU external stream paths.
+fn submit_external_share(
+    writer: &mut impl Write,
+    result_rx: &std::sync::mpsc::Receiver<PoolIncoming>,
+    config: &MinerConfig,
+    share: &ExternalShareResult,
+    _hashrate: &HashrateTracker,
+    verbose: bool,
+    record: impl Fn(bool),
+) {
+    let ext_submit = PoolMessage::ExternalSubmit {
+        miner_id: config.miner_id.clone(),
+        worker_name: config.worker_name.clone(),
+        coin: share.coin.clone(),
+        algorithm: share.algorithm.clone(),
+        external_job_id: share.external_job_id.clone(),
+        nonce: share.nonce,
+        hash_hex: hex::encode(share.hash),
+        mix_hash_hex: share.mix_hash.map(|m| hex::encode(m)),
+        extranonce1_hex: share.extranonce1_hex.clone(),
+    };
+    if let Err(e) = write_wire_message(writer, &ext_submit) {
+        println!("external_submit_write_error: {e}");
+        return;
+    }
+
+    // ── FIX #8: Don't block main loop on external share result ──
+    // The pool forwards external shares to upstream pools (NiceHash, 2miners)
+    // and may take 10-15 seconds to respond. Blocking here starves the GPU
+    // (observed: 14.3s main loop iteration, gpu_hps=0.00 on AMD RX 5600 XT).
+    // Use a short timeout: if the pool responds quickly, process the result.
+    // If not, log and move on — the late result will be drained below.
+    let ext_timeout_ms = std::env::var("ZION_EXT_SUBMIT_TIMEOUT_MS")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .unwrap_or(500);
+    match result_rx.recv_timeout(Duration::from_millis(ext_timeout_ms)) {
+        Ok(PoolIncoming::Result(line, msg)) => {
+            if verbose {
+                println!("wire_external_result={line}");
+            }
+            if let PoolMessage::ExternalResult { accepted, status, coin } = msg {
+                record(accepted);
+                let stream_label = if share.algorithm == "verushash" || share.algorithm == "randomx" {
+                    "CPU PROFIT"
+                } else {
+                    "GPU PROFIT"
+                };
+                if accepted {
+                    if !TUI_ACTIVE.load(Ordering::Relaxed) {
+                        ui::log_ext_accepted(stream_label, &coin, &share.algorithm, 0);
+                    }
+                    println!("[{}] external_share_accepted coin={} status={}", log_timestamp(), coin, status);
+                } else {
+                    if !TUI_ACTIVE.load(Ordering::Relaxed) {
+                        ui::log_ext_rejected(stream_label, &coin, &share.algorithm, &status);
+                    }
+                    println!("[{}] external_share_rejected coin={} status={}", log_timestamp(), coin, status);
+                }
+            }
+        }
+        Ok(PoolIncoming::Job(line, _, _, _, _, _, _)) => {
+            println!("external_result_unexpected_job: {line}");
+        }
+        Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
+            // Pool didn't respond within timeout — don't block the main loop.
+            // The late ExternalResult will arrive in result_rx and be drained
+            // by the next result_rx.recv() call (handled gracefully below).
+            println!(
+                "[{}] external_share_submitted_no_response coin={} algo={} timeout_ms={} — continuing without blocking",
+                log_timestamp(),
+                share.coin,
+                share.algorithm,
+                ext_timeout_ms,
+            );
+        }
+        Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => {
+            println!("external_result_read_error: channel disconnected");
+        }
+    }
+}
+
+/// Persistent external GPU miner thread for the single GPU profit coin.
+///
+/// Runs in a separate thread with its own GPU context/command queue.
+/// Receives external stream jobs via a channel, creates/switches the GPU
+/// backend on demand, scans nonces on GPU, and sends found shares back.
+fn external_gpu_thread(
+    rx: std::sync::mpsc::Receiver<zion_pool::ExternalStreamJob>,
+    tx: std::sync::mpsc::Sender<ExternalShareResult>,
+    work_size: usize,
+    hashrate: Arc<HashrateTracker>,
+    backend_kind: gpu_backend::GpuBackendKind,
+) {
+    println!("[{}] external_gpu_thread_entered backend={}", log_timestamp(), backend_kind.as_str());
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::{Hash, Hasher};
+
+    let mut current_job: Option<zion_pool::ExternalStreamJob> = None;
+    let mut current_miner: Option<Box<dyn gpu_backend::GpuMiner>> = None;
+    let mut current_algo: Option<String> = None;
+    let mut nonce_base: u64 = 0;
+    let mut nonce_offset: u64 = 0;
+    let mut backend_init_failures: u32 = 0;
+    let mut skipped_algos: std::collections::HashSet<String> = std::collections::HashSet::new();
+    // Use a large batch_size — mine_batch_raw caps it at the GPU's actual
+    // work_size internally, so this is safe.
+    let batch_size = 4_186_112u64;
+    let mut batch_count: u64 = 0;
+    let mut last_heartbeat = std::time::Instant::now();
+    let mut last_epoch: Option<u32> = None;
+
+    fn epoch_for_algorithm(algorithm: &str, height: u64) -> Option<u32> {
+        match algorithm {
+            "ethash" | "etchash" | "ethash_etc" => Some((height / 30000) as u32),
+            "progpow" | "progpow_epic" => Some((height / 30000) as u32),
+            "kawpow"
+            | "kawpow_rvn"
+            | "kawpow_clore"
+            | "kawpow_evr"
+            | "kawpow_mewc"
+            | "kawpow_quai"
+            | "evrprogpow"
+            | "evrprogpow_evr"
+            | "meowpow"
+            | "meowpow_mewc" => Some((height / 7500) as u32),
+            "autolykos" | "autolykos_erg" => Some((height / 45000) as u32),
+            "zelhash" | "zelhash_flux" | "beamhash" | "beamhash_beam" => None,
+            _ => None,
+        }
+    }
+
+    loop {
+        // Check for new job (non-blocking)
+        match rx.try_recv() {
+            Ok(job) => {
+                // Only reset nonce_offset when the job actually changes
+                // (different job_id or height). The pool re-sends the same
+                // job every ~1s; resetting nonce_offset each time would cause
+                // the GPU to re-scan the same nonces endlessly.
+                let is_new_job = current_job.as_ref().map_or(true, |j| {
+                    j.job_id != job.job_id || j.height != job.height
+                });
+                if is_new_job {
+                    // Random nonce base to avoid duplicates
+                    let mut h = DefaultHasher::new();
+                    job.job_id.hash(&mut h);
+                    std::process::id().hash(&mut h);
+                    let random_base = (h.finish() as u32) as u64;
+
+                    // NiceHash nonce format: extranonce1 occupies high bits
+                    // of the nonce. The miner must only iterate over the low
+                    // bits. Parse extranonce1_hex and embed it in nonce_base.
+                    let en1_bytes = if job.extranonce1_hex.is_empty() {
+                        Vec::new()
+                    } else {
+                        hex::decode(job.extranonce1_hex.trim_start_matches("0x")).unwrap_or_default()
+                    };
+                    let en1_len = en1_bytes.len();
+                    if en1_len > 0 && en1_len <= 4 {
+                        // Embed extranonce1 in the high bits of the nonce.
+                        // extranonce1 is big-endian; shift it left to occupy
+                        // the top en1_len bytes of the 8-byte nonce.
+                        let mut en1_val: u64 = 0;
+                        for &b in &en1_bytes {
+                            en1_val = (en1_val << 8) | (b as u64);
+                        }
+                        let shift = (8 - en1_len) * 8;
+                        nonce_base = (en1_val << shift) | (random_base & ((1u64 << shift) - 1));
+                        println!(
+                            "[{}] ext_gpu_nicehash_nonce en1_hex={} en1_len={} nonce_base=0x{:016x}",
+                            log_timestamp(),
+                            job.extranonce1_hex,
+                            en1_len,
+                            nonce_base,
+                        );
+                    } else {
+                        nonce_base = random_base;
+                    }
+                    nonce_offset = 0;
+                }
+                // Note: do NOT reset last_epoch here — the pool re-sends the
+                // same job every ~1s, and resetting would cause DAG reload
+                // every second. last_epoch is reset only when the algorithm
+                // changes (see algo switch below).
+                println!(
+                    "[{}] ext_gpu_job_received coin={} algo={} job_id={} height={}",
+                    log_timestamp(),
+                    job.coin,
+                    job.algorithm,
+                    job.job_id,
+                    job.height,
+                );
+                // Update hashrate tracker for triple-stream display
+                hashrate.set_gpu_ext_job(&job.coin, &job.algorithm);
+                current_job = Some(job);
+            }
+            Err(std::sync::mpsc::TryRecvError::Empty) => {
+                // Debug: log first few empty receives to confirm thread is alive
+                if batch_count == 0 && last_heartbeat.elapsed().as_secs() < 3 {
+                    println!("[{}] ext_gpu_rx_empty (no job yet, thread alive)", log_timestamp());
+                }
+            }
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                println!("[{}] ext_gpu_channel_closed — exiting", log_timestamp());
+                return;
+            }
+        }
+
+        // Heartbeat every 15s so we can see the thread is alive
+        if last_heartbeat.elapsed().as_secs() >= 15 {
+            println!(
+                "[{}] ext_gpu_heartbeat batches={} nonce_offset={} has_job={} epoch={:?} algo={:?}",
+                log_timestamp(),
+                batch_count,
+                nonce_offset,
+                current_job.is_some(),
+                last_epoch,
+                current_algo.as_deref().unwrap_or("none"),
+            );
+            last_heartbeat = std::time::Instant::now();
+        }
+
+        let job = match &current_job {
+            Some(j) => j,
+            None => {
+                // No job yet — wait a bit
+                thread::sleep(Duration::from_millis(50));
+                continue;
+            }
+        };
+
+        // Create or switch GPU backend when the algorithm changes.
+        let algo = job.algorithm.as_str();
+        if current_algo.as_deref() != Some(algo) {
+            // Skip algorithms that have already failed too many times
+            if skipped_algos.contains(algo) {
+                thread::sleep(Duration::from_millis(500));
+                continue;
+            }
+
+            // Safety guard: check if the backend can safely handle this algorithm.
+            // Metal on Apple Silicon cannot handle DAG-based algorithms (progpow,
+            // ethash, kawpow) because the ~2GB DAG allocation on unified memory
+            // causes system freezes.
+            if !gpu_backend::backend_supports_algorithm(backend_kind, algo) {
+                println!(
+                    "[{}] ext_gpu_skip_unsupported algo={} backend={} reason=\"DAG-based or memory-hard algorithm not safe on Metal (unified memory OOM risk)\"",
+                    log_timestamp(),
+                    algo,
+                    backend_kind.as_str(),
+                );
+                skipped_algos.insert(algo.to_string());
+                current_algo = None;
+                current_miner = None;
+                thread::sleep(Duration::from_millis(500));
+                continue;
+            }
+            match gpu_backend::create_gpu_backend(
+                backend_kind,
+                work_size,
+                algo,
+            ) {
+                Ok(m) => {
+                    println!(
+                        "[{}] ext_gpu_backend_init algo={} backend={} work_size={} device=\"{}\"",
+                        log_timestamp(),
+                        algo,
+                        backend_kind.as_str(),
+                        work_size,
+                        m.device_name()
+                    );
+                    current_miner = Some(m);
+                    current_algo = Some(algo.to_string());
+                    last_epoch = None;
+                    backend_init_failures = 0;
+                }
+                Err(e) => {
+                    backend_init_failures += 1;
+                    if backend_init_failures >= 3 {
+                        println!(
+                            "[{}] ext_gpu_backend_skip algo={} backend={} err=\"{e}\" — skipping after {} failures",
+                            log_timestamp(),
+                            algo,
+                            backend_kind.as_str(),
+                            backend_init_failures
+                        );
+                        skipped_algos.insert(algo.to_string());
+                        current_algo = None;
+                        current_miner = None;
+                        backend_init_failures = 0;
+                        thread::sleep(Duration::from_millis(500));
+                        continue;
+                    }
+                    println!(
+                        "[{}] ext_gpu_backend_init_failed algo={} backend={} err=\"{e}\" — retrying ({}/{})",
+                        log_timestamp(),
+                        algo,
+                        backend_kind.as_str(),
+                        backend_init_failures,
+                        3
+                    );
+                    thread::sleep(Duration::from_secs(2));
+                    continue;
+                }
+            }
+        }
+
+        let gpu_miner = match current_miner.as_mut() {
+            Some(m) => m,
+            None => {
+                thread::sleep(Duration::from_millis(100));
+                continue;
+            }
+        };
+
+        // Ensure DAG is loaded for DAG-based algorithms
+        let epoch = epoch_for_algorithm(algo, job.height);
+        if epoch != last_epoch {
+            if let Some(ep) = epoch {
+                println!(
+                    "[{}] ext_gpu_dag_loading algo={} epoch={} height={}",
+                    log_timestamp(),
+                    algo,
+                    ep,
+                    job.height,
+                );
+            }
+            if let Err(e) = gpu_miner.update_epoch(job.height) {
+                println!(
+                    "[{}] ext_gpu_epoch_failed algo={} height={} err=\"{e}\" — retrying",
+                    log_timestamp(),
+                    algo,
+                    job.height,
+                );
+                thread::sleep(Duration::from_secs(2));
+                continue;
+            }
+            if let Some(ep) = epoch {
+                println!(
+                    "[{}] ext_gpu_dag_ready algo={} epoch={}",
+                    log_timestamp(),
+                    algo,
+                    ep,
+                );
+            }
+            last_epoch = epoch;
+        }
+
+        // Parse header and target
+        let header_bytes = match hex::decode(job.header_hex.trim_start_matches("0x")) {
+            Ok(b) => b,
+            Err(e) => {
+                println!("ext_gpu_header_error algo={algo}: {e}");
+                thread::sleep(Duration::from_millis(100));
+                continue;
+            }
+        };
+
+        let target_bytes = match zion_pool::parse_fixed_hex::<32>(&job.target_hex, "external target") {
+            Ok(t) => t,
+            Err(e) => {
+                println!("ext_gpu_target_error algo={algo}: {e}");
+                thread::sleep(Duration::from_millis(100));
+                continue;
+            }
+        };
+
+        let target = DifficultyTarget { bytes: target_bytes };
+        let nonce = nonce_base.wrapping_add(nonce_offset);
+
+        // Scan one batch on GPU
+        let result = if header_bytes.len() > 80 {
+            gpu_miner.mine_batch_raw(&header_bytes, target, nonce, batch_size)
+        } else {
+            let mut bytes = [0u8; 80];
+            let len = header_bytes.len().min(80);
+            bytes[..len].copy_from_slice(&header_bytes[..len]);
+            let header = MiningHeader::from_bytes(bytes);
+            gpu_miner.mine_batch(header, target, nonce, batch_size)
+        };
+
+        let actual_batch: u64;
+        match result {
+            Ok(br) => {
+                actual_batch = br.nonces_tested;
+                if let Some((found_nonce, hash, mix_hash)) = br.solutions.first() {
+                    let share = ExternalShareResult {
+                        coin: job.coin.clone(),
+                        algorithm: job.algorithm.clone(),
+                        external_job_id: job.job_id.clone(),
+                        nonce: *found_nonce,
+                        hash: *hash,
+                        mix_hash: *mix_hash,
+                        extranonce1_hex: job.extranonce1_hex.clone(),
+                    };
+                    println!(
+                        "[{}] ext_gpu_share_found coin={} algo={} nonce={} hash={}",
+                        log_timestamp(),
+                        share.coin,
+                        share.algorithm,
+                        share.nonce,
+                        hex::encode(share.hash)
+                    );
+                    let _ = tx.send(share);
+                }
+            }
+            Err(e) => {
+                actual_batch = batch_size.min(work_size as u64);
+                println!("ext_gpu_batch_error algo={algo} nonce={nonce} err=\"{e}\"");
+                thread::sleep(Duration::from_millis(500));
+            }
+        }
+
+        // Advance nonce for next batch using the actual nonces tested
+        // as reported by the GPU backend. This accounts for the internal
+        // work_size cap in the AuXpow GpuMiner, preventing skipped nonces.
+        nonce_offset = nonce_offset.wrapping_add(actual_batch);
+        batch_count += 1;
+        hashrate.record_gpu_ext_hashes(actual_batch);
+
+        // ── FIX #7: Duty-cycle yield to Stream 1 (ZION) on single-GPU rigs ──
+        // On single-GPU machines, Stream 1 (ZION deeksha) and Stream 2
+        // (external GPU coin) share the same physical GPU via separate
+        // OpenCL/CUDA contexts. Without yielding, this tight loop hogs
+        // the GPU and starves Stream 1 (observed: gpu_hps=0.00,
+        // best_batch_ms=14849 on AMD RX 5600 XT).
+        //
+        // Duty-cycle approach: run N batches (burst), then sleep M ms
+        // (gap) to give Stream 1 a guaranteed GPU window. The gap must
+        // be long enough for Stream 1 to complete one deeksha batch
+        // (~270ms on RX 5600 XT at work_size=8192).
+        //
+        // Defaults: burst=3 batches, gap=300ms → ~75% Stream2 duty cycle.
+        // Tuning:
+        //   ZION_EXT_GPU_BURST=N  (batches per burst, 0=no limit)
+        //   ZION_EXT_GPU_GAP_MS=M (sleep after burst, 0=disabled)
+        let burst = std::env::var("ZION_EXT_GPU_BURST")
+            .ok()
+            .and_then(|v| v.parse::<u64>().ok())
+            .unwrap_or(3);
+        let gap_ms = std::env::var("ZION_EXT_GPU_GAP_MS")
+            .ok()
+            .and_then(|v| v.parse::<u64>().ok())
+            .unwrap_or(300);
+        if burst > 0 && gap_ms > 0 && batch_count % burst == 0 {
+            thread::sleep(Duration::from_millis(gap_ms));
+        }
+    }
+}
+
+
+
+
+/// Persistent CPU external stream thread (Stream 3c: VerusHash/RandomX).
+///
+/// Claymore-style: created once at session start, receives jobs via channel,
+/// mines continuously, and sends shares back via channel.  This replaces
+/// the old per-iteration `thread::spawn(mine_external_stream_cpu)` pattern
+/// which created and destroyed a thread every mining cycle.
+fn ext_cpu_thread(
+    rx: std::sync::mpsc::Receiver<zion_pool::ExternalStreamJob>,
+    tx: std::sync::mpsc::Sender<ExternalShareResult>,
+    threads: usize,
+    nonce_count: u64,
+    hashrate: Arc<HashrateTracker>,
+) {
+    // RandomX is ~1000× slower than VerusHash per hash.  Use a much smaller
+    // nonce batch for RandomX so that hashrate updates frequently and the
+    // thread stays responsive to new jobs.
+    //   VerusHash: ~5 MH/s per thread → 2M nonces ≈ 0.4s per batch
+    //   RandomX:   ~500 H/s per thread → 2M nonces ≈ 4000s per batch (!)
+    // With randomx_nonce_count=10000 and 4 threads, each thread gets ~2500
+    // nonces, taking ~5s per batch at 500 H/s — reasonable update frequency.
+    let randomx_nonce_count = parse_env_u64("ZION_EXT_CPU_RANDOMX_NONCE_COUNT", 10_000)
+        .unwrap_or(10_000);
+
+    // RandomX is memory-bandwidth bound.  Using all logical cores (HT) for
+    // RandomX starves the main mining loop (GPU share submission, TUI, etc.)
+    // causing 10× slowdown from scheduler contention.  Use fewer threads:
+    // default = threads/3 (e.g. 4 for 12T), leaving 8 logical cores for the
+    // main loop.  Override with ZION_EXT_CPU_RANDOMX_THREADS.
+    let randomx_threads = std::env::var("ZION_EXT_CPU_RANDOMX_THREADS")
+        .ok()
+        .and_then(|s| s.parse::<usize>().ok())
+        .unwrap_or((threads / 3).max(2));
+
+    println!(
+        "[{}] ext_cpu_thread: started (persistent, threads={}, randomx_threads={}, verushash_nonce_count={}, randomx_nonce_count={})",
+        log_timestamp(),
+        threads,
+        randomx_threads,
+        nonce_count,
+        randomx_nonce_count,
+    );
+
+    let mut current_job: Option<zion_pool::ExternalStreamJob> = None;
+    let mut current_job_id = String::new();
+    let mut nonce_base: u64 = 0;
+    let mut nonce_offset: u64 = 0;
+
+    loop {
+        // Check for new job (non-blocking).
+        // Drain ALL pending messages and keep only the latest one.
+        // The main loop sends external_stream_cpu every ~1s, but a RandomX
+        // batch takes ~3s, so the channel can accumulate many stale copies.
+        // Without draining, the ext_cpu_thread would read hours-old jobs.
+        let mut latest_job: Option<zion_pool::ExternalStreamJob> = None;
+        loop {
+            match rx.try_recv() {
+                Ok(job) => {
+                    latest_job = Some(job);
+                }
+                Err(std::sync::mpsc::TryRecvError::Empty) => break,
+                Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                    println!("[{}] ext_cpu_thread: channel closed, exiting", log_timestamp());
+                    return;
+                }
+            }
+        }
+        if let Some(job) = latest_job {
+            // Only reset the nonce scan when the job_id actually changes,
+            // otherwise the CPU thread would keep restarting from the same
+            // base and never cover enough nonces to find a share.
+            if job.job_id != current_job_id {
+                use std::collections::hash_map::DefaultHasher;
+                use std::hash::{Hash, Hasher};
+                let mut h = DefaultHasher::new();
+                job.job_id.hash(&mut h);
+                std::process::id().hash(&mut h);
+                std::thread::current().id().hash(&mut h);
+                nonce_base = (h.finish() as u32) as u64;
+                nonce_offset = 0;
+                current_job_id = job.job_id.clone();
+                println!(
+                    "[{}] ext_cpu_thread: new job coin={} algo={} job_id={} nonce_base={}",
+                    log_timestamp(),
+                    job.coin,
+                    job.algorithm,
+                    job.job_id,
+                    nonce_base,
+                );
+                // Update hashrate tracker for triple-stream display
+                hashrate.set_cpu_ext_job(&job.coin, &job.algorithm);
+            }
+            current_job = Some(job);
+        }
+
+        // Mine current job (if any)
+        if let Some(ref ext) = current_job {
+            // Use smaller nonce batches and fewer threads for RandomX
+            // (memory-bandwidth bound, HT doesn't help, and we need to leave
+            // CPU cores for the main GPU mining loop).
+            let (effective_threads, effective_nonce_count) = if ext.algorithm == "randomx" {
+                (randomx_threads, randomx_nonce_count)
+            } else {
+                (threads, nonce_count)
+            };
+
+            let start_nonce = nonce_base.wrapping_add(nonce_offset);
+            if let Some(share) = mine_external_stream_cpu(ext, effective_threads, start_nonce, effective_nonce_count) {
+                println!(
+                    "[{}] ext_cpu_thread: share found, sending via channel  coin={}  algo={}  job_id={}  nonce={}",
+                    log_timestamp(),
+                    share.coin,
+                    share.algorithm,
+                    share.external_job_id,
+                    share.nonce,
+                );
+                let next_offset = nonce_offset.wrapping_add(share.nonce.wrapping_sub(start_nonce) + 1);
+                let _ = tx.send(share);
+                // Keep mining the same job, just advance past the share we found.
+                nonce_offset = next_offset;
+            } else {
+                nonce_offset = nonce_offset.wrapping_add(effective_nonce_count);
+            }
+            hashrate.record_cpu_ext_hashes(effective_nonce_count);
+        } else {
+            // No job — brief sleep to avoid busy-loop
+            std::thread::sleep(std::time::Duration::from_millis(200));
+        }
+    }
+}
+
+
+fn mine_external_stream_cpu(
+    ext: &ExternalStreamJob,
+    threads: usize,
+    start_nonce: u64,
+    nonce_count: u64,
+) -> Option<ExternalShareResult> {
+    // Parse external coin from ticker
+    let coin = match zion_auxpow::types::ExternalCoin::from_str_loose(&ext.coin) {
+        Some(c) => c,
+        None => {
+            println!("external_stream_unknown_coin: {}", ext.coin);
+            return None;
+        }
+    };
+
+    // Parse header bytes
+    let header_bytes = match hex::decode(ext.header_hex.trim_start_matches("0x")) {
+        Ok(b) => b,
+        Err(e) => {
+            println!("external_stream_header_decode_error: {e}");
+            return None;
+        }
+    };
+
+    // Parse target
+    let target_bytes = match zion_pool::parse_fixed_hex::<32>(&ext.target_hex, "external target") {
+        Ok(t) => t,
+        Err(e) => {
+            println!("external_stream_target_parse_error: {e}");
+            return None;
+        }
+    };
+
+    // Parse extranonce1
+    let extranonce1 = if ext.extranonce1_hex.is_empty() {
+        Vec::new()
+    } else {
+        match hex::decode(ext.extranonce1_hex.trim_start_matches("0x")) {
+            Ok(b) => b,
+            Err(_) => Vec::new(),
+        }
+    };
+
+    // For VerusHash, initialize the hasher
+    if ext.algorithm == "verushash" {
+        zion_auxpow::external_hashers::init_verushash();
+    }
+
+    let scan_end = start_nonce.wrapping_add(nonce_count);
+
+    let job_pkg = zion_auxpow::types::JobPackage {
+        external_coin: coin,
+        external_job_id: ext.job_id.clone(),
+        algorithm: ext.algorithm.clone(),
+        header_bytes,
+        target_bytes,
+        timestamp: ext.height, // reused for height in some algorithms
+        block_number: Some(ext.height),
+        extranonce1,
+        start_nonce,
+        nonce_count,
+        seed_hash: if ext.seed_hash_hex.is_empty() {
+            None
+        } else {
+            hex::decode(ext.seed_hash_hex.trim_start_matches("0x")).ok()
+        },
+    };
+
+    // ── Multi-threaded scan for CPU-bound algorithms (VerusHash, RandomX) ──
+    // Both VerusHash and RandomX are CPU-only and benefit from parallel scanning.
+    // RandomX uses per-thread VMs (thread_local in C wrapper) so each thread
+    // gets its own VM sharing the global read-only dataset — no mutex contention.
+    // Split the nonce range across `threads` worker threads.
+    if (ext.algorithm == "verushash" || ext.algorithm == "randomx") && threads > 1 {
+        use std::sync::Arc;
+        let job_arc = Arc::new(job_pkg);
+        let chunk = (nonce_count / threads as u64).max(1);
+        let found = Arc::new(std::sync::Mutex::new(None::<zion_auxpow::miner_harness::FoundShare>));
+        let stop = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let algo = ext.algorithm.clone(); // clone for thread closure
+
+        let mut handles = Vec::new();
+        for t in 0..threads {
+            let job = Arc::clone(&job_arc);
+            let found = Arc::clone(&found);
+            let stop = Arc::clone(&stop);
+            let algo = algo.clone(); // clone per-iteration for closure
+            let t_start = start_nonce.wrapping_add((t as u64) * chunk);
+            let t_end = if t == threads - 1 {
+                scan_end
+            } else {
+                t_start.wrapping_add(chunk)
+            };
+            handles.push(std::thread::spawn(move || {
+                // Pin thread to physical core for RandomX (cache-sensitive)
+                thread_affinity::maybe_pin_thread(t, threads, &algo);
+                let range = t_start..t_end;
+                match zion_auxpow::miner_harness::mine(&job, range) {
+                    Ok(Some(share)) => {
+                        let mut guard = found.lock().unwrap();
+                        if guard.is_none() {
+                            *guard = Some(share);
+                        }
+                        stop.store(true, std::sync::atomic::Ordering::Relaxed);
+                    }
+                    _ => {}
+                }
+            }));
+        }
+        for h in handles {
+            let _ = h.join();
+        }
+        if let Some(share) = found.lock().unwrap().take() {
+            return Some(ExternalShareResult {
+                coin: ext.coin.clone(),
+                algorithm: ext.algorithm.clone(),
+                external_job_id: share.external_job_id,
+                nonce: share.nonce,
+                hash: share.hash,
+                mix_hash: None,
+                extranonce1_hex: ext.extranonce1_hex.clone(),
+            });
+        }
+        return None;
+    }
+
+    // Single-threaded fallback for other algorithms
+    match zion_auxpow::miner_harness::mine(&job_pkg, start_nonce..scan_end) {
+        Ok(Some(share)) => Some(ExternalShareResult {
+            coin: ext.coin.clone(),
+            algorithm: ext.algorithm.clone(),
+            external_job_id: share.external_job_id,
+            nonce: share.nonce,
+            hash: share.hash,
+            mix_hash: None,
+            extranonce1_hex: ext.extranonce1_hex.clone(),
+        }),
+        Ok(None) => None,
+        Err(e) => {
+            println!("external_stream_mine_error: {e}");
+            None
+        }
+    }
+}
+
+/// Routed pool message from the I/O thread to the main mining loop.
+enum PoolIncoming {
+    Job(
+        String,
+        MiningJob,
+        String,
+        Vec<u8>,
+        String,
+        Option<zion_pool::ExternalStreamJob>,
+        Option<zion_pool::ExternalStreamJob>,
+    ),
+    Result(String, PoolMessage),
+}
+
+/// Background pool I/O thread — owns the reader, routes messages to channels.
+///
+/// Continuously reads from the pool socket and routes:
+/// - `Job` → `job_tx` (parsed, with external stream fields)
+/// - `Result`/`ExternalResult` → `result_tx`
+/// - `Stale`/`Cancel` → printed inline
+/// - `SetDifficulty` → stored in `CURRENT_POOL_DIFFICULTY` atomic
+///
+/// When the pool disconnects or an error occurs, the thread exits and drops
+/// both senders, causing `recv()` on the main thread to return `Err` — which
+/// triggers reconnect logic.
+///
+/// This eliminates both GPU idle gaps:
+/// - **Job pre-fetch**: jobs are read continuously, so `job_rx.recv()` is
+///   non-blocking when a job is already queued (eliminates ~400ms job wait)
+/// - **Async submit response**: submit results are read continuously, so
+///   `result_rx.recv()` is non-blocking when the response is already queued
+///   (eliminates ~297ms submit wait)
+fn pool_io_thread(
+    mut reader: std::io::BufReader<std::net::TcpStream>,
+    job_tx: std::sync::mpsc::Sender<PoolIncoming>,
+    result_tx: std::sync::mpsc::Sender<PoolIncoming>,
+) {
+    loop {
+        let (line, message) = match read_wire_message(&mut reader) {
+            Ok(r) => r,
+            Err(e) => {
+                eprintln!("[{}] pool_io_thread_error: {e}", log_timestamp());
+                break;
+            }
+        };
+        match message {
+            PoolMessage::Job {
+                job_id,
+                algorithm,
+                start_nonce,
+                nonce_count,
+                target_hex,
+                header_hex,
+                height,
+                stream_weights,
+                external_stream,
+                external_stream_cpu,
+            } => {
+                if !stream_weights.is_empty() && !QUIET.load(Ordering::Relaxed) {
+                    println!("stream_weights job={} weights={}", job_id, stream_weights);
+                }
+                if let Some(ref ext) = external_stream {
+                    if !QUIET.load(Ordering::Relaxed) {
+                        println!(
+                            "external_stream job={} coin={} algo={}",
+                            job_id, ext.coin, ext.algorithm
+                        );
+                    }
+                }
+                if let Some(ref ext_cpu) = external_stream_cpu {
+                    if !QUIET.load(Ordering::Relaxed) {
+                        println!(
+                            "external_stream_cpu job={} coin={} algo={} target_hex={:.64}",
+                            job_id, ext_cpu.coin, ext_cpu.algorithm, ext_cpu.target_hex
+                        );
+                    }
+                }
+                let raw_header_bytes =
+                    hex::decode(header_hex.trim_start_matches("0x")).unwrap_or_default();
+                let job = match parse_header_hex(&header_hex) {
+                    Ok(h) => h,
+                    Err(e) => {
+                        eprintln!("pool_io_job_parse_error job={job_id}: {e} — skipping");
+                        continue;
+                    }
+                };
+                let target = match parse_fixed_hex::<32>(&target_hex, "job target") {
+                    Ok(t) => t,
+                    Err(e) => {
+                        eprintln!("pool_io_target_parse_error job={job_id}: {e} — skipping");
+                        continue;
+                    }
+                };
+                let incoming = PoolIncoming::Job(
+                    line,
+                    MiningJob {
+                        job_id,
+                        header: job,
+                        target: DifficultyTarget { bytes: target },
+                        start_nonce,
+                        nonce_count,
+                        height,
+                    },
+                    algorithm,
+                    raw_header_bytes,
+                    stream_weights,
+                    external_stream,
+                    external_stream_cpu,
+                );
+                if job_tx.send(incoming).is_err() {
+                    break; // Main thread dropped the receiver — exit
+                }
+            }
+            PoolMessage::Result { .. } | PoolMessage::ExternalResult { .. } => {
+                if result_tx.send(PoolIncoming::Result(line, message)).is_err() {
+                    break;
+                }
+            }
+            PoolMessage::Stale { .. } => println!("wire_stale={line}"),
+            PoolMessage::Cancel { .. } => println!("wire_cancel={line}"),
+            PoolMessage::SetDifficulty { difficulty, .. } => {
+                println!("pool_set_difficulty={difficulty}");
+                CURRENT_POOL_DIFFICULTY.store(difficulty, Ordering::Relaxed);
+            }
+            other => {
+                eprintln!("[{}] pool_io_unexpected_message: {other:?}", log_timestamp());
+            }
+        }
+    }
+    // Dropping senders signals the main thread to reconnect
+}
+
+fn read_next_job(
+    reader: &mut impl BufRead,
+) -> Result<(
+    String,
+    MiningJob,
+    String,
+    Vec<u8>,
+    String,
+    Option<zion_pool::ExternalStreamJob>,
+    Option<zion_pool::ExternalStreamJob>,
+)> {
     loop {
         let (line, message) = read_wire_message(reader)?;
         match message {
@@ -2105,7 +4078,34 @@ fn read_next_job(reader: &mut impl BufRead) -> Result<(String, MiningJob, String
                 target_hex,
                 header_hex,
                 height,
+                stream_weights,
+                external_stream,
+                external_stream_cpu,
             } => {
+                // Log stream weights if present (Deeksha Chv3 pipeline parameterisation).
+                if !stream_weights.is_empty() && !QUIET.load(Ordering::Relaxed) {
+                    println!("stream_weights job={} weights={}", job_id, stream_weights);
+                }
+                if let Some(ref ext) = external_stream {
+                    if !QUIET.load(Ordering::Relaxed) {
+                        println!(
+                            "external_stream job={} coin={} algo={}",
+                            job_id, ext.coin, ext.algorithm
+                        );
+                    }
+                }
+                if let Some(ref ext_cpu) = external_stream_cpu {
+                    if !QUIET.load(Ordering::Relaxed) {
+                        println!(
+                            "external_stream_cpu job={} coin={} algo={} target_hex={:.64}",
+                            job_id, ext_cpu.coin, ext_cpu.algorithm, ext_cpu.target_hex
+                        );
+                    }
+                }
+                // Keep raw header bytes for external algorithms that may
+                // use headers longer than 80 bytes (e.g. DCR = 180 bytes).
+                let raw_header_bytes =
+                    hex::decode(header_hex.trim_start_matches("0x")).unwrap_or_default();
                 return Ok((
                     line,
                     MiningJob {
@@ -2119,6 +4119,10 @@ fn read_next_job(reader: &mut impl BufRead) -> Result<(String, MiningJob, String
                         height,
                     },
                     algorithm,
+                    raw_header_bytes,
+                    stream_weights,
+                    external_stream,
+                    external_stream_cpu,
                 ))
             }
             PoolMessage::Stale { .. } => println!("wire_stale={line}"),
@@ -2137,6 +4141,7 @@ fn read_next_result(reader: &mut impl BufRead) -> Result<(String, PoolMessage)> 
         let (line, message) = read_wire_message(reader)?;
         match message {
             PoolMessage::Result { .. } => return Ok((line, message)),
+            PoolMessage::ExternalResult { .. } => return Ok((line, message)),
             PoolMessage::Stale { .. } => println!("wire_stale={line}"),
             PoolMessage::Cancel { .. } => println!("wire_cancel={line}"),
             PoolMessage::SetDifficulty { difficulty, .. } => {
@@ -2186,21 +4191,24 @@ fn log_solution<T: std::fmt::Debug>(
     hash: &[u8; 32],
     status: T,
 ) {
-    println!("iteration={iteration}");
-    println!("job_id={}", job.job_id);
-    println!(
-        "nonce_range={}..{}",
-        job.start_nonce,
-        job.start_nonce + job.nonce_count
-    );
-    println!("found_nonce={found_nonce}");
-    println!("hash={}", hex(hash));
+    let quiet = QUIET.load(Ordering::Relaxed);
+    if !quiet {
+        println!("iteration={iteration}");
+        println!("job_id={}", job.job_id);
+        println!(
+            "nonce_range={}..{}",
+            job.start_nonce,
+            job.start_nonce + job.nonce_count
+        );
+        println!("found_nonce={found_nonce}");
+        println!("hash={}", hex(hash));
+    }
     let status_str = format!("{status:?}");
     if status_str.contains("Accepted") {
         ui::log_accepted(job.job_id, job.height, found_nonce, 0);
     } else if status_str.contains("Rejected") {
         ui::log_rejected(job.job_id, job.height, found_nonce, 0, &status_str);
-    } else {
+    } else if !quiet {
         println!("share_status={status_str}");
     }
 }
@@ -2210,7 +4218,15 @@ fn hex(bytes: &[u8]) -> String {
 }
 
 fn parse_header_hex(raw: &str) -> Result<MiningHeader> {
-    let bytes = parse_fixed_hex::<80>(raw, "job header")?;
+    let normalized = raw.trim().trim_start_matches("0x");
+    let decoded = hex::decode(normalized)
+        .with_context(|| "job header contains invalid hex")?;
+
+    // Pad to 80 bytes (external AuxPoW jobs may send shorter headers,
+    // e.g. KAS sends only a 32-byte pre_pow_hash).
+    let mut bytes = [0u8; 80];
+    let len = decoded.len().min(80);
+    bytes[..len].copy_from_slice(&decoded[..len]);
 
     let version = u32::from_le_bytes(bytes[0..4].try_into().context("header version slice")?);
     let previous_hash: [u8; 32] = bytes[4..36].try_into().context("previous hash slice")?;
@@ -2295,8 +4311,26 @@ struct MinerConfig {
     threads: usize,
     gpu_backend: gpu_backend::GpuBackendKind,
     gpu_work_size: usize,
+    /// Work size for Pearl PoUW GPU (Stream 2). Defaults to gpu_work_size.
+    pearl_gpu_work_size: usize,
+    /// Work size for secondary external GPU (Stream 3, GPU-capable coins).
+    /// Defaults to gpu_work_size.
+    secondary_gpu_work_size: usize,
     /// Algorithm advertised in hello and used if pool matches.
     algorithm: String,
+    /// Whether Stream 1 (ZION primary) is enabled (default: true)
+    stream1_enabled: bool,
+    /// Whether Stream 2 (GPU external coins) is enabled (default: true if GPU)
+    stream2_enabled: bool,
+    /// Whether Stream 3 (CPU external coins) is enabled (default: true)
+    stream3_enabled: bool,
+    /// Auto-tuned nonce batch size for VerusHash CPU mining (Stream 3)
+    verushash_nonce_count: u64,
+    /// Whether auto-mode was requested (affects logging)
+    #[allow(dead_code)]
+    auto_mode: bool,
+    /// Detected GPU VRAM in bytes (from autotune, used by autonomous router)
+    gpu_vram_bytes: u64,
 }
 
 impl MinerConfig {
@@ -2334,9 +4368,89 @@ impl MinerConfig {
                     std::env::set_var("ZION_PROFILE", &args[i + 1]);
                     i += 2;
                 }
+                "--no-tui" => {
+                    std::env::set_var("ZION_INTERACTIVE", "0");
+                    i += 1;
+                }
                 "--algorithm" if i + 1 < args.len() => {
                     std::env::set_var("ZION_MINER_ALGORITHM", &args[i + 1]);
                     i += 2;
+                }
+                "--pearl" if i + 1 < args.len() => {
+                    // Pearl PoUW stratum stream: --pearl POOL_HOST:PORT:WALLET
+                    // Spawns AuxPowClient with PearlStratum protocol in parallel.
+                    std::env::set_var("ZION_PEARL_STREAM", &args[i + 1]);
+                    i += 2;
+                }
+                "--detect-hardware" => {
+                    // Hardware detection mode for `zion mine auto` CLI command.
+                    // Prints detected GPU devices and exits.
+                    let gpus = gpu_backend::detect_gpus();
+                    if gpus.is_empty() {
+                        println!("gpu_detect: none");
+                    } else {
+                        for dev in &gpus {
+                            println!("gpu_detect: {}", dev);
+                        }
+                    }
+                    let cpu_cores = parallel::detect_threads();
+                    println!("cpu_cores: {}", cpu_cores);
+                    std::process::exit(0);
+                }
+                "--auto-tune" => {
+                    // Hardware autotuning mode: detect hardware, print
+                    // recommended settings, and exit (no mining).
+                    let result = gpu_backend::auto_tune_work_sizes();
+                    println!("=== ZION Hardware Autotune ===");
+                    println!();
+                    println!("Detected Hardware:");
+                    println!(
+                        "  GPU:  {} ({} CUs, {} MB VRAM)",
+                        result.gpu_name,
+                        result.gpu_compute_units,
+                        result.gpu_vram_bytes / (1024 * 1024),
+                    );
+                    println!(
+                        "  CPU:  {} ({} physical / {} logical cores)",
+                        result.cpu_model,
+                        result.cpu_physical_cores,
+                        result.cpu_cores,
+                    );
+                    println!(
+                        "  RAM:  {} MB",
+                        result.sys_ram_bytes / (1024 * 1024),
+                    );
+                    println!();
+                    println!("Recommended Settings:");
+                    println!(
+                        "  ZION_GPU_WORK_SIZE={}",
+                        result.gpu_work_size,
+                    );
+                    println!(
+                        "  ZION_SECONDARY_GPU_WORK_SIZE={}",
+                        result.secondary_gpu_work_size,
+                    );
+                    println!(
+                        "  ZION_THREADS={}",
+                        result.threads,
+                    );
+                    println!(
+                        "  ZION_EXT_CPU_NONCE_COUNT={}",
+                        result.verushash_nonce_count,
+                    );
+                    println!();
+                    println!(
+                        "  (GPU WS formula: nearest_pow2(CUs * 512) = nearest_pow2({} * 512) = {})",
+                        result.gpu_compute_units,
+                        result.gpu_work_size,
+                    );
+                    let vram_mib = result.gpu_vram_bytes / (1024 * 1024);
+                    println!(
+                        "  (Secondary WS formula: clamp({}MiB * 0.75 / 1024, 1, 8) * 1M = {})",
+                        vram_mib,
+                        result.secondary_gpu_work_size,
+                    );
+                    std::process::exit(0);
                 }
                 "--help" | "-h" => {
                     println!("Usage: zion-miner [OPTIONS]");
@@ -2351,10 +4465,22 @@ impl MinerConfig {
                     println!("  --gpu BACKEND       GPU backend: auto, metal, opencl, cpu (default: auto)");
                     println!("  --loops N           Iteration count (default: 1)");
                     println!("  --profile NAME      Profile: pool, solo, benchmark, dual");
-                    println!("  --algorithm ALGO    Mining algorithm: deeksha_lite_v1, cosmic_harmony_ekam_deeksha_v2, deeksha_lite_fire");
+                    println!("  --algorithm ALGO    Mining algorithm (see list below)");
+                    println!("  --pearl H:P:W       Pearl PoUW stratum stream (host:port:wallet)");
+                    println!("  --detect-hardware   Detect GPU/CPU hardware and exit (for zion mine auto)");
+                    println!("  --auto-tune         Detect hardware, print recommended settings, and exit");
+                    println!();
+                    println!("  ZION algorithms:  deeksha_lite_v1, cosmic_harmony_ekam_deeksha_v2, deeksha_lite_fire");
+                    println!("  External GPU:      blake3 (ALPH/DCR), kheavyhash (KAS), autolykos (ERG),");
+                    println!("                     kawpow (RVN/CLORE/EVR/MEWC), ethash (ETC), zelhash (FLUX)");
+                    println!("  External CPU:      verushash (VRSC), randomx (XMR)");
+                    println!("  Special:           auto (autotune — benchmark all and pick best)");
+                println!("  --no-tui            Disable interactive TUI and log to stdout");
                     println!();
                     println!("Benchmarks:");
                     println!("  --ekam-bench          Ekam Deeksha GPU benchmark (single algo)");
+                    println!("  --verus-bench         VerusHash v2.2 CPU benchmark (requires native-verushash)");
+                    println!("  --randomx-bench       RandomX (Monero/XMR) CPU benchmark (requires native-randomx)");
                     println!("  --gpu-benchmark-all   Benchmark all algorithms and pick best");
                     println!("  --gpu-bench           GPU Blake3 DCR benchmark");
                     println!("  --bench               CPU Blake3 benchmark");
@@ -2371,16 +4497,104 @@ impl MinerConfig {
         // Apply profile defaults first — env vars still override.
         apply_profile_defaults();
 
+        // ── Hardware autotuning ──
+        // Detect GPU VRAM, compute units, CPU cores, and system RAM.
+        // Compute optimal work sizes and thread count for this hardware.
+        // Env vars always override autotuned values.
+        let autotune = gpu_backend::auto_tune_work_sizes();
+        let autotune_enabled = parse_bool_env("ZION_AUTOTUNE", true);
+        if autotune_enabled {
+            println!("=== Hardware Autotune ===");
+            println!(
+                "  GPU: {} ({} CUs, {} MB VRAM)",
+                autotune.gpu_name,
+                autotune.gpu_compute_units,
+                autotune.gpu_vram_bytes / (1024 * 1024),
+            );
+            println!(
+                "  CPU: {} ({} physical / {} logical cores)",
+                autotune.cpu_model,
+                autotune.cpu_physical_cores,
+                autotune.cpu_cores,
+            );
+            println!(
+                "  RAM: {} MB",
+                autotune.sys_ram_bytes / (1024 * 1024),
+            );
+            println!(
+                "  Recommended: gpu_work_size={} secondary_gpu_work_size={} threads={} verushash_nonce_count={}",
+                autotune.gpu_work_size,
+                autotune.secondary_gpu_work_size,
+                autotune.threads,
+                autotune.verushash_nonce_count,
+            );
+            println!("  (Set ZION_AUTOTUNE=0 to disable)");
+            println!("=========================");
+        }
+
         let threads = std::env::var("ZION_THREADS")
             .ok()
             .and_then(|v| v.parse().ok())
-            .unwrap_or_else(parallel::detect_threads);
+            .unwrap_or_else(|| {
+                if autotune_enabled {
+                    autotune.threads
+                } else {
+                    parallel::detect_threads()
+                }
+            });
 
         let miner_id = env_or_default("ZION_MINER_ID", "local-miner");
         let payout_address = std::env::var("ZION_PAYOUT_ADDRESS")
             .ok()
             .filter(|value| !value.trim().is_empty())
             .unwrap_or_else(|| miner_id.clone());
+
+        // ── Work size autotuning ──
+        // If env var is set, use it. Otherwise use autotuned value (if enabled)
+        // or fall back to 256K default.
+        let gpu_work_size = std::env::var("ZION_GPU_WORK_SIZE")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or_else(|| {
+                if autotune_enabled {
+                    autotune.gpu_work_size
+                } else {
+                    1 << 18 // 256K default
+                }
+            });
+        let pearl_gpu_work_size = std::env::var("ZION_PEARL_GPU_WORK_SIZE")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(gpu_work_size);
+        let secondary_gpu_work_size = std::env::var("ZION_SECONDARY_GPU_WORK_SIZE")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or_else(|| {
+                if autotune_enabled {
+                    autotune.secondary_gpu_work_size
+                } else {
+                    1 << 18 // 256K default
+                }
+            });
+
+        // ── Nonce count default ──
+        // For GPU mining, nonce_count must be ≥ work_size to fill the GPU
+        // pipeline, and ≥ 4× work_size to activate double-buffered async
+        // readback (the key optimization for 28-30 KH/s on RX 5700 XT).
+        // The old default of 1024 was far too small — it caused the GPU to
+        // process only 1024 nonces per batch with no double-buffering,
+        // resulting in ~10 KH/s instead of 28-30 KH/s.
+        // If ZION_NONCE_COUNT is explicitly set, respect it. Otherwise:
+        //   - GPU available: 4× gpu_work_size (e.g. 4×8192 = 32768)
+        //   - CPU only: 1024 (original default)
+        let gpu_backend_kind = gpu_backend::GpuBackendKind::from_env();
+        let nonce_count_default = if gpu_backend_kind != gpu_backend::GpuBackendKind::Cpu
+            && gpu_work_size > 0
+        {
+            gpu_work_size.saturating_mul(4) as u64
+        } else {
+            1024
+        };
 
         Ok(Self {
             miner_id,
@@ -2393,9 +4607,20 @@ impl MinerConfig {
             job_ttl_ms: parse_env_u64("ZION_JOB_TTL_MS", 15_000)?,
             nonce_stride: parse_env_u64("ZION_NONCE_STRIDE", 1_024)?,
             start_nonce: parse_env_u64("ZION_START_NONCE", 42)?,
-            nonce_count: parse_env_u64("ZION_NONCE_COUNT", 1024)?,
+            nonce_count: parse_env_u64("ZION_NONCE_COUNT", nonce_count_default)?,
             nonce_autotune: parse_bool_env("ZION_NONCE_AUTOTUNE", true),
-            nonce_count_min: parse_env_u64("ZION_NONCE_COUNT_MIN", 10_000)?,
+            nonce_count_min: parse_env_u64("ZION_NONCE_COUNT_MIN", {
+                // For GPU mining, min must be ≥ 2× work_size to keep
+                // double-buffered async readback active at all times.
+                // double-buffering requires nonce_count > work_size, so
+                // the minimum must be at least work_size + 1, but we use
+                // 2× for safety margin (autotune shrinks by 50%).
+                if gpu_backend_kind != gpu_backend::GpuBackendKind::Cpu && gpu_work_size > 0 {
+                    (gpu_work_size as u64).saturating_mul(2).max(10_000)
+                } else {
+                    10_000
+                }
+            })?,
             nonce_count_max: parse_env_u64("ZION_NONCE_COUNT_MAX", 5_000_000)?,
             nonce_adjust_percent: parse_env_u64("ZION_NONCE_ADJUST_PCT", 50)?,
             remote_ttl_guard_percent: parse_env_u64("ZION_REMOTE_TTL_GUARD_PCT", 90)?
@@ -2415,13 +4640,27 @@ impl MinerConfig {
             )?,
             revenue_value_usd: parse_env_f64("ZION_REVENUE_USD", 1.25)?,
             threads,
-            gpu_backend: gpu_backend::GpuBackendKind::from_env(),
-            gpu_work_size: std::env::var("ZION_GPU_WORK_SIZE")
-                .ok()
-                .and_then(|v| v.parse().ok())
-                .unwrap_or(1 << 18), // 256K default
+            gpu_backend: gpu_backend_kind,
+            gpu_work_size,
+            pearl_gpu_work_size,
+            secondary_gpu_work_size,
             algorithm: std::env::var("ZION_MINER_ALGORITHM")
                 .unwrap_or_else(|_| "deeksha_lite_v1".to_string()),
+            stream1_enabled: parse_bool_env("ZION_STREAM1_ENABLED", true),
+            stream2_enabled: parse_bool_env("ZION_STREAM2_ENABLED", true),
+            stream3_enabled: parse_bool_env("ZION_STREAM3_ENABLED", true),
+            verushash_nonce_count: std::env::var("ZION_EXT_CPU_NONCE_COUNT")
+                .ok()
+                .and_then(|v| v.parse().ok())
+                .unwrap_or_else(|| {
+                    if autotune_enabled {
+                        autotune.verushash_nonce_count
+                    } else {
+                        10_000_000
+                    }
+                }),
+            auto_mode: parse_bool_env("ZION_AUTO_MODE", false),
+            gpu_vram_bytes: autotune.gpu_vram_bytes,
         })
     }
 }
@@ -2723,9 +4962,11 @@ mod tests {
     }
 
     #[test]
-    fn parse_header_hex_rejects_short_input() {
+    fn parse_header_hex_pads_short_input() {
+        // External AuxPoW jobs may send shorter headers (e.g. KAS 32-byte pre_pow_hash);
+        // the parser pads them to the 80-byte MiningHeader layout.
         let result = parse_header_hex("aabb");
-        assert!(result.is_err());
+        assert!(result.is_ok());
     }
 
     // ── parse_bool_env ──
@@ -2965,3 +5206,5 @@ mod tests {
         }
     }
 }
+
+
