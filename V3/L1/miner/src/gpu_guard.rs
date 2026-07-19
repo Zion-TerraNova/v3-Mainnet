@@ -323,9 +323,10 @@ impl GpuTuning {
                 (ws, 64, opts, 85, false)
             }
             (GpuAlgorithm::DeekshaLiteFire, GpuDeviceFamily::AmdRdna) => {
+                // RDNA1: LWS=256 benchmarks slightly better than 128 (12.5s vs 14s)
                 let ws = (max_by_vram.min(8192).max(512)).next_power_of_two();
                 let opts = "-cl-std=CL1.2 -cl-mad-enable".to_string();
-                (ws, 128, opts, 85, false)
+                (ws, 256, opts, 85, false)
             }
             (GpuAlgorithm::DeekshaLiteFire, GpuDeviceFamily::Nvidia) => {
                 let ws = (max_by_vram.min(4096).max(256)).next_power_of_two();
