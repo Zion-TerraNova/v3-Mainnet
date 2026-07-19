@@ -106,6 +106,56 @@ fn log_always(msg: &str) {
     println!("{}", msg);
 }
 
+/// Serializable per-stream telemetry for the triple-stream architecture.
+///
+/// Mirrors `ui::StreamStats` but derives `Serialize` so it can be embedded
+/// in the stats JSON file and HTTP `/stats` payload consumed by the desktop
+/// agent (and any other external telemetry consumer).
+///
+/// Field names use the `stream_*` prefix so consumers can disambiguate from
+/// the legacy aggregate `hashrate_*` / `shares_*` fields.
+#[derive(Debug, Clone, serde::Serialize)]
+struct StreamStatsInfo {
+    /// Stream index (1 = ZION, 2 = GPU external, 3 = CPU external)
+    index: u8,
+    /// Stable label: "ZION", "GPU PROFIT", "CPU PROFIT"
+    label: String,
+    /// External coin ticker ("ZION" for stream 1, "KAS"/"VRSC"/... for 2/3)
+    coin: String,
+    /// Algorithm name (e.g. "deeksha_lite_v1", "verushash", "kheavyhash")
+    algorithm: String,
+    /// 10-second rolling hashrate (H/s)
+    hashrate_10s: f64,
+    /// 60-second rolling hashrate (H/s)
+    hashrate_60s: f64,
+    /// 15-minute rolling hashrate (H/s) — 0.0 for streams 2/3 (not tracked)
+    hashrate_15m: f64,
+    /// Accepted shares for this stream
+    accepted: u64,
+    /// Rejected shares for this stream
+    rejected: u64,
+    /// Whether this stream is currently mining
+    active: bool,
+}
+
+impl StreamStatsInfo {
+    /// Build from a `ui::StreamStats` reference (which is not Serialize).
+    fn from_ui(index: u8, s: &ui::StreamStats) -> Self {
+        Self {
+            index,
+            label: s.label.to_string(),
+            coin: s.coin.clone(),
+            algorithm: s.algorithm.clone(),
+            hashrate_10s: s.hashrate_10s,
+            hashrate_60s: s.hashrate_60s,
+            hashrate_15m: s.hashrate_15m,
+            accepted: s.accepted,
+            rejected: s.rejected,
+            active: s.active,
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 struct MinerMetricsSnapshot {
     started_at: Instant,
@@ -117,6 +167,10 @@ struct MinerMetricsSnapshot {
     pool_addr: String,
     backend: String,
     status: String,
+    /// Per-stream telemetry for the triple-stream architecture.
+    /// Index 0 = ZION (stream 1), 1 = GPU external (stream 2), 2 = CPU external (stream 3).
+    /// Empty when triple-stream is not active (legacy single-stream mode).
+    streams: Vec<StreamStatsInfo>,
     #[allow(dead_code)]
     loop_target: u32,
     current_iteration: u32,
@@ -189,7 +243,20 @@ impl MinerMetricsSnapshot {
             remote_ttl_ms: 0,
             hashrate_max: 0.0,
             algorithm: config.algorithm.clone(),
+            streams: Vec::new(),
         }
+    }
+
+    /// Update per-stream telemetry from `HashrateTracker::build_stream_stats()`.
+    /// Called from `maybe_print_status()` right before the stats file is written
+    /// so the desktop agent (and HTTP `/stats` consumers) see fresh per-stream
+    /// hashrates, shares, and coin/algorithm labels.
+    fn set_streams(&mut self, stats: &[ui::StreamStats]) {
+        self.streams = stats
+            .iter()
+            .enumerate()
+            .map(|(i, s)| StreamStatsInfo::from_ui((i + 1) as u8, s))
+            .collect();
     }
 
     fn sync(
@@ -483,6 +550,8 @@ fn build_miner_stats_payload(snapshot: &MinerMetricsSnapshot) -> String {
         "best_batch_ms": snapshot.best_batch_ms,
         "remote_ttl_ms": snapshot.remote_ttl_ms,
         "hashrate_max": snapshot.hashrate_max,
+        // ── Triple-stream per-stream telemetry (DeekshaChv3 parallel streaming)
+        "streams": snapshot.streams,
         "api": {
             "health": "/health",
             "metrics": "/metrics",
@@ -595,6 +664,11 @@ fn write_stats_file(path: &str, snapshot: &MinerMetricsSnapshot) {
         "status": snapshot.status,
         "miner_id": snapshot.miner_id,
         "pool_addr": snapshot.pool_addr,
+        // ── Triple-stream per-stream telemetry (DeekshaChv3 parallel streaming)
+        // Empty array when triple-stream is not active (legacy single-stream mode).
+        // Each entry: {index, label, coin, algorithm, hashrate_10s, hashrate_60s,
+        //              hashrate_15m, accepted, rejected, active}
+        "streams": snapshot.streams,
     });
 
     // Atomic write: write to temp then rename (prevents partial reads by agent)
@@ -3289,7 +3363,12 @@ impl SessionTelemetry {
         if let Some(path) = stats_file {
             // Throttle writes to at most every 3 seconds
             if now.duration_since(self.last_stats_write).as_secs() >= 3 {
-                if let Ok(snapshot) = metrics.lock() {
+                if let Ok(mut snapshot) = metrics.lock() {
+                    // Refresh per-stream telemetry so the stats file / HTTP
+                    // /stats endpoint expose fresh triple-stream data to the
+                    // desktop agent. `stream_stats` is built by
+                    // `HashrateTracker::build_stream_stats()` upstream.
+                    snapshot.set_streams(stream_stats);
                     write_stats_file(path, &snapshot);
                     self.last_stats_write = now;
                 }
@@ -4082,6 +4161,7 @@ fn mine_external_stream_cpu(
         algorithm: ext.algorithm.clone(),
         header_bytes,
         target_bytes,
+        share_target_bytes: target_bytes,
         timestamp: ext.height, // reused for height in some algorithms
         block_number: Some(ext.height),
         extranonce1,
