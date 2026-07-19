@@ -294,14 +294,15 @@ impl GpuTuning {
                 (ws, 64, opts, 85, false)
             }
             (GpuAlgorithm::DeekshaLiteV1, GpuDeviceFamily::AmdRdna) => {
-                // RDNA: fast ulong-width path, smaller local size for better occupancy
+                // RDNA: fast ulong-width path, LWS=256 benchmarks better than 128
+                // (matches fire tuning — same kernel without thermal loop).
                 // NO -cl-fast-relaxed-math: causes AMD driver crashes on integer
                 // code paths (Keccak scratchpad, AES) on some RDNA driver versions.
                 // NO -cl-uniform-work-group-size: rejected with CL_INVALID_COMPILER_OPTIONS
                 // on ROCm 3581.0 / gfx1010 (RDNA1) — OpenCL 2.0 flag but driver rejects it.
                 let ws = (max_by_vram.min(8192).max(512)).next_power_of_two();
                 let opts = "-cl-std=CL1.2 -cl-mad-enable".to_string();
-                (ws, 128, opts, 85, false)
+                (ws, 256, opts, 85, false)
             }
             (GpuAlgorithm::DeekshaLiteV1, GpuDeviceFamily::Nvidia) => {
                 let ws = (max_by_vram.min(8192).max(512)).next_power_of_two();
