@@ -71,6 +71,7 @@ pub struct MinerControl {
 const CPU_COIN_OPTIONS: &[&str] = &["auto", "VRSC", "XMR", "RTM"];
 const GPU_COIN_OPTIONS: &[&str] = &[
     "auto", "RVN", "KAS", "ALPH", "DCR", "ERG", "ETC", "CLORE", "MEWC", "EVR", "FLUX", "EPIC",
+    "ZANO",
 ];
 
 impl MinerControl {
