@@ -157,7 +157,7 @@ impl StreamStatsInfo {
 }
 
 #[derive(Debug, Clone)]
-struct MinerMetricsSnapshot {
+pub(crate) struct MinerMetricsSnapshot {
     started_at: Instant,
     last_update_at: Instant,
     miner_id: String,
@@ -326,6 +326,35 @@ impl MinerMetricsSnapshot {
     fn seconds_since_update(&self) -> u64 {
         self.last_update_at.elapsed().as_secs()
     }
+
+    pub(crate) fn as_tui(&self) -> TuiMetrics {
+        TuiMetrics {
+            submit_avg_ms: self.submit_avg_latency_ms,
+            submit_max_ms: self.submit_max_latency_ms,
+            best_batch_ms: self.best_batch_ms,
+            remote_ttl_ms: self.remote_ttl_ms,
+            hashrate_max: self.hashrate_max,
+            current_iteration: self.current_iteration,
+            threads: self.threads,
+            nonce_window: self.nonce_window,
+            status: self.status.clone(),
+            backend: self.backend.clone(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub(crate) struct TuiMetrics {
+    pub submit_avg_ms: f64,
+    pub submit_max_ms: u64,
+    pub best_batch_ms: u64,
+    pub remote_ttl_ms: u64,
+    pub hashrate_max: f64,
+    pub current_iteration: u32,
+    pub threads: usize,
+    pub nonce_window: u64,
+    pub status: String,
+    pub backend: String,
 }
 
 fn sync_miner_metrics(
@@ -1109,6 +1138,7 @@ fn main() -> Result<()> {
             },
             work_size,
             &bench_algorithm,
+            "",
         )?;
         println!("device={}", gpu.device_name());
         println!("backend={}", gpu.backend_kind().as_str());
@@ -1264,6 +1294,8 @@ fn main() -> Result<()> {
         &config.algorithm,
         config.threads,
         config.gpu_backend != gpu_backend::GpuBackendKind::Cpu,
+        config.cpu_coin.as_deref().unwrap_or(""),
+        config.gpu_coin.as_deref().unwrap_or(""),
     )));
     let hashrate = HashrateTracker::new();
 
@@ -1301,7 +1333,12 @@ fn main() -> Result<()> {
                 });
 
                 // Run interactive TUI in main thread
-                let _ = interactive::run_interactive(Arc::clone(&control), Arc::clone(&hashrate));
+                let _ = interactive::run_interactive(
+                    Arc::clone(&control),
+                    Arc::clone(&hashrate),
+                    Arc::clone(&metrics),
+                    pool_addr.to_string(),
+                );
 
                 // Signal quit and wait for mining thread
                 control.lock().unwrap().requested_quit = true;
@@ -2354,6 +2391,11 @@ fn run_remote_session(
 
     let mut current_algorithm = String::new();
 
+    // Track the last CPU/GPU coin preference actually sent so the TUI can
+    // cycle coins at runtime without a restart.
+    let mut last_sent_cpu_coin = control.lock().unwrap().cpu_coin.clone();
+    let mut last_sent_gpu_coin = control.lock().unwrap().gpu_coin.clone();
+
     // ── Send initial CoinPreference to pool ──
     // Two sources:
     //   1. Autonomous mode: profit_router builds preference from profit estimates
@@ -2400,6 +2442,34 @@ fn run_remote_session(
                 threads = t;
             }
             VERBOSE.store(c.verbose, Ordering::Relaxed);
+        }
+
+        // ── TUI-driven coin preference update ──
+        {
+            let c = control.lock().unwrap();
+            if c.cpu_coin != last_sent_cpu_coin || c.gpu_coin != last_sent_gpu_coin {
+                let pref_msg = zion_pool::PoolMessage::CoinPreference {
+                    miner_id: config.miner_id.clone(),
+                    gpu_coin: c.gpu_coin.clone(),
+                    cpu_coin: c.cpu_coin.clone(),
+                    gpu_profit_usd_day: 0.0,
+                    cpu_profit_usd_day: 0.0,
+                };
+                if let Ok(pref_line) = zion_pool::encode_message(&pref_msg) {
+                    if let Ok(mut w) = writer.lock() {
+                        let _ = w.write_all(pref_line.as_bytes());
+                        let _ = w.flush();
+                        println!(
+                            "[{}] tui_coin_preference_updated cpu_coin={} gpu_coin={}",
+                            log_timestamp(),
+                            c.cpu_coin,
+                            c.gpu_coin
+                        );
+                    }
+                }
+                last_sent_cpu_coin = c.cpu_coin.clone();
+                last_sent_gpu_coin = c.gpu_coin.clone();
+            }
         }
 
         // ── Autonomous profit router: periodic re-evaluation ──
@@ -2788,35 +2858,11 @@ fn run_remote_session(
             // Every ZION_ADAPTIVE_UPDATE_INTERVAL_S seconds, recompute the
             // optimal (burst, gap_ms) for the external GPU thread based on
             // observed Stream 1 (Deeksha) vs Stream 2 (ProgPow) hashrates.
-            // The scheduler targets equal expected share rates between the
-            // two streams, weighted by their respective share difficulties.
-            if let Some(ref atx) = adaptive_tx {
-                let now = std::time::Instant::now();
-                let update_interval = std::env::var("ZION_ADAPTIVE_UPDATE_INTERVAL_S")
-                    .ok()
-                    .and_then(|v| v.parse::<u64>().ok())
-                    .unwrap_or(30);
-                let last = last_adaptive_update.lock().unwrap();
-                if now.duration_since(*last).as_secs() >= update_interval {
-                    drop(last);
-                    *last_adaptive_update.lock().unwrap() = now;
-                    let zion_hps = hashrate.zion_hps_60s();
-                    let ext_hps = hashrate.gpu_ext_hps_60s();
-                    let (burst, gap_ms) = compute_adaptive_duty_cycle(zion_hps, ext_hps);
-                    let _ = atx.send((burst, gap_ms));
-                    println!(
-                        "[{}] adaptive_duty_cycle_computed zion_hps={:.1} ext_hps={:.1} burst={} gap_ms={} duty={:.0}%",
-                        log_timestamp(),
-                        zion_hps,
-                        ext_hps,
-                        burst,
-                        gap_ms,
-                        if burst > 0 { 100.0 * burst as f64 / (burst as f64 + gap_ms as f64 / 50.0) } else { 0.0 }
-                    );
-                } else {
-                    drop(last);
-                }
-            }
+            maybe_send_adaptive_update(
+                &adaptive_tx,
+                &last_adaptive_update,
+                &hashrate,
+            );
             continue;
         };
         let search_depth = solution.candidate.nonce.saturating_sub(job.start_nonce) + 1;
@@ -3021,6 +3067,13 @@ fn run_remote_session(
             metrics,
             pool_addr,
             &stream_stats,
+        );
+
+        // ── Adaptive GPU duty-cycle scheduler (Fáze 4) ──
+        maybe_send_adaptive_update(
+            &adaptive_tx,
+            &last_adaptive_update,
+            &hashrate,
         );
     }
 
@@ -3539,6 +3592,50 @@ fn compute_adaptive_duty_cycle(zion_hps: f64, ext_hps: f64) -> (u64, u64) {
     (burst, gap_ms)
 }
 
+/// Throttled adaptive duty-cycle update sender. Called from both branches of
+/// the main mining loop (solution found / no solution). Reads per-stream 60s
+/// hashrates from `hashrate`, computes a new (burst, gap_ms) via
+/// `compute_adaptive_duty_cycle`, and sends it to the external GPU thread
+/// at most once per `ZION_ADAPTIVE_UPDATE_INTERVAL_S` seconds.
+fn maybe_send_adaptive_update(
+    adaptive_tx: &Option<std::sync::mpsc::Sender<(u64, u64)>>,
+    last_adaptive_update: &std::sync::Mutex<std::time::Instant>,
+    hashrate: &Arc<HashrateTracker>,
+) {
+    let atx = match adaptive_tx {
+        Some(tx) => tx,
+        None => {
+            eprintln!("[DEBUG] maybe_send_adaptive_update: adaptive_tx=None");
+            return;
+        }
+    };
+    let now = std::time::Instant::now();
+    let update_interval = std::env::var("ZION_ADAPTIVE_UPDATE_INTERVAL_S")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .unwrap_or(30);
+    let last = last_adaptive_update.lock().unwrap();
+    let elapsed = now.duration_since(*last).as_secs();
+    if elapsed < update_interval {
+        return;
+    }
+    drop(last);
+    *last_adaptive_update.lock().unwrap() = now;
+    let zion_hps = hashrate.zion_hps_60s();
+    let ext_hps = hashrate.gpu_ext_hps_60s();
+    let (burst, gap_ms) = compute_adaptive_duty_cycle(zion_hps, ext_hps);
+    let _ = atx.send((burst, gap_ms));
+    println!(
+        "[{}] adaptive_duty_cycle_computed zion_hps={:.1} ext_hps={:.1} burst={} gap_ms={} duty={:.0}%",
+        log_timestamp(),
+        zion_hps,
+        ext_hps,
+        burst,
+        gap_ms,
+        if burst > 0 { 100.0 * burst as f64 / (burst as f64 + gap_ms as f64 / 50.0) } else { 0.0 }
+    );
+}
+
 /// Persistent external GPU miner thread for the single GPU profit coin.
 ///
 /// Runs in a separate thread with its own GPU context/command queue.
@@ -3605,9 +3702,31 @@ fn external_gpu_thread(
     }
 
     loop {
-        // Check for new job (non-blocking)
-        match rx.try_recv() {
-            Ok(job) => {
+        // Check for new job (non-blocking). Drain the channel to get the
+        // LATEST job — the pool sends wire_job every ~1s and the channel
+        // can accumulate many stale jobs while the GPU batch is running.
+        // Without draining, the miner would process old jobs FIFO and
+        // always be behind (observed: 15+ jobs stale on ALPH).
+        let mut latest_job: Option<zion_pool::ExternalStreamJob> = None;
+        let mut channel_disconnected = false;
+        loop {
+            match rx.try_recv() {
+                Ok(job) => {
+                    latest_job = Some(job);
+                }
+                Err(std::sync::mpsc::TryRecvError::Empty) => break,
+                Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                    channel_disconnected = true;
+                    break;
+                }
+            }
+        }
+        if channel_disconnected && latest_job.is_none() {
+            println!("[{}] ext_gpu_channel_closed — exiting", log_timestamp());
+            return;
+        }
+        match latest_job {
+            Some(job) => {
                 // Only reset nonce_offset when the job actually changes
                 // (different job_id or height). The pool re-sends the same
                 // job every ~1s; resetting nonce_offset each time would cause
@@ -3669,15 +3788,11 @@ fn external_gpu_thread(
                 hashrate.set_gpu_ext_job(&job.coin, &job.algorithm);
                 current_job = Some(job);
             }
-            Err(std::sync::mpsc::TryRecvError::Empty) => {
-                // Debug: log first few empty receives to confirm thread is alive
+            None => {
+                // No job in channel — debug: log first few empty receives
                 if batch_count == 0 && last_heartbeat.elapsed().as_secs() < 3 {
                     println!("[{}] ext_gpu_rx_empty (no job yet, thread alive)", log_timestamp());
                 }
-            }
-            Err(std::sync::mpsc::TryRecvError::Disconnected) => {
-                println!("[{}] ext_gpu_channel_closed — exiting", log_timestamp());
-                return;
             }
         }
 
@@ -3734,6 +3849,7 @@ fn external_gpu_thread(
                 backend_kind,
                 work_size,
                 algo,
+                &job.coin,
                 shared_cuda_dev.clone(),
             ) {
                 Ok(m) => {
