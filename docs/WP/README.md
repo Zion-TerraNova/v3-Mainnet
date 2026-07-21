@@ -5,6 +5,13 @@ ZION TerraNova v3 — Mainnet Alpha 3.1.
 
 ## Documents
 
+### Master / Canonical Synthesis
+
+| Document | Language | Format | Description |
+|----------|----------|--------|-------------|
+| `ZION_MASTER_WHITEPAPER_3.1_CZ.md` | Czech | Markdown | The Golden Book — canonical synthesis of all four books (Genesis, Quantum Revolution, Ekam Deeksha, Terra Nova) for Mainnet Alpha 3.1 |
+| `ZION_MASTER_WHITEPAPER_3.1_EN.md` | English | Markdown | English translation of the Golden Book |
+
 ### Story / Narrative
 
 | Document | Language | Format | Description |
@@ -25,6 +32,9 @@ ZION TerraNova v3 — Mainnet Alpha 3.1.
 
 ## How to Read
 
+- **Want the whole picture?** Read the Master Whitepaper (Golden Book) —
+  the canonical synthesis of all four books with the technical anchor
+  facts and the Mainnet Alpha 3.1 roadmap.
 - **Want the story?** Start with the Fable Edition (WpLite) — a fairy tale
   with verifiable facts after each chapter.
 - **Want the technical details?** Read the Technical Whitepaper — the
