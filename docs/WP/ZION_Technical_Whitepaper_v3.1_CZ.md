@@ -470,7 +470,7 @@ rozestavěné, ne hotové.
 
 | Co si ověřit | Kde |
 |---------------|-----|
-| Protokol | `zion-v3-node/3.0.5` |
+| Protokol | `zion-v3-node/3.0.6` |
 | Genesis hash | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
 | Celková nabídka | 144 000 000 000 ZION (`emission.rs`) |
 | Premine | 16 780 000 000 ZION, transparentní výstupy v bloku 0 |

@@ -58,7 +58,7 @@ Blockchain s proof-of-work konsenzem, dual-algoritmem, cross-chain bridge, DeFi 
 
 > **⚠️ MAINNET BETA — Těžba na vlastní nebezpečí**
 
-ZION v3.0.5 je **živý a běží** jako Mainnet Beta. Síť je operační, bloky jsou produkovány a genesis řetězec je ustaven.
+ZION v3.0.6 je **živý a běží** jako Mainnet Beta. Síť je operační, bloky jsou produkovány a genesis řetězec je ustaven.
 
 **Co to znamená:**
 - ✅ Síť je živá a produkuje bloky
@@ -320,7 +320,7 @@ v3-Mainnet/
 ├── Cargo.toml              # Root Rust workspace
 ├── SECURITY.md             # Hlášení zranitelností
 ├── CONTRIBUTING.md         # Průvodce příspěvky
-├── CHANGELOG.md            # Historie verzí (v3.0.0 → v3.0.5-beta)
+├── CHANGELOG.md            # Historie verzí (v3.0.0 → v3.0.6-beta)
 └── LICENSE                 # MIT
 ```
 
@@ -452,8 +452,8 @@ cargo run --release -p zion-core --bin zion-node
 
 | | |
 |---|---|
-| **Protokol** | 3.0.5 |
-| **Release** | v3.0.5-beta (Mainnet Beta) |
+| **Protokol** | 3.0.6 |
+| **Release** | v3.0.6-beta (Mainnet Beta) |
 | **Status** | Live — těžba aktivní (na vlastní nebezpečí) |
 | **Oficiální launch** | 2026-12-31 |
 
@@ -464,7 +464,7 @@ ZION používá modifikovaný semantic versioning:
 | Komponent | Formát | Příklad |
 |-----------|--------|---------|
 | Protokol | `MAJOR.MINOR.PATCH` | `3.0.6` |
-| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.5-beta` |
+| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.6-beta` |
 | Suffix | `-beta`, `-rc`, `-stable` | `v3.1.0-rc1` |
 
 - **MAJOR** — consensus-breaking změny (nový genesis, hard fork)
@@ -478,15 +478,15 @@ ZION používá modifikovaný semantic versioning:
 
 | Verze | Cíl | Status |
 |---------|--------|--------|
-| 3.0.5-beta | Mainnet Beta | ✅ Live (2026-07-09) |
-| 3.0.5-stable | Oficiální veřejný launch | 📅 2026-12-31 |
+| 3.0.6-beta | Mainnet Beta | ✅ Live (2026-07-09) |
+| 3.0.6-stable | Oficiální veřejný launch | 📅 2026-12-31 |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care hybrid (NPU těžba) | 🔜 2027 |
 | 4.0.0 | Plný Proof-of-Care konsensus | 🔜 2028+ |
 
 ### Historie verzí
 
-Viz [CHANGELOG.md](../../CHANGELOG.md) pro plnou historii verzí, včetně všech změn z v3.0.0 až po v3.0.5-beta.
+Viz [CHANGELOG.md](../../CHANGELOG.md) pro plnou historii verzí, včetně všech změn z v3.0.0 až po v3.0.6-beta.
 
 Klíčové milníky:
 - **v3.0.0** (2026-05-20) — Initial V3 mainnet launch
