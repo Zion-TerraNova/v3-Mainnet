@@ -242,7 +242,7 @@ brochure would omit. That is exactly why it is here.
 | **v3.0.3** | The decimal cut | The 1 ZION = 1,000,000 flowers unit, unified scale across the network |
 | **v3.0.4** | The night of the snake and the new root | Security incident disclosed and fixed, hard genesis reset; first DeFi bridges — wZION on six EVM chains, staking, farming, DAO |
 | **v3.0.5** | All Green | Mainnet Beta stabilization, public community CLI, all services active, whitepaper canonized |
-| **v3.0.6-beta** | Three Streams of One River | The **Triple Stream** engine — Zion Grow, Zion Liquidity |
+| **v3.0.6-beta** | Three Streams of One River | The **Trinity** engine — Zion Grow, Zion Liquidity |
 | **v3.1.0** | **Mainnet Alpha** | Public launch — target 31 Dec 2026 |
 
 ## The night the snake entered the garden
@@ -273,14 +273,14 @@ growth ring shown to visitors first.
 
 ---
 
-# PART FOUR — Three Streams of One River: Triple Stream
+# PART FOUR — Three Streams of One River: Trinity
 
 ## Mine ZION. Earn ZION. Grow ZION.
 
 Starting with **v3.0.6-beta**, the official ZION miner carries a new
-capability — a bonus for everyone who mines: **Triple Stream**.
+capability — a bonus for everyone who mines: **Trinity**.
 
-Triple Stream is a smart mining engine built directly into the official
+Trinity is a smart mining engine built directly into the official
 miner. It activates automatically — no configuration, no second wallet,
 no second application. It does one thing: **extract more value from your
 hardware than the core alone could, and pay all of it out in ZION.**
@@ -318,7 +318,7 @@ downhill — toward those who do the work.
 
 ## A bonus, not a condition
 
-Triple Stream demands nothing: it is not a fee, a registration, or a
+Trinity demands nothing: it is not a fee, a registration, or a
 setting. It is a property of the official ZION miner v3.0.6 and later.
 ZION's core and pool remain fully open under the MIT license; the Triple
 Stream engine is a proprietary bonus layer above them — free to everyone
@@ -409,7 +409,7 @@ stars toward which the sap may one day rise.
 ## The road
 
 **Phase A — Take root (now, LIVE):** stable L1, Mainnet Beta, the
-Triple Stream engine, transparent communication, documentation that does
+Trinity engine, transparent communication, documentation that does
 not lie about status.
 
 **Phase B — Mainnet Alpha 3.1 (target 31 Dec 2026):**
@@ -459,7 +459,7 @@ It is **living infrastructure + a compass**.
 | Emission | Decade Decay −20%/decade + perpetual tail ~724.785 ZION/block |
 | Unit | 1 ZION = 1,000,000 flowers |
 | Launch model | Fair Launch — no ICO, no pre-sale |
-| Official miner | v3.0.6-beta+ with Triple Stream (Zion Grow · Zion Liquidity) |
+| Official miner | v3.0.6-beta+ with Trinity (Zion Grow · Zion Liquidity) |
 | Core & pool license | MIT, open source |
 | Source code | https://github.com/Zion-TerraNova/v3-Mainnet |
 | Website / Explorer | https://zionterranova.com · /explorer |

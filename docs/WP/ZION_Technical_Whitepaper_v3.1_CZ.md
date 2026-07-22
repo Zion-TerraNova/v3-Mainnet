@@ -434,7 +434,7 @@ výmluva, je to účet, který roste.
 | **v3.0.3** | Desetinný řez | Přechod na 1 ZION = 1 000 000 flowers, sjednocení RPC měřítka | ŽIVÉ |
 | **v3.0.4** | Noc hada a nový kořen | Bezpečnostní incident zveřejněn a opraven, hard genesis reset, DeFi mosty (wZION na 6 EVM sítích, staking, farming, DAO) | ŽIVÉ |
 | **v3.0.5** | Všechno zelené | Mainnet Beta stabilizace, veřejné vydání komunitního CLI, 12/12 služeb aktivních, whitepaper kanonizován | ŽIVÉ |
-| **v3.0.6-beta** | Tři proudy jedné řeky | Triple Stream těžební jádro — Zion Grow, Zion Liquidity | ŽIVÉ (Beta) |
+| **v3.0.6-beta** | Tři proudy jedné řeky | Trinity těžební jádro — Zion Grow, Zion Liquidity | ŽIVÉ (Beta) |
 | **v3.1.0** | Mainnet Alpha | Veřejný launch, externí audit, mobilní peněženka, rozšířené DeFi | Plánováno (31. 12. 2026) |
 
 ---

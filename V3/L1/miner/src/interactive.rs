@@ -578,7 +578,7 @@ impl HashrateTracker {
         self.cpu_ext_active.store(0, Ordering::Relaxed);
     }
 
-    /// Build per-stream stats for the triple-stream display.
+    /// Build per-stream stats for the trinity display.
     /// `zion_algorithm` is the current ZION algorithm (from control/telemetry).
     pub fn build_stream_stats(&self, zion_algorithm: &str) -> Vec<crate::ui::StreamStats> {
         let (z10, z60, z15m) = if let Ok(w) = self.zion_windows.lock() {
@@ -1820,7 +1820,7 @@ pub(crate) fn draw_dashboard_redesign(
     #[cfg(feature = "public_build")]
     let header_label = "ZION MINER";
     #[cfg(not(feature = "public_build"))]
-    let header_label = "ZION MINER  |  TRIPLE STREAM";
+    let header_label = "ZION MINER  |  TRINITY";
     frame.title(&format!(
         "{}  |  {}",
         header_label,
@@ -1881,7 +1881,7 @@ pub(crate) fn draw_dashboard_redesign(
         Color::White,
     )?;
     // In public_build, hide Stream 2 (GPU/ZANO) and Stream 3 (CPU/VRSC).
-    // Triple Stream still runs internally — only the display is suppressed.
+    // Trinity still runs internally — only the display is suppressed.
     #[cfg(not(feature = "public_build"))]
     {
     let gpu_desc = if gpu_active {
@@ -1939,7 +1939,7 @@ pub(crate) fn draw_dashboard_redesign(
         let word = if entry.accepted { "OK" } else { "REJ" };
         let reason = dashboard_share_reason(&entry.reason);
         // In public_build, all shares display as "ZION" regardless of which
-        // stream actually found them (Triple Stream runs silently).
+        // stream actually found them (Trinity runs silently).
         #[cfg(feature = "public_build")]
         let stream_label = "ZION";
         #[cfg(not(feature = "public_build"))]

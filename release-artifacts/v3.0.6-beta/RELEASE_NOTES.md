@@ -1,4 +1,4 @@
-# ZION v3.0.6-beta — Zion Trinity · Triple Stream
+# ZION v3.0.6-beta — Trinity
 
 **Mine ZION. Earn ZION. Grow ZION.**
 
@@ -7,11 +7,11 @@
 
 ---
 
-## What's new in v3.0.6 — Zion Trinity?
+## What's new in v3.0.6 — Trinity?
 
-### Zion Trinity · Triple Stream Engine
+### Trinity Engine
 
-The ZION v3.0.6 miner introduces our proprietary **Triple Stream** mining
+The ZION v3.0.6 miner introduces our proprietary **Trinity** mining
 engine — your GPU and CPU work together to maximize your ZION earnings.
 
 - **No exchanges, no selling, no price dumps**
@@ -37,7 +37,7 @@ Optimized GPU kernels for AMD RDNA (RX 5000/6000 series):
 
 | GPU | Algorithm | Hashrate |
 |-----|-----------|----------|
-| RX 5600 XT | Deeksha Lite v1 | 34 KH/s (solo) / 17 KH/s (Triple Stream) |
+| RX 5600 XT | Deeksha Lite v1 | 34 KH/s (solo) / 17 KH/s (Trinity) |
 | RX 5700 XT | Deeksha Lite v1 | 28-30 KH/s |
 
 ---
@@ -175,9 +175,9 @@ chmod +x zion
 
 ---
 
-## What is Zion Trinity · Triple Stream?
+## What is Trinity?
 
-**Zion Trinity** is the v3.0.6 release name. **Triple Stream** is ZION's
+**Trinity** is the v3.0.6 release name. **Trinity** is ZION's
 proprietary mining architecture that maximizes your ZION earnings by
 utilizing your entire rig — GPU and CPU — simultaneously.
 
@@ -275,7 +275,7 @@ sha256sum zion-miner-linux-x86_64.tar.gz
 
 MIT — see [LICENSE](https://github.com/Zion-TerraNova/v3-Mainnet/blob/main/LICENSE)
 
-> **Note:** The miner binary is released under MIT license. The Triple Stream
+> **Note:** The miner binary is released under MIT license. The Trinity
 > engine and AuxPow source code are proprietary and not included in the
 > public repository. The ZION blockchain core, pool, and community CLI remain
 > fully open-source.
@@ -284,7 +284,7 @@ MIT — see [LICENSE](https://github.com/Zion-TerraNova/v3-Mainnet/blob/main/LIC
 
 <div align="center">
 
-**ZION Zion Trinity — Multichain Dharma Ecosystem**
+**ZION Trinity — Multichain Dharma Ecosystem**
 
 *Built with care, secured by consensus.*
 

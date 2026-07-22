@@ -226,7 +226,7 @@ brožura vynechala. Právě proto tu je.
 | **v3.0.3** | Desetinný řez | Jednotka 1 ZION = 1 000 000 flowers, sjednocení měřítka napříč sítí |
 | **v3.0.4** | Noc hada a nový kořen | Bezpečnostní incident zveřejněn, opraven, hard genesis reset; první DeFi mosty — wZION na šesti EVM sítích, staking, farming, DAO |
 | **v3.0.5** | Všechno zelené | Mainnet Beta stabilizace, veřejné komunitní CLI, všechny služby aktivní, whitepaper kanonizován |
-| **v3.0.6-beta** | Tři proudy jedné řeky | **Triple Stream** engine — Zion Grow, Zion Liquidity |
+| **v3.0.6-beta** | Tři proudy jedné řeky | **Trinity** engine — Zion Grow, Zion Liquidity |
 | **v3.1.0** | **Mainnet Alpha** | Veřejný launch — cíl 31. 12. 2026 |
 
 ## Noc, kdy do zahrady vlezl had
@@ -256,14 +256,14 @@ návštěvníkům ukazuje jako první.
 
 ---
 
-# ČÁST ČTVRTÁ — Tři proudy jedné řeky: Triple Stream
+# ČÁST ČTVRTÁ — Tři proudy jedné řeky: Trinity
 
 ## Mine ZION. Earn ZION. Grow ZION.
 
 Od verze **v3.0.6-beta** nese oficiální ZION miner novou schopnost,
-která je bonusem pro každého, kdo těží: **Triple Stream**.
+která je bonusem pro každého, kdo těží: **Trinity**.
 
-Triple Stream je chytrý těžební engine zabudovaný přímo do oficiálního
+Trinity je chytrý těžební engine zabudovaný přímo do oficiálního
 mineru. Zapíná se automaticky — žádné nastavování, žádný druhý wallet,
 žádná druhá aplikace. Dělá jedinou věc: **vytěží z tvého hardware víc
 hodnoty, než dokáže samotné jádro, a celou ji vyplatí v ZIONu.**
@@ -300,7 +300,7 @@ dolů — k těm, kdo pracují.
 
 ## Bonus, ne podmínka
 
-Triple Stream nic nevyžaduje: není to poplatek, registrace ani
+Trinity nic nevyžaduje: není to poplatek, registrace ani
 nastavení. Je to vlastnost oficiálního ZION mineru v3.0.6 a novějšího.
 Jádro a pool ZIONu zůstávají plně otevřené pod MIT licencí; Triple
 Stream engine je proprietární bonusová vrstva nad nimi — dostupná
@@ -388,7 +388,7 @@ které se míza může jednou zvednout.
 ## Cesta
 
 **Fáze A — Zakořenit (teď, ŽIVÉ):** stabilní L1, Mainnet Beta,
-Triple Stream engine, transparentní komunikace, dokumentace, která
+Trinity engine, transparentní komunikace, dokumentace, která
 nelže o stavu.
 
 **Fáze B — Mainnet Alpha 3.1 (cíl 31. 12. 2026):**
@@ -438,7 +438,7 @@ Je to **žijící infrastruktura + kompas**.
 | Emise | Decade Decay −20 %/dekádu + věčný tail ~724,785 ZION/blok |
 | Jednotka | 1 ZION = 1 000 000 flowers |
 | Launch model | Fair Launch — bez ICO, bez předprodeje |
-| Oficiální miner | v3.0.6-beta+ s Triple Stream (Zion Grow · Zion Liquidity) |
+| Oficiální miner | v3.0.6-beta+ s Trinity (Zion Grow · Zion Liquidity) |
 | Licence jádra a poolu | MIT, open source |
 | Zdrojový kód | https://github.com/Zion-TerraNova/v3-Mainnet |
 | Web / Explorer | https://zionterranova.com · /explorer |

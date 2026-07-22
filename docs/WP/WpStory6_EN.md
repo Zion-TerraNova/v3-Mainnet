@@ -1,12 +1,12 @@
 # ZION
-## Three Streams of One River — From Genesis to Triple Stream
+## Three Streams of One River — From Genesis to Trinity
 
 *Canonical addendum to the story whitepaper · v3.0.1 → v3.0.6-beta · July 2026*
 
 > *A tree does not grow by sprouting once and waiting. It grows in rings —*
 > *year by year, fix by fix, fruit by fruit.*
 > *This addendum records what has been carved into the bark since planting —*
-> *up to the youngest, newest branch: Triple Stream.*
+> *up to the youngest, newest branch: Trinity.*
 
 ---
 
@@ -15,7 +15,7 @@
 This text does not replace the main story whitepaper (`WpStory.md` and its
 later versions). It is the **growth chronicle** — a summary of what happened
 between version **3.0.1** and **3.0.6-beta**, and an explanation of the
-newest branch of the tree: **Triple Stream**, **Zion Grow**, and **Zion
+newest branch of the tree: **Trinity**, **Zion Grow**, and **Zion
 Liquidity**.
 
 The same rule applies here as in the whole ZION story: what is **LIVE** is
@@ -25,7 +25,7 @@ a direction the tree is reaching toward, but has not yet touched.
 
 ---
 
-# I. Chronicle of the rings — the road from seed to Triple Stream
+# I. Chronicle of the rings — the road from seed to Trinity
 
 Before we get to the newest branch, let's look at how the tree has grown.
 
@@ -35,7 +35,7 @@ Before we get to the newest branch, let's look at how the tree has grown.
 | **v3.0.3** | The decimal cut | Migration to the 1 ZION = 1,000,000 flowers unit, unified RPC scale | LIVE |
 | **v3.0.4** | The night of the snake and the new root | Security incident disclosed and fixed, hard genesis reset, new constitutional anchor, first DeFi bridges (wZION on six EVM chains, staking, farming, DAO) | LIVE |
 | **v3.0.5** | All Green | Mainnet Beta stabilization, public release of the community CLI (`zion`), 12/12 services active, whitepaper canonized | LIVE |
-| **v3.0.6-beta** | Three Streams of One River | **Triple Stream** mining core — Zion Grow, Zion Liquidity | LIVE (Beta) |
+| **v3.0.6-beta** | Three Streams of One River | **Trinity** mining core — Zion Grow, Zion Liquidity | LIVE (Beta) |
 
 Every row in this table is a growth ring. None of them came without work,
 and none came without a trial. The hardest trial — the 2026 security
@@ -63,11 +63,11 @@ That rule does not change. It is the root, and the root does not move.
 ## 2. What's new in v3.0.6
 
 Starting with **v3.0.6-beta**, the official ZION miner carries a new
-capability: **Triple Stream**.
+capability: **Trinity**.
 
 > **Mine ZION. Earn ZION. Grow ZION.**
 
-Triple Stream is a smart mining engine built directly into the official
+Trinity is a smart mining engine built directly into the official
 ZION miner. It turns on automatically — no configuration, no second wallet,
 no second application needed. Its job is one thing: **extract more value
 from your hardware than the Ekam Deeksha core alone could, and pay all of
@@ -87,7 +87,7 @@ running the official ZION miner.
 ## 3. Zion Grow — a position that keeps growing
 
 **Zion Grow** is the name for what happens to your wallet when you mine
-with the Triple Stream engine:
+with the Trinity engine:
 
 - Every block your hardware contributes to increases your ZION balance.
 - You never need to sell, swap, or watch an exchange.
@@ -107,7 +107,7 @@ more people mine, the greater the sell pressure.
 
 **Zion Liquidity** inverts this pattern:
 
-- The Triple Stream engine internally converts all mined value into ZION
+- The Trinity engine internally converts all mined value into ZION
   before anything ever reaches an exchange.
 - The miner never needs to sell anything — they receive ZION directly.
 - The result is that mining **creates no sell pressure** on the ZION price.
@@ -120,7 +120,7 @@ uphill now flows downhill, toward those who do the work.
 
 ## 5. Why this is a bonus, not a requirement
 
-Triple Stream requires nothing extra. It is not a new fee, not a new
+Trinity requires nothing extra. It is not a new fee, not a new
 registration, not something you need to configure. It is a property of the
 official ZION miner v3.0.6 and later — if you mine with it, you receive the
 bonus automatically. If you use an older version or your own setup, you
@@ -139,7 +139,7 @@ this acceleration.
 | Reward split | 89% miner / 5% humanitarian fund / 5% Issobella fund / 1% burned |
 | Block time | ~60 seconds |
 | Network status | Mainnet Beta, public launch target 31 Dec 2026 |
-| Official miner | ZION v3.0.6-beta — Triple Stream engine, Zion Grow, Zion Liquidity |
+| Official miner | ZION v3.0.6-beta — Trinity engine, Zion Grow, Zion Liquidity |
 | Core & pool license | MIT, open source |
 | Source code | https://github.com/Zion-TerraNova/v3-Mainnet |
 | Pool | `62.171.141.136:8444` |
@@ -162,5 +162,5 @@ work first, then fruit.
 
 ---
 
-*ZION TerraNova · MIT License for core and pool · Triple Stream is a bonus layer of the official miner*
+*ZION TerraNova · MIT License for core and pool · Trinity is a bonus layer of the official miner*
 *Gate, Gate, Paragate, Parasamgate, Bodhi Svaha.*
