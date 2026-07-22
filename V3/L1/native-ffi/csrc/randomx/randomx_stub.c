@@ -31,6 +31,7 @@
 #include <time.h>
 
 #ifdef _WIN32
+    #include <windows.h>
     #define EXPORT __declspec(dllexport)
 #else
     #define EXPORT
@@ -114,12 +115,20 @@ EXPORT int32_t randomx_zion_verify(
 EXPORT double randomx_zion_benchmark(int32_t iterations) {
     uint8_t header[76] = {0x42}, out[32];
     struct timespec t0, t1;
+    #if defined(_WIN32)
+    LARGE_INTEGER _perf_t0; QueryPerformanceCounter(&_perf_t0);
+#else
     timespec_get(&t0, TIME_UTC);
+#endif
     for (int32_t i = 0; i < iterations; i++) {
         header[0] = (uint8_t)i;
         randomx_zion_hash(header, 76, (uint64_t)i, out);
     }
+    #if defined(_WIN32)
+    LARGE_INTEGER _perf_t1; QueryPerformanceCounter(&_perf_t1);
+#else
     timespec_get(&t1, TIME_UTC);
+#endif
     double secs = (t1.tv_sec - t0.tv_sec) + (t1.tv_nsec - t0.tv_nsec) * 1e-9;
     return secs > 0.0 ? iterations / secs : 0.0;
 }

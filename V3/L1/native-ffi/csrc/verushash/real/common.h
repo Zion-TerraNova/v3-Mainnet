@@ -16,6 +16,61 @@
 
 #if defined(_WIN32)
 #include <winsock2.h>
+// Windows winsock2.h does NOT define le16toh/le32toh/le64toh or htole* macros.
+// Add them explicitly (Windows is little-endian on x86_64).
+#ifndef le16toh
+#define le16toh(x) (x)
+#endif
+#ifndef le32toh
+#define le32toh(x) (x)
+#endif
+#ifndef le64toh
+#define le64toh(x) (x)
+#endif
+#ifndef htole16
+#define htole16(x) (x)
+#endif
+#ifndef htole32
+#define htole32(x) (x)
+#endif
+#ifndef htole64
+#define htole64(x) (x)
+#endif
+#ifndef htobe16
+#define htobe16(x) __builtin_bswap16(x)
+#endif
+#ifndef htobe32
+#define htobe32(x) __builtin_bswap32(x)
+#endif
+#ifndef htobe64
+#define htobe64(x) __builtin_bswap64(x)
+#endif
+#ifndef be16toh
+#define be16toh(x) __builtin_bswap16(x)
+#endif
+#ifndef be32toh
+#define be32toh(x) __builtin_bswap32(x)
+#endif
+#ifndef be64toh
+#define be64toh(x) __builtin_bswap64(x)
+#endif
+#elif defined(__APPLE__)
+#include <machine/endian.h>
+#include <libkern/OSByteOrder.h>
+// macOS doesn't have the Linux endian.h convenience macros — map them
+// to OSSwapHostTo{Little,Big}{16,32,64} / OSSwap{Little,Big}ToHost{16,32,64}
+#define htole16(x) OSSwapHostToLittleInt16(x)
+#define htole32(x) OSSwapHostToLittleInt32(x)
+#define htole64(x) OSSwapHostToLittleInt64(x)
+#define le16toh(x) OSSwapLittleToHostInt16(x)
+#define le32toh(x) OSSwapLittleToHostInt32(x)
+#define le64toh(x) OSSwapLittleToHostInt64(x)
+#define htobe16(x) OSSwapHostToBigInt16(x)
+#define htobe32(x) OSSwapHostToBigInt32(x)
+#define htobe64(x) OSSwapHostToBigInt64(x)
+#define be16toh(x) OSSwapBigToHostInt16(x)
+#define be32toh(x) OSSwapBigToHostInt32(x)
+#define be64toh(x) OSSwapBigToHostInt64(x)
 #else
 #include <arpa/inet.h>
 #include <endian.h>
