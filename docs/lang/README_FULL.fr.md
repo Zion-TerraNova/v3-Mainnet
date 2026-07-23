@@ -58,7 +58,7 @@ Une blockchain avec consensus proof-of-work, algorithme dual, pont cross-chain, 
 
 > **⚠️ MAINNET BETA — Minage à vos risques et périls**
 
-ZION v3.0.5 est **en ligne et opérationnel** en tant que Mainnet Beta. Le réseau est opérationnel, les blocs sont produits et la chaîne de genèse est établie.
+ZION v3.0.6 est **en ligne et opérationnel** en tant que Mainnet Beta. Le réseau est opérationnel, les blocs sont produits et la chaîne de genèse est établie.
 
 **Ce que cela signifie :**
 - ✅ Le réseau est en ligne et produit des blocs
@@ -320,7 +320,7 @@ v3-Mainnet/
 ├── Cargo.toml              # Racine du workspace Rust
 ├── SECURITY.md             # Signalement de vulnérabilités
 ├── CONTRIBUTING.md         # Guide de contribution
-├── CHANGELOG.md            # Historique des versions (v3.0.0 → v3.0.5-beta)
+├── CHANGELOG.md            # Historique des versions (v3.0.0 → v3.0.6-beta)
 └── LICENSE                 # MIT
 ```
 
@@ -453,7 +453,7 @@ cargo run --release -p zion-core --bin zion-node
 | | |
 |---|---|
 | **Protocole** | 3.0.6 |
-| **Release** | v3.0.5-beta (Mainnet Beta) |
+| **Release** | v3.0.6-beta (Mainnet Beta) |
 | **Statut** | En direct — minage actif (à vos risques et périls) |
 | **Lancement officiel** | 2026-12-31 |
 
@@ -464,7 +464,7 @@ ZION utilise un schéma de versioning sémantique modifié :
 | Composant | Format | Exemple |
 |-----------|--------|---------|
 | Protocole | `MAJOR.MINOR.PATCH` | `3.0.6` |
-| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.5-beta` |
+| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.6-beta` |
 | Suffixe | `-beta`, `-rc`, `-stable` | `v3.1.0-rc1` |
 
 - **MAJOR** — changements cassant le consensus (nouveau génesis, hard fork)
@@ -478,15 +478,15 @@ ZION utilise un schéma de versioning sémantique modifié :
 
 | Version | Objectif | Statut |
 |---------|----------|--------|
-| 3.0.5-beta | Mainnet Beta | ✅ En direct (2026-07-09) |
-| 3.0.5-stable | Lancement public officiel | 📅 2026-12-31 |
+| 3.0.6-beta | Mainnet Beta | ✅ En direct (2026-07-09) |
+| 3.0.6-stable | Lancement public officiel | 📅 2026-12-31 |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care hybride (minage NPU) | 🔜 2027 |
 | 4.0.0 | Consensus Proof-of-Care complet | 🔜 2028+ |
 
 ### Historique des versions
 
-Voir [CHANGELOG.md](../../CHANGELOG.md) pour l'historique complet des versions, y compris tous les changements de v3.0.0 à v3.0.5-beta.
+Voir [CHANGELOG.md](../../CHANGELOG.md) pour l'historique complet des versions, y compris tous les changements de v3.0.0 à v3.0.6-beta.
 
 Jalons clés :
 - **v3.0.0** (2026-05-20) — Lancement initial de V3 mainnet

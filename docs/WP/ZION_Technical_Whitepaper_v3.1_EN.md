@@ -434,7 +434,7 @@ horizon is not an excuse, it is an account that grows.
 | **v3.0.3** | The decimal cut | Migration to 1 ZION = 1,000,000 flowers, unified RPC scale | LIVE |
 | **v3.0.4** | Night of the snake + new root | Security incident disclosed and fixed, hard genesis reset, DeFi bridges (wZION on 6 EVM chains, staking, farming, DAO) | LIVE |
 | **v3.0.5** | All Green | Mainnet Beta stabilization, public community CLI release, 12/12 services active, whitepaper canonized | LIVE |
-| **v3.0.6-beta** | Three Streams of One River | Triple Stream mining core — Zion Grow, Zion Liquidity | LIVE (Beta) |
+| **v3.0.6-beta** | Three Streams of One River | Trinity mining core — Zion Grow, Zion Liquidity | LIVE (Beta) |
 | **v3.1.0** | Mainnet Alpha | Public launch, external audit, mobile wallet, expanded DeFi | Planned (31 Dec 2026) |
 
 ---
@@ -469,7 +469,7 @@ work in progress, not finished.
 
 | What to verify | Where |
 |----------------|-------|
-| Protocol | `zion-v3-node/3.0.5` |
+| Protocol | `zion-v3-node/3.0.6` |
 | Genesis hash | `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e` |
 | Total supply | 144,000,000,000 ZION (`emission.rs`) |
 | Premine | 16,780,000,000 ZION, transparent outputs in block 0 |

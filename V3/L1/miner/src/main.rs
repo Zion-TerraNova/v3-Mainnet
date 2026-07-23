@@ -106,7 +106,7 @@ fn log_always(msg: &str) {
     println!("{}", msg);
 }
 
-/// Serializable per-stream telemetry for the triple-stream architecture.
+/// Serializable per-stream telemetry for the trinity architecture.
 ///
 /// Mirrors `ui::StreamStats` but derives `Serialize` so it can be embedded
 /// in the stats JSON file and HTTP `/stats` payload consumed by the desktop
@@ -167,9 +167,9 @@ pub(crate) struct MinerMetricsSnapshot {
     pool_addr: String,
     backend: String,
     status: String,
-    /// Per-stream telemetry for the triple-stream architecture.
+    /// Per-stream telemetry for the trinity architecture.
     /// Index 0 = ZION (stream 1), 1 = GPU external (stream 2), 2 = CPU external (stream 3).
-    /// Empty when triple-stream is not active (legacy single-stream mode).
+    /// Empty when trinity is not active (legacy single-stream mode).
     streams: Vec<StreamStatsInfo>,
     #[allow(dead_code)]
     loop_target: u32,
@@ -694,7 +694,7 @@ fn write_stats_file(path: &str, snapshot: &MinerMetricsSnapshot) {
         "miner_id": snapshot.miner_id,
         "pool_addr": snapshot.pool_addr,
         // ── Triple-stream per-stream telemetry (DeekshaChv3 parallel streaming)
-        // Empty array when triple-stream is not active (legacy single-stream mode).
+        // Empty array when trinity is not active (legacy single-stream mode).
         // Each entry: {index, label, coin, algorithm, hashrate_10s, hashrate_60s,
         //              hashrate_15m, accepted, rejected, active}
         "streams": snapshot.streams,
@@ -3380,7 +3380,7 @@ impl SessionTelemetry {
         }
 
         if !TUI_ACTIVE.load(Ordering::Relaxed) {
-            // ── Claymore-style sticky triple-stream stats (alt screen + full redraw) ──
+            // ── Claymore-style sticky trinity stats (alt screen + full redraw) ──
             // Activate quiet mode to suppress verbose log lines (clean metrics display)
             QUIET.store(true, Ordering::Relaxed);
             std::env::set_var("ZION_QUIET", "1");
@@ -3399,7 +3399,7 @@ impl SessionTelemetry {
                     )
                 })
                 .collect();
-            ui::print_triple_stream_stats_sticky(
+            ui::print_trinity_stats_sticky(
                 uptime_secs,
                 stream_stats,
                 accepted,
@@ -3418,7 +3418,7 @@ impl SessionTelemetry {
             if now.duration_since(self.last_stats_write).as_secs() >= 3 {
                 if let Ok(mut snapshot) = metrics.lock() {
                     // Refresh per-stream telemetry so the stats file / HTTP
-                    // /stats endpoint expose fresh triple-stream data to the
+                    // /stats endpoint expose fresh trinity data to the
                     // desktop agent. `stream_stats` is built by
                     // `HashrateTracker::build_stream_stats()` upstream.
                     snapshot.set_streams(stream_stats);
@@ -3784,7 +3784,7 @@ fn external_gpu_thread(
                     job.job_id,
                     job.height,
                 );
-                // Update hashrate tracker for triple-stream display
+                // Update hashrate tracker for trinity display
                 hashrate.set_gpu_ext_job(&job.coin, &job.algorithm);
                 current_job = Some(job);
             }
@@ -4178,7 +4178,7 @@ fn ext_cpu_thread(
                     job.job_id,
                     nonce_base,
                 );
-                // Update hashrate tracker for triple-stream display
+                // Update hashrate tracker for trinity display
                 hashrate.set_cpu_ext_job(&job.coin, &job.algorithm);
             }
             current_job = Some(job);

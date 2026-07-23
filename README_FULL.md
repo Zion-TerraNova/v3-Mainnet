@@ -58,7 +58,7 @@ A proof-of-work blockchain with dual-algo consensus, cross-chain bridge, DeFi la
 
 > **⚠️ MAINNET BETA — Mining at your own risk**
 
-ZION v3.0.5 is **live and running** as Mainnet Beta. The network is operational, blocks are being produced, and the genesis chain is established.
+ZION v3.0.6 is **live and running** as Mainnet Beta. The network is operational, blocks are being produced, and the genesis chain is established.
 
 **What this means:**
 - ✅ The network is live and producing blocks
@@ -320,7 +320,7 @@ v3-Mainnet/
 ├── Cargo.toml              # Rust workspace root
 ├── SECURITY.md             # Vulnerability reporting
 ├── CONTRIBUTING.md         # Contribution guide
-├── CHANGELOG.md            # Version history (v3.0.0 → v3.0.5-beta)
+├── CHANGELOG.md            # Version history (v3.0.0 → v3.0.6-beta)
 └── LICENSE                 # MIT
 ```
 
@@ -453,7 +453,7 @@ cargo run --release -p zion-core --bin zion-node
 | | |
 |---|---|
 | **Protocol** | 3.0.6 |
-| **Release** | v3.0.5-beta (Mainnet Beta) |
+| **Release** | v3.0.6-beta (Mainnet Beta) |
 | **Status** | Live — mining active (at your own risk) |
 | **Official launch** | 2026-12-31 |
 
@@ -464,7 +464,7 @@ ZION uses a modified semantic versioning scheme:
 | Component | Format | Example |
 |-----------|--------|---------|
 | Protocol | `MAJOR.MINOR.PATCH` | `3.0.6` |
-| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.5-beta` |
+| Release tag | `vMAJOR.MINOR.PATCH[-suffix]` | `v3.0.6-beta` |
 | Suffix | `-beta`, `-rc`, `-stable` | `v3.1.0-rc1` |
 
 - **MAJOR** — consensus-breaking changes (new genesis, hard fork)
@@ -478,15 +478,15 @@ ZION uses a modified semantic versioning scheme:
 
 | Version | Target | Status |
 |---------|--------|--------|
-| 3.0.5-beta | Mainnet Beta | ✅ Live (2026-07-09) |
-| 3.0.5-stable | Official Public Launch | 📅 2026-12-31 |
+| 3.0.6-beta | Mainnet Beta | ✅ Live (2026-07-09) |
+| 3.0.6-stable | Official Public Launch | 📅 2026-12-31 |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care hybrid (NPU mining) | 🔜 2027 |
 | 4.0.0 | Full Proof-of-Care consensus | 🔜 2028+ |
 
 ### Version History
 
-See [CHANGELOG.md](./CHANGELOG.md) for the full version history, including all changes from v3.0.0 through v3.0.5-beta.
+See [CHANGELOG.md](./CHANGELOG.md) for the full version history, including all changes from v3.0.0 through v3.0.6-beta.
 
 Key milestones:
 - **v3.0.0** (2026-05-20) — Initial V3 mainnet launch
