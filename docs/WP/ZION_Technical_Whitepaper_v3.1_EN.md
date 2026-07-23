@@ -1,6 +1,6 @@
 # ZION v3 — Canonical Technical Whitepaper
 
-> **Version 3.1** · Mainnet Alpha · July 2026 · MIT License
+> **Version 3.1** · Mainnet Beta v3.0.6 → Mainnet Alpha 3.1 · July 2026 · MIT License
 > Genesis hash: `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e`
 > Network status: **Mainnet Beta v3.0.6 → Mainnet Alpha 3.1** (public launch target: 31 Dec 2026)
 
@@ -85,7 +85,9 @@ ZION is built on three principles:
 | Contract | Address | Chain |
 |----------|---------|-------|
 | wZION (ERC-20) | `0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6` | Base + 5 chains |
-| ZIONBridge | `0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467` | Base |
+| ZIONBridge (Base) | `0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467` | Base |
+| ZIONBridge (non-Base) | `0xa5a09b2C09A7182BBA9623A2D2cd46cD7D041721` | Arbitrum, BSC, Polygon, Optimism, Avalanche |
+| ZIONAtomicSwap | `0x3DE9Ad42716854083ab837706E3961d10B0e63Eb` | Base |
 | ZIONGovernance | `0xB77eB4ab9468Ce03FBd7eCec70e976EFCfa623E8` | Base |
 | ZIONTreasury | `0x455f465ac7e14fdA97dC46fdd74bCa78bfC0aEeD` | Base |
 | ZIONStaking | `0xbd5cEe7878337d22188BFBaF9aa9F39A850Be78B` | Base |
@@ -147,6 +149,16 @@ ZION uses **LWMA** (Linear Weighted Moving Average) difficulty adjustment:
 This provides smooth retargeting resistant to timewarp attacks while
 maintaining a stable 60-second block cadence.
 
+### 4.5 Mainnet Algorithm Profile
+
+> **Current Mainnet Beta runs a height-aware algorithm sequence:**
+> `deeksha_lite_v1` (heights 0–4499) → `deeksha_chv3` (heights 4500–4999)
+> → `deeksha_lite_fire` (height ≥ 5000).
+>
+> The full `cosmic_harmony_ekam_deeksha_v2` profile described above,
+> including NPU mixing, is **future-gated** and will be activated by a
+> governance vote. NPU mixing is **not yet active** on mainnet.
+
 ---
 
 ## 5. Token Economics
@@ -177,7 +189,7 @@ in to sustain miner incentives indefinitely.
 | 7 (2086–2096) | 1,415.595 |
 | 8 (2096–2106) | 1,132.476 |
 | 9 (2106–2116) | 905.981 |
-| 10+ (tail, from ~2126) | 724.785 (perpetual) |
+| 10+ (tail, from ~2126) | 724.784723 (perpetual) |
 
 ### 5.3 Fee Split (Consensus-Enforced)
 
@@ -222,7 +234,12 @@ is the sole coinbase.
 - **Previous hash**: `0000...0000` (all zeros)
 - **Algorithm**: `deeksha_lite_v1`
 
-See [`genesis.md`](./genesis.md) for the full premine allocation table and
+> **Hard genesis reset (2026-07-20):** A block retention bug caused the
+> previous chain (blocks 0–~10913) to be pruned with no recoverable backup.
+> The network was hard-reset on 2026-07-20 with unlimited retention. This
+> genesis hash applies to the reset chain.
+
+See [`genesis.md`](../genesis.md) for the full premine allocation table and
 genesis message.
 
 ### 6.2 Premine Distribution
@@ -374,7 +391,7 @@ constitutional stones:
 
 Five vulnerabilities were disclosed and remediated in the 3.0.4 hard
 reset. See
-[`security/SECURITY_DISCLOSURE_2026-07.md`](./security/SECURITY_DISCLOSURE_2026-07.md)
+[`security/SECURITY_DISCLOSURE_2026-07.md`](../security/SECURITY_DISCLOSURE_2026-07.md)
 for full details.
 
 | ID | Severity | Description | Status |
@@ -400,7 +417,7 @@ for full details.
 
 ### 11.3 Testing
 
-The test pyramid counts approximately **1,470 tests** across thirteen
+The test pyramid counts approximately **2,066+ tests** across thirteen
 crates — from L1 core through bridge to the AI layer. Zero failures. Zero
 known vulnerabilities in `cargo audit`. External audit (Trail of Bits /
 Halborn / OtterSec) is scheduled.
@@ -475,19 +492,20 @@ work in progress, not finished.
 | Premine | 16,780,000,000 ZION, transparent outputs in block 0 |
 | 89/5/5/1 split | Four-output coinbase, consensus-enforced |
 | Base reward | 5,400.067 ZION · 60s block |
-| Decade Decay + tail | −20%/decade, then 724.785 ZION/block forever |
+| Decade Decay + tail | −20%/decade, then 724.784723 ZION/block forever |
 | Source code | https://github.com/Zion-TerraNova/v3-Mainnet (MIT) |
 | Website / Explorer | https://zionterranova.com · /explorer |
 | Pool | pool.zionterranova.com:8444 |
+| RPC | rpc.zionterranova.com:8443 |
 | Security disclosure | ZION-2026-001…005, public, EF format |
 
 ---
 
 ## 16. References
 
-- Source code: [V3/](../V3/) directory in this repository
-- Genesis documentation: [`genesis.md`](./genesis.md)
-- Security disclosures: [`security/SECURITY_DISCLOSURE_2026-07.md`](./security/SECURITY_DISCLOSURE_2026-07.md)
+- Source code: [V3/](../../V3/) directory in this repository
+- Genesis documentation: [`genesis.md`](../genesis.md)
+- Security disclosures: [`security/SECURITY_DISCLOSURE_2026-07.md`](../security/SECURITY_DISCLOSURE_2026-07.md)
 - Narrative companion: *Fable Edition* (WpLite) and *Book of Genesis*
 - Story chronicle: *WpStory6 — Three Streams of One River*
 

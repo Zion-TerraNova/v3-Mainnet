@@ -1,6 +1,6 @@
 # ZION v3 — Kanonický technický whitepaper
 
-> **Verze 3.1** · Mainnet Alpha · červenec 2026 · Licence MIT
+> **Verze 3.1** · Mainnet Beta v3.0.6 → Mainnet Alpha 3.1 · červenec 2026 · Licence MIT
 > Genesis hash: `4f75a0dfe6dde3b167287d445aa1ade56577b0e9166c641ed288b4c20a79bd6e`
 > Stav sítě: **Mainnet Beta v3.0.6 → Mainnet Alpha 3.1** (veřejný launch cíl: 31. 12. 2026)
 
@@ -85,7 +85,9 @@ ZION je postaven na třech principech:
 | Kontrakt | Adresa | Chain |
 |----------|--------|-------|
 | wZION (ERC-20) | `0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6` | Base + 5 chainů |
-| ZIONBridge | `0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467` | Base |
+| ZIONBridge (Base) | `0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467` | Base |
+| ZIONBridge (non-Base) | `0xa5a09b2C09A7182BBA9623A2D2cd46cD7D041721` | Arbitrum, BSC, Polygon, Optimism, Avalanche |
+| ZIONAtomicSwap | `0x3DE9Ad42716854083ab837706E3961d10B0e63Eb` | Base |
 | ZIONGovernance | `0xB77eB4ab9468Ce03FBd7eCec70e976EFCfa623E8` | Base |
 | ZIONTreasury | `0x455f465ac7e14fdA97dC46fdd74bCa78bfC0aEeD` | Base |
 | ZIONStaking | `0xbd5cEe7878337d22188BFBaF9aa9F39A850Be78B` | Base |
@@ -149,6 +151,16 @@ obtížnosti:
 To poskytuje plynulé retargeting odolné vůči timewarp útokům a udržuje
 stabilní 60sekundový rytmus bloků.
 
+### 4.5 Profil mainnetového algoritmu
+
+> **Aktuální Mainnet Beta používá height-aware sekvenci algoritmů:**
+> `deeksha_lite_v1` (výšky 0–4499) → `deeksha_chv3` (výšky 4500–4999)
+> → `deeksha_lite_fire` (výška ≥ 5000).
+>
+> Plný profil `cosmic_harmony_ekam_deeksha_v2` popsaný výše,
+> včetně NPU mixing, je **future-gated** a bude aktivován až po
+> governance hlasování. NPU mixing **zatím není aktivní** na mainnetu.
+
 ---
 
 ## 5. Tokenová ekonomika
@@ -179,7 +191,7 @@ udržení motivace těžařů natrvalo.
 | 7 (2086–2096) | 1 415,595 |
 | 8 (2096–2106) | 1 132,476 |
 | 9 (2106–2116) | 905,981 |
-| 10+ (tail, od ~2126) | 724,785 (věčně) |
+| 10+ (tail, od ~2126) | 724,784723 (věčně) |
 
 ### 5.3 Rozdělení odměny (vynuceno konsensem)
 
@@ -223,7 +235,12 @@ jediný coinbase.
 - **Previous hash**: `0000...0000` (samé nuly)
 - **Algoritmus**: `deeksha_lite_v1`
 
-Viz [`genesis.md`](./genesis.md) pro úplnou tabulku premine alokace a
+> **Hard genesis reset (2026-07-20):** Chyba v block retention způsobila,
+> že předchozí řetězec (bloky 0–~10913) byl ořezán bez možnosti obnovy.
+> Síť byla 20. 7. 2026 hard-resetována s neomezenou retencí. Tento genesis
+> hash patří k resetovanému řetězci.
+
+Viz [`genesis.md`](../genesis.md) pro úplnou tabulku premine alokace a
 genesis zprávu.
 
 ### 6.2 Distribuce premine
@@ -374,7 +391,7 @@ DAO **nemůže** změnit následující parametry — jsou to konstituční kame
 ### 11.1 Zveřejněné zranitelnosti (2026-07)
 
 Pět zranitelností bylo zveřejněno a opraveno v hard resetu 3.0.4. Viz
-[`security/SECURITY_DISCLOSURE_2026-07.md`](./security/SECURITY_DISCLOSURE_2026-07.md)
+[`security/SECURITY_DISCLOSURE_2026-07.md`](../security/SECURITY_DISCLOSURE_2026-07.md)
 pro plné detaily.
 
 | ID | Závažnost | Popis | Stav |
@@ -400,7 +417,7 @@ pro plné detaily.
 
 ### 11.3 Testování
 
-Testovací pyramida čítá přibližně **1 470 testů** napříč třinácti cratemi
+Testovací pyramida čítá přibližně **2 066+ testů** napříč třinácti cratemi
 — od L1 core přes bridge po AI vrstvu. Nulová selhání. Nulové známé
 zranitelnosti v `cargo audit`. Externí audit (Trail of Bits / Halborn /
 OtterSec) je naplánován.
@@ -476,19 +493,20 @@ rozestavěné, ne hotové.
 | Premine | 16 780 000 000 ZION, transparentní výstupy v bloku 0 |
 | Split 89/5/5/1 | Čtyřvýstupová coinbase, vynuceno konsensem |
 | Základní odměna | 5 400,067 ZION · blok 60 s |
-| Decade Decay + tail | −20 %/dekádu, poté 724,785 ZION/blok navěky |
+| Decade Decay + tail | −20 %/dekádu, poté 724,784723 ZION/blok navěky |
 | Zdrojový kód | https://github.com/Zion-TerraNova/v3-Mainnet (MIT) |
 | Web / Explorer | https://zionterranova.com · /explorer |
 | Pool | pool.zionterranova.com:8444 |
+| RPC | rpc.zionterranova.com:8443 |
 | Security disclosure | ZION-2026-001…005, veřejná, formát EF |
 
 ---
 
 ## 16. Reference
 
-- Zdrojový kód: adresář [V3/](../V3/) v tomto repozitáři
-- Genesis dokumentace: [`genesis.md`](./genesis.md)
-- Security discloures: [`security/SECURITY_DISCLOSURE_2026-07.md`](./security/SECURITY_DISCLOSURE_2026-07.md)
+- Zdrojový kód: adresář [V3/](../../V3/) v tomto repozitáři
+- Genesis dokumentace: [`genesis.md`](../genesis.md)
+- Security discloures: [`security/SECURITY_DISCLOSURE_2026-07.md`](../security/SECURITY_DISCLOSURE_2026-07.md)
 - Narativní doprovod: *Bajka (WpLite)* a *Kniha Zrození*
 - Kronika příběhu: *WpStory6 — Tři proudy jedné řeky*
 
