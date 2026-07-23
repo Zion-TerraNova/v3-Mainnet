@@ -21,7 +21,7 @@ rpc_url_backup = "http://rpc.zionterranova.com:8443"
 bridge_address = "zion1j53677g5k83030x3s2z2z644e7h07792q0u02t7"
 finality_blocks     = 60
 poll_interval_secs  = 15
-start_block_height  = 4000  # Local/Edge L1 nodes retain ~1000 accepted blocks; scan from a height that exists after the 3.0.4 genesis reset
+start_block_height  = 0  # After 2026-07-20 genesis reset nodes retain all blocks (ZION_BLOCK_RETENTION=0); scan from genesis
 default_evm_recipient = "0xdde17506BC2D2dCE1d594bD1D85B0BAbb389D186"
 
 # ── EVM Chains ──────────────────────────────────────────────
