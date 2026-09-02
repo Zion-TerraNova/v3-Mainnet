@@ -147,6 +147,16 @@ To update an existing community:
 
 ---
 
+## Companion: Bodhi Gaia — Kniha Země (L5 narrative + truth anchor)
+
+A unified narrative + technical series that mirrors this directory and adds a full L5 truth anchor (status of every claim, discrepancies to fix, evidence registry) is maintained at:
+
+→ [`docs/WP-Mainet/BodhiGaia/00-README.md`](../../../../docs/WP-Mainet/BodhiGaia/00-README.md) (CZ, 9 chapters + EN index)
+
+The series is **DRAFT** pending technical, security, factual and cultural review per `MiseAmenti/08-Protokol-Zmen.md` §2 (class E + C). It does not supersede this engineering directory; it provides the narrative bridge and the public-facing truth ledger for L5.
+
+---
+
 > *"Freedom is not given — it is built, block by block, seed by seed."*
 
 *V3/L5 · Terra Nova Physical Layer · 2026*
