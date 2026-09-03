@@ -18,13 +18,15 @@ L5 is the **terrestrial layer** of ZION — where blockchain consensus meets soi
 - **L4** (OASIS) provides the **digital interface** — avatars, quests, reputation.
 - **L5** (this layer) provides the **physical substrate** — farms, sanctuaries, workshops, homes.
 
-### The L5 Trinity
+### The L5 Pentagram — Five Nodes, Five Elements
 
 | Node | Element | Archetype | Function |
 |------|---------|-----------|----------|
 | **Genesis Garden** | Earth | Root / Base Camp | Foundation, agriculture, entry point |
 | **Dharma Temple** | Fire | Trunk / Sanctuary | Practice, transformation, depth |
 | **Te Pīko Ora** | Water | Crown / Paradise | Fruition, abundance, integration |
+| **Golden Republic Bohemia** | Air | Heart / Governance Lab | Circle of decision, Czech wisdom, Zlatá republika protocol |
+| **Bodhi Lanka** | Akasha / Ether | Soul / Akasha Node | Love (Rama-Sita), Bodhi tree, Bhakti protocol |
 
 ---
 
@@ -48,7 +50,9 @@ V3/L5/docs/
 ├── COMMUNITIES/
 │   ├── genesis-garden.md          ← Zahrada Genesis, Portugal
 │   ├── dharma-temple.md           ← Dharma Temple, La Palma
-│   └── te-piko-ora.md             ← Te Pīko Ora, French Polynesia
+│   ├── te-piko-ora.md             ← Te Pīko Ora, French Polynesia
+│   ├── golden-republic-bohemia.md ← Golden Republic Bohemia, Czech Republic
+│   └── bodhi-lanka.md             ← Bodhi Lanka, Sri Lanka
 └── TEMPLATES/
     └── community-blueprint.md     ← Generic template for new L5 communities
 ```
@@ -62,6 +66,8 @@ V3/L5/docs/
 | **Genesis Garden** | Algarve, Portugal | Base Camp — movement, ocean, farm | 🟡 Active development | [`COMMUNITIES/genesis-garden.md`](./COMMUNITIES/genesis-garden.md) |
 | **Dharma Temple** | La Palma, Canary Islands | Sanctuary — silence, meditation, volcano | 🔵 Preparation | [`COMMUNITIES/dharma-temple.md`](./COMMUNITIES/dharma-temple.md) |
 | **Te Pīko Ora** | Raiatea / Tahiti, French Polynesia | Crown — paradise, marine permaculture, wayfinding | 🔵 Vision / Preparation | [`COMMUNITIES/te-piko-ora.md`](./COMMUNITIES/te-piko-ora.md) |
+| **Golden Republic Bohemia** | Bohemia, Czech Republic | Heart — governance lab, circle of decision, Czech wisdom | 🔵 Preparation | [`COMMUNITIES/golden-republic-bohemia.md`](./COMMUNITIES/golden-republic-bohemia.md) |
+| **Bodhi Lanka** | Sri Lanka | Akasha — love (Rama-Sita), Bodhi tree, Bhakti protocol | 🔵 Vision / Preparation | [`COMMUNITIES/bodhi-lanka.md`](./COMMUNITIES/bodhi-lanka.md) |
 
 ---
 
@@ -151,7 +157,7 @@ To update an existing community:
 
 A unified narrative + technical series that mirrors this directory and adds a full L5 truth anchor (status of every claim, discrepancies to fix, evidence registry) is maintained at:
 
-→ [`docs/WP-Mainet/BodhiGaia/00-README.md`](../../../../docs/WP-Mainet/BodhiGaia/00-README.md) (CZ, 9 chapters + EN index)
+→ [`docs/WP-Mainet/BodhiGaia/00-README.md`](../../../../docs/WP-Mainet/BodhiGaia/00-README.md) (CZ, 11 chapters + EN index)
 
 The series is **DRAFT** pending technical, security, factual and cultural review per `MiseAmenti/08-Protokol-Zmen.md` §2 (class E + C). It does not supersede this engineering directory; it provides the narrative bridge and the public-facing truth ledger for L5.
 
