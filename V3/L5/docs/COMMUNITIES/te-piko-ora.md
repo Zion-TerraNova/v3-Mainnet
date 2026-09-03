@@ -438,8 +438,8 @@ Quarterly all-night vigil watching the stars, practicing traditional navigation,
 | **French Polynesia investment** | https://www.investfp.pf/ |
 | **ZION** | https://github.com/Zion-TerraNova |
 | **L5 Docs** | [`V3/L5/docs/README.md`](../README.md) |
-| **Hawaii lineage** | [`docs/TerraNova/hawaii/KNIHA-LEHUA/`](../../../../docs/TerraNova/hawaii/KNIHA-LEHUA/) |
-| **Pacific avatars** | [`docs/docs2.9/ZION_OASIS/SACRED_TRINITY/62_LA_ILIAI.md`](../../../../docs/docs2.9/ZION_OASIS/SACRED_TRINITY/62_LA_ILIAI.md) |
+| **Hawaii lineage** | [`docs/TerraNova/hawaii/KNIHA-LEHUA/`](../../../../../docs/TerraNova/hawaii/KNIHA-LEHUA/) |
+| **Pacific avatars** | [`docs/docs2.9/ZION_OASIS/SACRED_TRINITY/62_LA_ILIAI.md`](../../../../../docs/docs2.9/ZION_OASIS/SACRED_TRINITY/62_LA_ILIAI.md) |
 
 ---
 

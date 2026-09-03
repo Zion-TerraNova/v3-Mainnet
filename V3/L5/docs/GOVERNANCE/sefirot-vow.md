@@ -1,11 +1,11 @@
 # Sefirot Vow — Zohar Validator Pledge
 
 > *"Ne ten kdo má největší sílu, ale ten kdo nejlépe opékuje, ten bude vést."*
-> — Protokol Péče, [evoluZion.md](../../../docs/3.0.3/evoluZion.md)
+> — Protokol Péče, [evoluZion.md](../../../../../docs/3.0.3/evoluZion.md)
 
 > **Scope:** All ZION validators — L1 miners, L2 DAO guardians, L3 WARP bridge
 > validators, L3 AI/Hiran care-proof producers, future Proof-of-Care validators.
-> **Status:** 🟡 Active development (Fáze 2 of [Zohar roadmap](../../../docs/Zohar/02-ROADMAP.md))
+> **Status:** 🟡 Active development (Fáze 2 of [Zohar roadmap](../../../../../docs/Zohar/02-ROADMAP.md))
 > **Last modified:** 2026-07-03
 > **Relation to existing vow:** Extends the [Bodhisattva Vow](./consciousness-admission-framework.md#6-the-bodhisattva-vow-of-guardians)
 > (L5 community entry) into a **technical validator pledge** structured by the
@@ -224,7 +224,7 @@ validator. They are a learning one.
 ## 6. The 11 Vows as Care Task Categories (Fáze 3 preview)
 
 When the Protokol Péče (Proof-of-Care) consensus activates
-([evoluZion.md Fáze 3](../../../docs/3.0.3/evoluZion.md)), the 11 vows
+([evoluZion.md Fáze 3](../../../../../docs/3.0.3/evoluZion.md)), the 11 vows
 become **11 categories of care tasks** that validators may be assigned:
 
 | Vow | Care task category |
@@ -324,12 +324,12 @@ they will perform the care work honestly.
 
 | Source | Path | Why |
 |--------|------|-----|
-| Zohar README | [`docs/Zohar/README.md`](../../../docs/Zohar/README.md) | Manifest of the Zohar layer |
-| Sefirot → vrstvy mapping | [`docs/Zohar/01-SEFIROT-VRSTVY.md`](../../../docs/Zohar/01-SEFIROT-VRSTVY.md) | 10 sefirot + Da'at mapped to L1-L6 |
-| Zohar roadmap | [`docs/Zohar/02-ROADMAP.md`](../../../docs/Zohar/02-ROADMAP.md) | Fáze 2 = this vow |
-| evoluZion.md | [`docs/3.0.3/evoluZion.md`](../../../docs/3.0.3/evoluZion.md) | Strom života metafora, Protokol Péče |
+| Zohar README | [`docs/Zohar/README.md`](../../../../../docs/Zohar/README.md) | Manifest of the Zohar layer |
+| Sefirot → vrstvy mapping | [`docs/Zohar/01-SEFIROT-VRSTVY.md`](../../../../../docs/Zohar/01-SEFIROT-VRSTVY.md) | 10 sefirot + Da'at mapped to L1-L6 |
+| Zohar roadmap | [`docs/Zohar/02-ROADMAP.md`](../../../../../docs/Zohar/02-ROADMAP.md) | Fáze 2 = this vow |
+| evoluZion.md | [`docs/3.0.3/evoluZion.md`](../../../../../docs/3.0.3/evoluZion.md) | Strom života metafora, Protokol Péče |
 | Bodhisattva Vow | [`V3/L5/docs/GOVERNANCE/consciousness-admission-framework.md`](./consciousness-admission-framework.md) §6 | Sister vow for L5 Guardians |
-| AGENTS.md L1 Protocol | [`AGENTS.md`](../../../AGENTS.md) §L1 Protocol Security | Constraints on Fáze 3 |
+| AGENTS.md L1 Protocol | [`AGENTS.md`](../../../../../AGENTS.md) §L1 Protocol Security | Constraints on Fáze 3 |
 
 ---
 
