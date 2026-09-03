@@ -29,11 +29,11 @@ L5 is not a blockchain layer. It is a **socio-physical system** that uses the ZI
 │  Consensus · Mempool · State · P2P · RPC                     │
 └────────────────────────────┬────────────────────────────────────┘
                              │  ZION P2P (port 8333)
-┌────────────────────────────▼────────────────────────────────────┐
-│                     L5  PHYSICAL                              │
-│  Genesis Garden │ Dharma Temple │ [Future communities]        │
-│  Energy · Water · Food · Shelter · Governance · Culture       │
-└─────────────────────────────────────────────────────────────────┘
+┌────────────────────────────▼─────────────────────────────────────────┐
+│                     L5  PHYSICAL                                      │
+│  Genesis Garden │ Dharma Temple │ Te Pīko Ora │ Bohemia │ Bodhi Lanka│
+│  Energy · Water · Food · Shelter · Governance · Culture              │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---

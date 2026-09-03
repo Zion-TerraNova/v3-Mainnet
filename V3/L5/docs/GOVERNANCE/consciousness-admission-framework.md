@@ -2,7 +2,7 @@
 
 > *"We do not guard the gate to exclude. We guard the gate so that what enters is worthy of the land."*
 >
-> **Scope:** All Terra Nova L5 communities — Genesis Garden, Dharma Temple, Te Pīko Ora, and all future nodes
+> **Scope:** All Terra Nova L5 communities — Genesis Garden, Dharma Temple, Te Pīko Ora, Golden Republic Bohemia, Bodhi Lanka, and all future nodes
 > **Status:** 🟡 Active development
 > **Last modified:** 2026-05-21
 
@@ -335,6 +335,8 @@ The Bodhisattva Vow is taken in **public ceremony** at the community's most sacr
 - **Genesis Garden:** Under the oldest tree on the property
 - **Dharma Temple:** In the meditation pavilion, at dawn
 - **Te Pīko Ora:** Beside the Guardian's coconut palm, at sunset
+- **Golden Republic Bohemia:** At the Circle of Decision, by the bridge
+- **Bodhi Lanka:** Beneath the sacred Bodhi tree, at sunrise
 
 **Elements:**
 1. **Silence (10 min):** The candidate sits in silence with the community.
@@ -345,6 +347,8 @@ The Bodhisattva Vow is taken in **public ceremony** at the community's most sacr
    - Genesis Garden: Planting a tree
    - Dharma Temple: Receiving a wooden *tatau* carving
    - Te Pīko Ora: Planting a coconut palm with personal token
+   - Golden Republic Bohemia: Placing a salt crystal on the Golden Bull altar
+   - Bodhi Lanka: Tying a thread to the Bodhi tree (pirith noola)
 6. **Record:** The vow is recorded in the Consciousness Registry (on-chain) and in the community's physical Book of Guardians (handwritten, paper, permanent).
 
 ### 6.4 DAO Confirmation of the Bodhisattva Vow
@@ -490,6 +494,8 @@ If a Guardian is expelled from one L5 community, the ban is **not automatic** ac
 | **Genesis Garden** | "Surf & Seed" youth camp (seasonal), parent-child weekends | Community Guardian | Under the oldest olive / oak |
 | **Dharma Temple** | "Silence for Youth" — 3-day intro to silence (age 14+) | Dharma Guardian | Meditation pavilion at dawn |
 | **Te Pīko Ora** | "Wayfinding Youth" — navigation, canoe, marine ecology | Polynesian elder + Community Guardian | Beside Guardian's coconut palm |
+| **Golden Republic Bohemia** | "Circle of Youth" — civic governance lab, bridge stewardship | Community Guardian | At the Circle of Decision, by the bridge |
+| **Bodhi Lanka** | "Bodhi Saplings" — Ayurveda, meditation, sacred tree care | Community Guardian + Ayurveda elder | Beneath the sacred Bodhi tree |
 
 ---
 

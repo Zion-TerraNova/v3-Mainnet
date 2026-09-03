@@ -58,6 +58,8 @@ It operates at three levels of depth, scaling with community maturity.
 **Herbal pharmacy (bioregional):**
 - **Portugal (Genesis Garden):** Lavender, rosemary, thyme, marigold, nettle, dandelion, mallow
 - **La Palma (Dharma Temple):** Aloe vera, dragon tree sap (*Dracaena draco*), local *Bosea* species, Tenerife lavender
+- **Bohemia (Golden Republic Bohemia):** Czech herbal tradition — chamomile, linden blossom (*Tilia*), elderflower (*Sambucus*), St. John's wort, peppermint, yarrow
+- **Sri Lanka (Bodhi Lanka):** Ayurveda / Hela Wedakama — gotu kola (*Centella asiatica*), neem (*Azadirachta indica*), cinnamon (*Cinnamomum verum*), turmeric, ginger, coriander, sacred basil (*Ocimum tenuiflorum*)
 - **General:** Echinacea, ginger, turmeric, garlic, honey (antibacterial)
 
 **Personnel:**

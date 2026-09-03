@@ -92,7 +92,7 @@ Every Layer Council meeting (Co-Admin gathering) begins with a **60-second colle
 The Resonance Council is **not a decision-making body**. It is a **pre-decision attunement body** that convenes before any proposal crosses from Tier 1 (informational) to Tier 2 (binding) under the Community DAO Framework.
 
 **Composition**:
-- **1 Guardian** from each active L5 node (Genesis Garden, Dharma Temple, Te Pīko Ora)
+- **1 Guardian** from each active L5 node (Genesis Garden, Dharma Temple, Te Pīko Ora, Golden Republic Bohemia, Bodhi Lanka)
 - **1 Youth Delegate** (age 13–17) elected by the Seedling/Sprout/Sapling circles of that node
 - **1 Elder** (age 60+) from that node, or from the L6 Steward network if the node has no resident elder
 - **1 Frequency Keeper** — a trained sound/energy practitioner who maintains the layer's tone and HRV measurement rig
@@ -335,7 +335,7 @@ The Co-Admin types defined in `V3/L2/dao/src/types.rs` receive Resonance extensi
 | `Treasury` (L2) | Allocates 2% of treasury yield to Humanitarian Tithe Resonance Pool (see §7.3) |
 | `Bridge` (L2) | Maintains cross-chain `frequency_anchor` — a periodic heartbeat tone published to connected chains |
 | `Curator` (L4) | Certifies Light Language Registry entries for quality and authenticity |
-| `Community` (L5) | **Becomes the Resonance Council chair by default**; rotates annually among the three node Guardians |
+| `Community` (L5) | **Becomes the Resonance Council chair by default**; rotates annually among the five node Guardians |
 | `Network` (L5) | Maintains the Fibonacci Time Capsule smart contract and unlock oracle |
 | `Steward` (L6) | Serves as default **Elder Witness** if a node lacks a resident elder |
 

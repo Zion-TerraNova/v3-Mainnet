@@ -23,7 +23,7 @@ The L5 Mesh Network provides **reliable, low-power, long-range communication** t
 | Parameter | Specification |
 |-----------|---------------|
 | **Protocol** | Meshtastic (open-source, LoRa-based mesh) |
-| **Frequency** | EU868 (Europe), EU433 (fallback), ISM band |
+| **Frequency** | EU868 (Europe), AS923 (Asia/Sri Lanka), EU433 (fallback), ISM band |
 | **Modulation** | LoRa (Semtech SX1262) |
 | **Range** | 5–15 km line-of-sight, 1–3 km urban/forest |
 | **Data rate** | 300 bps – 10 kbps (spreading factor adjustable) |
@@ -142,7 +142,7 @@ The L5 Mesh Network provides **reliable, low-power, long-range communication** t
 ```protobuf
 message L5MeshPacket {
   string packet_id = 1;           // UUID
-  string community_id = 2;        // "genesis-garden", "dharma-temple"
+  string community_id = 2;        // "genesis-garden", "dharma-temple", "te-piko-ora", "golden-republic-bohemia", "bodhi-lanka"
   string sender_node_id = 3;      // Hardware node ID
   int64 timestamp = 4;            // Unix epoch (ms)
   string msg_type = 5;            // "emergency", "sensor", "coordination", "inter-node"
