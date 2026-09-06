@@ -117,17 +117,31 @@ Peace & One Love 4ever.
 Všech 14 premine outputů je **admin-locked** (vyžaduje 3-of-3 admin multisig
 + DAO hlasování pro odemčení). DAO Treasury outputy jsou navíc **time-locked**.
 
-### OASIS + Golden Egg (5 slotů × 1,65B = 8,25B ZION)
+### OASIS + Golden Egg (3 sloty × 1,65B = 4,95B ZION) — Sloty 4 a 5 přesunuty na L5 Free World Projects
 
 | # | Adresa | Částka (ZION) |
 |---|--------|---------------|
 | 1 | `zion172h3y7d6m7d7y7d8q2d4x363t0m55227n2rt2v2` | 1 650 000 000 |
 | 2 | `zion1e7n6j8r28324y487w826s7f3547290m8p0y54t4` | 1 650 000 000 |
 | 3 | `zion1m0c7n2v060r6r4x6d4a2u4u5t305f677w6ws0p4` | 1 650 000 000 |
-| 4 | `zion15647n3n8u696t548u0028868p746c838f59g7a3` | 1 650 000 000 |
-| 5 | `zion190p6f0k0r3c2j4h0k8p340t5s6m5z75287d72d2` | 1 650 000 000 |
+| 4 | `zion15647n3n8u696t548u0028868p746c838f59g7a3` | 1 650 000 000 → L5 Free World Projects (repurposed) |
+| 5 | `zion190p6f0k0r3c2j4h0k8p340t5s6m5z75287d72d2` | 1 650 000 000 → L5 Free World Projects (repurposed) |
 
-**Účel**: OASIS platforma odměny + Golden Egg/XP výherní ceny.
+**Účel**: OASIS platforma odměny + Golden Egg/XP výherní ceny (sloty 1–3). Sloty 4 a 5 byly přesunuty na L5 Free World Projects (3,3B ZION).
+
+### L5 Free World Projects (2 sloty × 1,65B = 3,3B ZION) — přesunuto z OASIS slotů 4 a 5
+
+| Projekt | Částka (ZION) |
+|---------|---------------|
+| Projekt Genesis Garden | 500 000 000 |
+| Project Dharma Temple | 500 000 000 |
+| Projekt Te Piko Ora | 500 000 000 |
+| Project Bohemia | 500 000 000 |
+| Project Bodhi Lanka | 500 000 000 |
+| L5 rezervní fond | 800 000 000 |
+| **Celkem L5** | **3 300 000 000** |
+
+> **Poznámka:** Správce jednotlivých L5 projektů jmenuje Trustee. Jména správců budou zveřejněna po dosažení bodu globální expanze (~0,20 USD/ZION). Do té doby jsou informace o správcích důvěrné.
 
 ### DAO Treasury (3 sloty = 4,0B ZION) — time-locked do bloku 144 000
 
@@ -173,7 +187,8 @@ pro vejení částky do `u64` limitů. Adresa je odvozena z
 
 | Kategorie | Sloty | Částka (ZION) | % z premine |
 |-----------|-------|---------------|-------------|
-| OASIS + Golden Egg | 5 | 8 250 000 000 | 49,2 % |
+| OASIS + Golden Egg | 3 | 4 950 000 000 | 29,5 % |
+| L5 Free World Projects | 2 | 3 300 000 000 | 19,7 % |
 | DAO Treasury | 3 | 4 000 000 000 | 23,8 % |
 | Infrastruktura | 3 | 2 590 000 000 | 15,4 % |
 | Humanitární | 1 | 1 440 000 000 | 8,6 % |

@@ -46,7 +46,8 @@ a v [`genesis.md`](./genesis.md). Žádná část není skrytá.
 
 | Kategorie | Částka (ZION) | % | Lock |
 |-----------|---------------|---|------|
-| OASIS + Golden Egg (5 slotů) | 8 250 000 000 | 49,2 % | admin-locked |
+| OASIS + Golden Egg (3 sloty) | 4 950 000 000 | 29,5 % | admin-locked |
+| L5 Free World Projects (2 sloty) | 3 300 000 000 | 19,7 % | admin-locked |
 | DAO Treasury (3 sloty) | 4 000 000 000 | 23,8 % | admin + time-locked (blok 144 000) |
 | Infrastruktura (3 sloty) | 2 590 000 000 | 15,4 % | admin-locked |
 | Humanitární (Children Future Fund) | 1 440 000 000 | 8,6 % | admin-locked |
@@ -188,7 +189,7 @@ DAO treasury (4B ZION) je **trojí zámek**:
 
 ## 10. OASIS rewards
 
-OASIS (5 slotů × 1,65B = 8,25B ZION) je **komunitní reward systém**:
+OASIS (3 sloty × 1,65B = 4,95B ZION) je **komunitní reward systém** — sloty 4 a 5 byly přesunuty na L5 Free World Projects (3,3B ZION):
 
 - **Golden Egg/XP** — výherní ceny pro OASIS hráče
 - **Admin-locked** — nelze utratit bez 3-of-3 + DAO

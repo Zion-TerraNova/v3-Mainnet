@@ -250,7 +250,7 @@ The **Golden Egg** is the ultimate treasure hunt in ZION Oasis — a cosmic ques
 
 - **108 clues** across 7 categories (Sacred Trinity Profiles, Sacred Knowledge Levels, ZION Whitepaper, Source Code, Blockchain Data, Community Events, EKAM Temple Pilgrimage)
 - **3 master keys**: Ramayana Key (30 clues), Mahabharata Key (35 clues), Unity Key (43 clues — requires both previous keys)
-- **10 prize tiers** with **8.25B ZION** total reward pool
+- **10 prize tiers** with **4.95B ZION** total reward pool
 - **Final boss**: Hiranyagarbha — the cosmic consciousness entity
 - **First 3 solvers** (CL9 + 108 clues + 3 master keys):
   - 1st place: **1,000,000,000 ZION**
@@ -277,7 +277,7 @@ The **Golden Egg** is the ultimate treasure hunt in ZION Oasis — a cosmic ques
 - **Non-consensus**: Oasis never affects L1 mining or blockchain validation
 
 #### Reward Pool
-- **8.25B ZION** total reward pool for the Golden Egg treasure hunt
+- **4.95B ZION** total reward pool for the Golden Egg treasure hunt
 
 ## Repository Structure
 
