@@ -90,7 +90,7 @@ jobs:
           sha256sum zion-miner-v${{ env.VERSION }}-linux-x86_64.tar.gz
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: miner-linux-x86_64
           path: V31/dist/zion-miner-v${{ env.VERSION }}-linux-x86_64.tar.gz
@@ -127,7 +127,7 @@ jobs:
           sha256sum zion-miner-v${{ env.VERSION }}-linux-arm64.tar.gz
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: miner-linux-arm64
           path: V31/dist/zion-miner-v${{ env.VERSION }}-linux-arm64.tar.gz
@@ -179,7 +179,7 @@ jobs:
           sha256sum zion-miner-v${{ env.VERSION }}-windows-x86_64.zip
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: miner-windows-x86_64
           path: V31/dist/zion-miner-v${{ env.VERSION }}-windows-x86_64.zip
@@ -211,7 +211,7 @@ jobs:
           shasum -a 256 zion-miner-v${{ env.VERSION }}-macos-arm64.tar.gz
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: miner-macos-arm64
           path: V31/dist/zion-miner-v${{ env.VERSION }}-macos-arm64.tar.gz
@@ -245,7 +245,7 @@ jobs:
           shasum -a 256 zion-miner-v${{ env.VERSION }}-macos-x86_64.tar.gz
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: miner-macos-x86_64
           path: V31/dist/zion-miner-v${{ env.VERSION }}-macos-x86_64.tar.gz
