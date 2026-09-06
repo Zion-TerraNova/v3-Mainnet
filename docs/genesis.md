@@ -121,11 +121,11 @@ Všech 14 premine outputů je **admin-locked** (vyžaduje 3-of-3 admin multisig
 
 | # | Adresa | Částka (ZION) |
 |---|--------|---------------|
-| 1 | `zion172h3y7d6m7d7y7d8q2d4x363t0m55227n2rt2v2` | 1 650 000 000 |
-| 2 | `zion1e7n6j8r28324y487w826s7f3547290m8p0y54t4` | 1 650 000 000 |
-| 3 | `zion1m0c7n2v060r6r4x6d4a2u4u5t305f677w6ws0p4` | 1 650 000 000 |
-| 4 | `zion15647n3n8u696t548u0028868p746c838f59g7a3` | 1 650 000 000 → L5 Free World Projects (repurposed) |
-| 5 | `zion190p6f0k0r3c2j4h0k8p340t5s6m5z75287d72d2` | 1 650 000 000 → L5 Free World Projects (repurposed) |
+| 1 | `zion1s0t7f8q680t4h6v7g240p4k7g2s0a4z8g3cc5h5` | 1 650 000 000 |
+| 2 | `zion1s7x735r6v86485k7t36008l682g777g3q8pu3q0` | 1 650 000 000 |
+| 3 | `zion1e0f4h6w3w394d4p355z2r440k4s2f6v5h4rl8f4` | 1 650 000 000 |
+| 4 | `zion1h7r3v595y3g0z3e3l8p005h4c6l7l6s4s2xh708` | 1 650 000 000 → L5 Free World Projects (repurposed) |
+| 5 | `zion1x535z563d3p6r6u3v6x0g0y445f507w8h6g8388` | 1 650 000 000 → L5 Free World Projects (repurposed) |
 
 **Účel**: OASIS platforma odměny + Golden Egg/XP výherní ceny (sloty 1–3). Sloty 4 a 5 byly přesunuty na L5 Free World Projects (3,3B ZION).
 
@@ -147,9 +147,9 @@ Všech 14 premine outputů je **admin-locked** (vyžaduje 3-of-3 admin multisig
 
 | # | Adresa | Částka (ZION) | Účel |
 |---|--------|---------------|------|
-| 6 | `zion1j5a327c7d3w7h4e474n5p4z0z827f8p874mr2p7` | 2 500 000 000 | Komunitní governance (hlavní) |
-| 7 | `zion1f7g4h034m5l0x3g6q4l5d298d597v5a4q3wc3t7` | 1 000 000 000 | Granty & Bounties |
-| 8 | `zion1a6s5y727s0d5m5s3u448d5g3g60032s6p5xy2l5` | 500 000 000 | Ecosystem Bootstrap |
+| 6 | `zion1f5h5k6t8q3t3d8c5y667z6p2x8t3y3p8c7633g5` | 2 500 000 000 | Komunitní governance (hlavní) |
+| 7 | `zion1s27490u7n823g098w42077h8f2n824w0y75w0s3` | 1 000 000 000 | Granty & Bounties |
+| 8 | `zion1n0r7k274z3t030h4v4g3g5h704c737z658aa238` | 500 000 000 | Ecosystem Bootstrap |
 
 **Time-lock**: Blok 144 000 (~100 dní při 60s/blok).
 
@@ -157,27 +157,27 @@ Všech 14 premine outputů je **admin-locked** (vyžaduje 3-of-3 admin multisig
 
 | # | Adresa | Částka (ZION) | Účel |
 |---|--------|---------------|------|
-| 9 | `zion172k256y2f6y6k6r3q5e3j0v382f694e3q59e4w0` | 1 000 000 000 | Core Development Fund |
-| 10 | `zion1g2k605u0n838t3j2j0j203u0e5m556a8l6fl8n8` | 1 000 000 000 | Síťová infrastruktura (P2P seed nody) |
-| 11 | `zion1s646m4g6d8u8j4t06332w6j4w6q2y0z3x5hv4w4` | 590 000 000 | Genesis Projects — Dharma Temple, Piko de Ora + DAO |
+| 9 | `zion1k752909323x66062k5j7074096f003z095ax8m7` | 1 000 000 000 | Core Development Fund |
+| 10 | `zion1z3a4w726w5u4r4s4z644s8p897v4a2k045rt706` | 1 000 000 000 | Síťová infrastruktura (P2P seed nody) |
+| 11 | `zion122v8f8g55398f4g884k7j482h3z845j6c6ta4f8` | 590 000 000 | Genesis Projects — Dharma Temple, Piko de Ora + DAO |
 
 ### Humanitární (1 slot = 1,44B ZION)
 
 | # | Adresa | Částka (ZION) | Účel |
 |---|--------|---------------|------|
-| 12 | `zion1f0t7e2y3t340g3j4h470q0z7e5j7w7y4q49u5t6` | 1 440 000 000 | Children Future Fund — Humanitarian DAO |
+| 12 | `zion1h6644748u5x6p4p784n6g2l7j77625w6a0k80s8` | 1 440 000 000 | Children Future Fund — Humanitarian DAO |
 
 ### Bridge Seed (1 slot = 0,4B ZION)
 
 | # | Adresa | Částka (ZION) | Účel |
 |---|--------|---------------|------|
-| 13 | `zion1j8c7h0a2r377v5n0y757n8j5w6y2n2d8005f750` | 400 000 000 | EVM Bridge likvidita |
+| 13 | `zion1t6z3c0f0p3h0v233a3h432k5h764j0r3n5ml756` | 400 000 000 | EVM Bridge likvidita |
 
 ### Bridge Vault UTXO (1 slot = 0,1B ZION)
 
 | # | Adresa | Částka (ZION) | Účel |
 |---|--------|---------------|------|
-| 14 | `zion1x2f2u5p560a0e5a5u8g7m837m78856v5f8e45l7` | 100 000 000 | Bridge Vault UTXO — EVM Bridge Unlock likvidita |
+| 14 | `zion1j3w3h7k8m635h734y786j5804305m822t5uk546` | 100 000 000 | Bridge Vault UTXO — EVM Bridge Unlock likvidita |
 
 Tento output je **UTXO transakce** (ne account-model) s 6 outputy
 pro vejení částky do `u64` limitů. Adresa je odvozena z
