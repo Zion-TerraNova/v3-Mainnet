@@ -296,7 +296,7 @@ General Circle (all Guardians + long-stay members)
 |----------|---------------|
 | **Web** | https://www.newearth.cz/V2/camp.html |
 | **Instagram** | @terranova_project |
-| **Discord** | https://discord.gg/eatGYDbd |
+| **Discord** | https://discord.gg/wvxJ7DhZ8 |
 | **GitHub** | https://github.com/Zion-TerraNova |
 | **Coordinator** | Terra Nova ® PT team |
 | **L5 Docs** | [`V3/L5/docs/README.md`](../README.md) |
