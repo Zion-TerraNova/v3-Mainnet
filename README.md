@@ -113,7 +113,7 @@ ZION's web presence is organised across three domains:
 | **Status** | Mainnet Stable |
 | **Protocol** | 3.1.0 "Boost" |
 | **Genesis hash** | `96109423298542a836edc10b9ba5ff9b29a1970418db543c2ee5cd952fe35bdb` |
-| **Official launch** | 2026-12-31 |
+| **Official launch** | postponed (TBD) |
 | **Block time** | ~60 seconds |
 | **Mining algorithm** | `deeksha_lite_v1` (CPU + GPU) |
 | **Total supply** | 144B ZION |

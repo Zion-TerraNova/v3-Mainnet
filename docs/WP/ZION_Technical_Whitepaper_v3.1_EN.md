@@ -2,7 +2,7 @@
 
 > **Version 3.1** · Mainnet Beta v3.0.6 → Mainnet Alpha 3.1 · July 2026 · MIT License
 > Genesis hash: `96109423298542a836edc10b9ba5ff9b29a1970418db543c2ee5cd952fe35bdb`
-> Network status: **Mainnet Beta v3.0.6 → Mainnet Alpha 3.1** (public launch target: 31 Dec 2026)
+> Network status: **Mainnet Beta v3.0.6 → Mainnet Alpha 3.1** (public launch target: postponed (TBD))
 
 ---
 
@@ -453,7 +453,7 @@ horizon is not an excuse, it is an account that grows.
 | **v3.0.4** | Night of the snake + new root | Security incident disclosed and fixed, hard genesis reset, DeFi bridges (wZION on 6 EVM chains, staking, farming, DAO) | LIVE |
 | **v3.0.5** | All Green | Mainnet Beta stabilization, public community CLI release, 12/12 services active, whitepaper canonized | LIVE |
 | **v3.0.6-beta** | Three Streams of One River | Trinity mining core — Zion Grow, Zion Liquidity | LIVE (Beta) |
-| **v3.1.0** | Mainnet Alpha | Public launch, external audit, mobile wallet, expanded DeFi | Planned (31 Dec 2026) |
+| **v3.1.0** | Mainnet Alpha | Public launch, external audit, mobile wallet, expanded DeFi | Planned (postponed (TBD)) |
 
 ---
 

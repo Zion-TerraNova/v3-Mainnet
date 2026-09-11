@@ -94,7 +94,7 @@
 | **Estado** | Mainnet Stable |
 | **Protocolo** | 3.1.0-alpha |
 | **Genesis hash** | `96109423298542a836edc10b9ba5ff9b29a1970418db543c2ee5cd952fe35bdb` |
-| **Lanzamiento oficial** | 2026-12-31 |
+| **Lanzamiento oficial** | pospuesto (TBD) |
 | **Tiempo de bloque** | ~60 segundos |
 | **Algoritmo de minería** | `deeksha_lite_v1` (CPU + GPU) |
 | **Suministro total** | 144B ZION |

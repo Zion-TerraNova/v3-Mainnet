@@ -94,7 +94,7 @@
 | **Status** | Mainnet Stable |
 | **Protokol** | 3.1.0-alpha |
 | **Genesis hash** | `96109423298542a836edc10b9ba5ff9b29a1970418db543c2ee5cd952fe35bdb` |
-| **Oficiální launch** | 2026-12-31 |
+| **Oficiální launch** | odložen (TBD) |
 | **Block time** | ~60 sekund |
 | **Těžební algoritmus** | `deeksha_lite_v1` (CPU + GPU) |
 | **Celková zásoba** | 144B ZION |

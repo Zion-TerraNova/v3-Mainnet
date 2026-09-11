@@ -68,9 +68,9 @@ ZION v3.2.0 One Love está **en vivo y funcionando** como Mainnet Stable. La red
 - ⚠️ La red aún puede contener errores — mina y realiza transacciones bajo tu propio riesgo
 - ⚠️ No se proporciona garantía — consulta el [Descargo legal](../../docs/LEGAL_DISCLAIMER.md)
 
-**Lanzamiento público oficial: 31 de diciembre de 2026**
+**Lanzamiento público oficial: pospuesto (TBD)**
 
-El período Mainnet Beta se extiende hasta el lanzamiento público oficial el **31.12.2026**, según la hoja de ruta original. Durante este período:
+El período Mainnet Beta se extiende hasta el lanzamiento público oficial, que está **pospuesto (TBD)**, según la hoja de ruta original. Durante este período:
 - La red se somete a una verificación de seguridad continua
 - Si la red pasa la verificación de seguridad, el bloque de génesis y todos los bloques minados **permanecerán permanentemente**
 - Los comentarios de la comunidad y los informes de errores son bienvenidos — consulta [Contributing](../../CONTRIBUTING.md)
@@ -81,7 +81,7 @@ El período Mainnet Beta se extiende hasta el lanzamiento público oficial el **
 | Estado | **Mainnet Stable** |
 | Protocolo | 3.1.0-alpha |
 | Hash de génesis | `96109423298542a836edc10b9ba5ff9b29a1970418db543c2ee5cd952fe35bdb` |
-| Lanzamiento oficial | 2026-12-31 |
+| Lanzamiento oficial | pospuesto (TBD) |
 | Minería | Activa (bajo tu propio riesgo) |
 
 ---
@@ -455,7 +455,7 @@ cargo run --release -p zion-core --bin zion-node
 | **Protocolo** | 3.1.0-alpha |
 | **Release** | v3.0.6-beta (Mainnet Beta) |
 | **Estado** | En vivo — minería activa (bajo tu propio riesgo) |
-| **Lanzamiento oficial** | 2026-12-31 |
+| **Lanzamiento oficial** | pospuesto (TBD) |
 
 ### Esquema de versionado
 
@@ -479,7 +479,7 @@ ZION utiliza un esquema de versionado semántico modificado:
 | Versión | Objetivo | Estado |
 |---------|----------|--------|
 | 3.0.6-beta | Mainnet Beta | ✅ En vivo (2026-07-09) |
-| 3.0.6-stable | Lanzamiento público oficial | 📅 2026-12-31 |
+| 3.0.6-stable | Lanzamiento público oficial | 📅 pospuesto (TBD) |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care híbrido (minería NPU) | 🔜 2027 |
 | 4.0.0 | Consenso Proof-of-Care completo | 🔜 2028+ |

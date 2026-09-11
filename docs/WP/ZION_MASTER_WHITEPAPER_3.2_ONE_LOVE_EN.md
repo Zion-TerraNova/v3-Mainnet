@@ -3,7 +3,7 @@
 
 **The master story and public marketing edition**
 **A synthesis of the four books: Genesis · Quantum Revolution · Ekam Deeksha · Terra Nova**
-**Network status: Mainnet Alpha 3.1 → Mainnet Stable 3.2 "One Love" · Public launch: 31 Dec 2026**
+**Network status: Mainnet Alpha 3.1 → Mainnet Stable 3.2 "One Love" · Public launch: postponed (TBD)**
 **License: MIT for core and pool · This text is manifesto, chronicle, and guide**
 
 ---
@@ -120,7 +120,7 @@ trial of the soul. The egg hides 4.95 billion ZION, but that billion is
 not the goal. The goal is the road. The road where a man returns to
 himself. To Jah. To the roots.
 
-December 31, 2026 is Mainnet Dawn — the launch of the network. But don't
+postponed (TBD) is Mainnet Dawn — the launch of the network. But don't
 take it as the end. It is the first morning. The Golden Age doesn't start
 with a date. It starts with each of us deciding to enter the riddim.
 Redemption song is not something you sing — it is something you live.
@@ -517,7 +517,7 @@ It is **living infrastructure + a compass**.
 | Source code | https://github.com/Zion-TerraNova/v3-Mainnet |
 | Website / Explorer | https://zionterranova.com · /explorer |
 | Pool | `62.171.141.136:8444` |
-| Status | Mainnet Alpha · public launch target 31 Dec 2026 |
+| Status | Mainnet Alpha · public launch target postponed (TBD) |
 
 Do not believe the story. Verify the chronicle. And when the chronicle
 holds — keep telling the story, because stories that have stood before a

@@ -132,7 +132,7 @@ zrychlení.
 | Celková nabídka | 144 000 000 000 ZION |
 | Rozdělení odměny | 89 % miner / 5 % humanitární fond / 5 % fond Issobella / 1 % spáleno |
 | Blok | ~60 sekund |
-| Stav sítě | Mainnet Beta, veřejný launch cíl 31. 12. 2026 |
+| Stav sítě | Mainnet Beta, cíl veřejného launchu: odložen (TBD) |
 | Oficiální miner | ZION v3.0.6-beta — Trinity engine, Zion Grow, Zion Liquidity |
 | Licence jádra a poolu | MIT, otevřený zdrojový kód |
 | Zdrojový kód | https://github.com/Zion-TerraNova/v3-Mainnet |

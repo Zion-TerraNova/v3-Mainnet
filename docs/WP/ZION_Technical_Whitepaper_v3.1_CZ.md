@@ -2,7 +2,7 @@
 
 > **Verze 3.1** · Mainnet Beta v3.0.6 → Mainnet Alpha 3.1 · červenec 2026 · Licence MIT
 > Genesis hash: `96109423298542a836edc10b9ba5ff9b29a1970418db543c2ee5cd952fe35bdb`
-> Stav sítě: **Mainnet Beta v3.0.6 → Mainnet Alpha 3.1** (veřejný launch cíl: 31. 12. 2026)
+> Stav sítě: **Mainnet Beta v3.0.6 → Mainnet Alpha 3.1** (veřejný launch cíl: odložen (TBD))
 
 ---
 
@@ -453,7 +453,7 @@ výmluva, je to účet, který roste.
 | **v3.0.4** | Noc hada a nový kořen | Bezpečnostní incident zveřejněn a opraven, hard genesis reset, DeFi mosty (wZION na 6 EVM sítích, staking, farming, DAO) | ŽIVÉ |
 | **v3.0.5** | Všechno zelené | Mainnet Beta stabilizace, veřejné vydání komunitního CLI, 12/12 služeb aktivních, whitepaper kanonizován | ŽIVÉ |
 | **v3.0.6-beta** | Tři proudy jedné řeky | Trinity těžební jádro — Zion Grow, Zion Liquidity | ŽIVÉ (Beta) |
-| **v3.1.0** | Mainnet Alpha | Veřejný launch, externí audit, mobilní peněženka, rozšířené DeFi | Plánováno (31. 12. 2026) |
+| **v3.1.0** | Mainnet Alpha | Veřejný launch, externí audit, mobilní peněženka, rozšířené DeFi | Plánováno (odložen (TBD)) |
 
 ---
 

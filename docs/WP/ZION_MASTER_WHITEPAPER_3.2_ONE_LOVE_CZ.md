@@ -3,7 +3,7 @@
 
 **Vyprávění a veřejná marketingová edice**
 **Syntéza čtyř knih: Genesis · Kvantová revoluce · Ekam Deeksha · Terra Nova**
-**Status sítě: Mainnet Alpha 3.1 → Mainnet Stable 3.2 "One Love" · Veřejný launch: 31. prosince 2026**
+**Status sítě: Mainnet Alpha 3.1 → Mainnet Stable 3.2 "One Love" · Veřejný launch: odložen (TBD)**
 **Licence: MIT pro core a pool · Tento text je manifest, kronika a průvodce**
 
 ---
@@ -115,7 +115,7 @@ Je to cesta zasvěcení. Kdo najde 108 stop, projde zkouškou duše. Vejce
 skrývá 8,25 miliardy ZION, ale ta miliarda není cíl. Cílem je cesta.
 Cesta, kde se člověk vrací sám k sobě. K Jah. Ke kořenům.
 
-31. prosince 2026 je Mainnet Dawn — start sítě. Ale neber to jako konec.
+odložen (TBD) je Mainnet Dawn — start sítě. Ale neber to jako konec.
 Je to první ráno. Zlatý věk nezačíná datem. Začíná tím, že se každý z nás
 rozhodne vstoupit do riddimu. Redemption song se nezpívá — žije se.
 
@@ -494,7 +494,7 @@ Je to **živá infrastruktura + kompas**.
 | Zdrojový kód | https://github.com/Zion-TerraNova/v3-Mainnet |
 | Web / Explorer | https://zionterranova.com · /explorer |
 | Pool | `62.171.141.136:8444` |
-| Status | Mainnet Alpha · veřejný launch cíl 31. prosince 2026 |
+| Status | Mainnet Alpha · cíl veřejného launchu: odložen (TBD) |
 
 Nevěř příběhu. Ověř kroniku. A když kronika drží — vyprávěj příběh dál,
 protože příběhy, které obstály před kalkulačkou, jsou nejcennější, co

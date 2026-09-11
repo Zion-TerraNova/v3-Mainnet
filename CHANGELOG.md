@@ -199,7 +199,7 @@ ZION uses a modified semantic versioning scheme:
 |---------|--------|--------|
 | 3.0.5-beta | Community CLI | ✅ Live (2026-07-10) |
 | 3.0.4-beta | Mainnet Beta | ✅ Live (2026-07-09) |
-| 3.0.4-stable | Official Public Launch | 📅 2026-12-31 |
+| 3.0.4-stable | Official Public Launch | 📅 postponed (TBD) |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care hybrid (NPU mining) | 🔜 2027 |
 | 4.0.0 | Full Proof-of-Care consensus | 🔜 2028+ |

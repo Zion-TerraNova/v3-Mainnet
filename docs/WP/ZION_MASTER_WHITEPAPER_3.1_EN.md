@@ -3,7 +3,7 @@
 
 **The master story and public marketing edition**
 **A synthesis of the four books: Genesis · Quantum Revolution · Ekam Deeksha · Terra Nova**
-**Network status: Mainnet Beta v3.0.6 → Mainnet Alpha 3.1 · Public launch: 31 Dec 2026**
+**Network status: Mainnet Beta v3.0.6 → Mainnet Alpha 3.1 · Public launch: postponed (TBD)**
 **License: MIT for core and pool · This text is manifesto, chronicle, and guide**
 
 ---
@@ -243,7 +243,7 @@ brochure would omit. That is exactly why it is here.
 | **v3.0.4** | The night of the snake and the new root | Security incident disclosed and fixed, hard genesis reset; first DeFi bridges — wZION on six EVM chains, staking, farming, DAO |
 | **v3.0.5** | All Green | Mainnet Beta stabilization, public community CLI, all services active, whitepaper canonized |
 | **v3.0.6-beta** | Three Streams of One River | The **Trinity** engine — Zion Grow, Zion Liquidity |
-| **v3.1.0** | **Mainnet Alpha** | Public launch — target 31 Dec 2026 |
+| **v3.1.0** | **Mainnet Alpha** | Public launch — target postponed (TBD) |
 
 ## The night the snake entered the garden
 
@@ -412,7 +412,7 @@ stars toward which the sap may one day rise.
 Trinity engine, transparent communication, documentation that does
 not lie about status.
 
-**Phase B — Mainnet Alpha 3.1 (target 31 Dec 2026):**
+**Phase B — Mainnet Alpha 3.1 (target postponed (TBD)):**
 - public launch of the network;
 - Zion Grow dashboard — watch your ZION position grow directly in the app;
 - Zion Liquidity metrics — see how your mining deepens the network's liquidity;
@@ -464,7 +464,7 @@ It is **living infrastructure + a compass**.
 | Source code | https://github.com/Zion-TerraNova/v3-Mainnet |
 | Website / Explorer | https://zionterranova.com · /explorer |
 | Pool | `62.171.141.136:8444` |
-| Status | Mainnet Beta · public launch target 31 Dec 2026 |
+| Status | Mainnet Beta · public launch target postponed (TBD) |
 
 Do not believe the story. Verify the chronicle. And when the chronicle
 holds — keep telling the story, because stories that have stood before a

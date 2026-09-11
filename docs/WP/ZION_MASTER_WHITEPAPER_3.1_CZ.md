@@ -3,7 +3,7 @@
 
 **Hlavní příběh a marketingové vydání pro veřejnost**
 **Syntéza čtyř knih: Genesis · Kvantová revoluce · Ekam Deeksha · Terra Nova**
-**Stav sítě: Mainnet Beta v3.0.6 → Mainnet Alpha 3.1 · Veřejný launch: 31. 12. 2026**
+**Stav sítě: Mainnet Beta v3.0.6 → Mainnet Alpha 3.1 · Veřejný launch: odložen (TBD)**
 **Licence: MIT pro jádro a pool · Tento text je manifest, kronika i průvodce**
 
 ---
@@ -227,7 +227,7 @@ brožura vynechala. Právě proto tu je.
 | **v3.0.4** | Noc hada a nový kořen | Bezpečnostní incident zveřejněn, opraven, hard genesis reset; první DeFi mosty — wZION na šesti EVM sítích, staking, farming, DAO |
 | **v3.0.5** | Všechno zelené | Mainnet Beta stabilizace, veřejné komunitní CLI, všechny služby aktivní, whitepaper kanonizován |
 | **v3.0.6-beta** | Tři proudy jedné řeky | **Trinity** engine — Zion Grow, Zion Liquidity |
-| **v3.1.0** | **Mainnet Alpha** | Veřejný launch — cíl 31. 12. 2026 |
+| **v3.1.0** | **Mainnet Alpha** | Veřejný launch — cíl odložen (TBD) |
 
 ## Noc, kdy do zahrady vlezl had
 
@@ -391,7 +391,7 @@ které se míza může jednou zvednout.
 Trinity engine, transparentní komunikace, dokumentace, která
 nelže o stavu.
 
-**Fáze B — Mainnet Alpha 3.1 (cíl 31. 12. 2026):**
+**Fáze B — Mainnet Alpha 3.1 (cíl odložen (TBD)):**
 - veřejný launch sítě;
 - Zion Grow dashboard — sleduj růst své ZION pozice přímo v aplikaci;
 - Zion Liquidity metriky — viz, jak tvá těžba prohlubuje likviditu sítě;
@@ -443,7 +443,7 @@ Je to **žijící infrastruktura + kompas**.
 | Zdrojový kód | https://github.com/Zion-TerraNova/v3-Mainnet |
 | Web / Explorer | https://zionterranova.com · /explorer |
 | Pool | `62.171.141.136:8444` |
-| Stav | Mainnet Beta · veřejný launch cíl 31. 12. 2026 |
+| Stav | Mainnet Beta · cíl veřejného launchu: odložen (TBD) |
 
 Nevěř příběhu. Ověř kroniku. A když kronika obstojí — vyprávěj příběh
 dál, protože příběhy, které obstály před kalkulačkou, jsou to

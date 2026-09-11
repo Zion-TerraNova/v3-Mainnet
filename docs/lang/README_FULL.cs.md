@@ -68,9 +68,9 @@ ZION v3.2.0 One Love je **živý a běží** jako Mainnet Stable. Síť je opera
 - ⚠️ Síť může stále obsahovat chyby — těžte a transakujte na vlastní nebezpečí
 - ⚠️ Není poskytována žádná záruka — viz [Právní upozornění](../../docs/LEGAL_DISCLAIMER.md)
 
-**Oficiální veřejný Launch: 31. prosince 2026**
+**Oficiální veřejný Launch: odložen (TBD)**
 
-Období Mainnet Beta trvá do oficiálního veřejného spuštění **31.12.2026** podle původního roadmapu. Během tohoto období:
+Období Mainnet Beta trvá do oficiálního veřejného spuštění, které je **odloženo (TBD)**, podle původního roadmapu. Během tohoto období:
 - Síť prochází kontinuálním bezpečnostním ověřováním
 - Pokud síť projde bezpečnostním ověřením, genesis blok a všechny vytěžené bloky **zůstanou trvale**
 - Feedback komunity a hlášení chyb jsou vítány — viz [Contributing](../../CONTRIBUTING.md)
@@ -81,7 +81,7 @@ Období Mainnet Beta trvá do oficiálního veřejného spuštění **31.12.2026
 | Status | **Mainnet Stable** |
 | Protokol | 3.1.0-alpha |
 | Genesis hash | `96109423298542a836edc10b9ba5ff9b29a1970418db543c2ee5cd952fe35bdb` |
-| Oficiální launch | 2026-12-31 |
+| Oficiální launch | odložen (TBD) |
 | Těžba | Aktivní (na vlastní nebezpečí) |
 
 ---
@@ -455,7 +455,7 @@ cargo run --release -p zion-core --bin zion-node
 | **Protokol** | 3.1.0-alpha |
 | **Release** | v3.0.6-beta (Mainnet Beta) |
 | **Status** | Live — těžba aktivní (na vlastní nebezpečí) |
-| **Oficiální launch** | 2026-12-31 |
+| **Oficiální launch** | odložen (TBD) |
 
 ### Schéma verzování
 
@@ -479,7 +479,7 @@ ZION používá modifikovaný semantic versioning:
 | Verze | Cíl | Status |
 |---------|--------|--------|
 | 3.0.6-beta | Mainnet Beta | ✅ Live (2026-07-09) |
-| 3.0.6-stable | Oficiální veřejný launch | 📅 2026-12-31 |
+| 3.0.6-stable | Oficiální veřejný launch | 📅 odložen (TBD) |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care hybrid (NPU těžba) | 🔜 2027 |
 | 4.0.0 | Plný Proof-of-Care konsensus | 🔜 2028+ |

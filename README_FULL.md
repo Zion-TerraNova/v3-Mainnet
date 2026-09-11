@@ -68,9 +68,9 @@ ZION v3.2.0 One Love is **live and running** as Mainnet Stable. The network is o
 - ⚠️ The network may still contain bugs — mine and transact at your own risk
 - ⚠️ No warranty is provided — see [Legal Disclaimer](./docs/LEGAL_DISCLAIMER.md)
 
-**Official Public Launch: December 31, 2026**
+**Official Public Launch: postponed (TBD)**
 
-The Mainnet Beta period runs until the official public launch on **31.12.2026**, per the original roadmap. During this period:
+The Mainnet Beta period runs until the official public launch **postponed (TBD)**, per the original roadmap. During this period:
 - The network undergoes continuous security verification
 - If the network passes security verification, the genesis block and all mined blocks **will remain permanently**
 - Community feedback and bug reports are welcome — see [Contributing](./CONTRIBUTING.md)
@@ -81,7 +81,7 @@ The Mainnet Beta period runs until the official public launch on **31.12.2026**,
 | Status | **Mainnet Stable** |
 | Protocol | 3.1.0-alpha |
 | Genesis hash | `96109423298542a836edc10b9ba5ff9b29a1970418db543c2ee5cd952fe35bdb` |
-| Official launch | 2026-12-31 |
+| Official launch | postponed (TBD) |
 | Mining | Active (at your own risk) |
 
 ---
@@ -455,7 +455,7 @@ cargo run --release -p zion-core --bin zion-node
 | **Protocol** | 3.1.0-alpha |
 | **Release** | v3.0.6-beta (Mainnet Beta) |
 | **Status** | Live — mining active (at your own risk) |
-| **Official launch** | 2026-12-31 |
+| **Official launch** | postponed (TBD) |
 
 ### Versioning Scheme
 
@@ -479,7 +479,7 @@ ZION uses a modified semantic versioning scheme:
 | Version | Target | Status |
 |---------|--------|--------|
 | 3.0.6-beta | Mainnet Beta | ✅ Live (2026-07-09) |
-| 3.0.6-stable | Official Public Launch | 📅 2026-12-31 |
+| 3.0.6-stable | Official Public Launch | 📅 postponed (TBD) |
 | 3.1.0 | Wallet SDK + Mobile App + TX History | 🔜 Q3 2026 |
 | 3.2.0 | Proof-of-Care hybrid (NPU mining) | 🔜 2027 |
 | 4.0.0 | Full Proof-of-Care consensus | 🔜 2028+ |

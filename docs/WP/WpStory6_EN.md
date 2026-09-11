@@ -138,7 +138,7 @@ this acceleration.
 | Total supply | 144,000,000,000 ZION |
 | Reward split | 89% miner / 5% humanitarian fund / 5% Issobella fund / 1% burned |
 | Block time | ~60 seconds |
-| Network status | Mainnet Beta, public launch target 31 Dec 2026 |
+| Network status | Mainnet Beta, public launch target postponed (TBD) |
 | Official miner | ZION v3.0.6-beta — Trinity engine, Zion Grow, Zion Liquidity |
 | Core & pool license | MIT, open source |
 | Source code | https://github.com/Zion-TerraNova/v3-Mainnet |
