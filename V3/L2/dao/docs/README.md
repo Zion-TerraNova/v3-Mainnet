@@ -66,7 +66,7 @@ DAO není jen technická struktura — je to **dharmická organizace** založen�
 
 | Parametr | Hodnota | Zdroj |
 |----------|---------|-------|
-| DAO Treasury | 4 000 000 000 ZION (genesis premine) | `types.rs` |
+| DAO Treasury | 1 500 000 000 ZION (genesis premine, sloty 7–8) | `types.rs` † |
 | Multi-sig | 5 z 7 signatářů | `types.rs` |
 | Denní limit výdajů | 100M ZION | `types.rs` |
 | Práh návrhu | 1M ZION | `types.rs` |
@@ -74,6 +74,8 @@ DAO není jen technická struktura — je to **dharmická organizace** založen�
 | Timelock | 48 hodin | `types.rs` |
 | Quorum | 10 % oběžného množství | `types.rs` |
 | Default API port | 8080 | `config.rs` |
+
+† Kanonický premine je definován ve V31 `v3_compat.rs` `PREMINE_OUTPUTS` (DAO Treasury = sloty 7–8, 1B + 0.5B, time-lock do bloku 144 000). Legacy V3 konstanta `DAO_TREASURY_TOTAL = 4_000_000_000` v `types.rs` je překonaná — slot 6 (2.5B) byl přesměrován na L6 Issobella Orbital Station & Quantum Research Fund.
 
 ---
 

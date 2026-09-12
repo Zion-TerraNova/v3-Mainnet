@@ -143,11 +143,16 @@ Všech 14 premine outputů je **admin-locked** (vyžaduje 3-of-3 admin multisig
 
 > **Poznámka:** Správce jednotlivých L5 projektů jmenuje Trustee. Jména správců budou zveřejněna po dosažení bodu globální expanze (~0,20 USD/ZION). Do té doby jsou informace o správcích důvěrné.
 
-### DAO Treasury (3 sloty = 4,0B ZION) — time-locked do bloku 144 000
+### L6 Issobella (1 slot = 2,5B ZION) — repurposed z DAO Treasury, time-locked do bloku 144 000
 
 | # | Adresa | Částka (ZION) | Účel |
 |---|--------|---------------|------|
-| 6 | `zion1f5h5k6t8q3t3d8c5y667z6p2x8t3y3p8c7633g5` | 2 500 000 000 | Komunitní governance (hlavní) |
+| 6 | `zion1f5h5k6t8q3t3d8c5y667z6p2x8t3y3p8c7633g5` | 2 500 000 000 | Orbital Station & Quantum Research Fund (dříve Komunitní governance) |
+
+### DAO Treasury (2 sloty = 1,5B ZION) — time-locked do bloku 144 000
+
+| # | Adresa | Částka (ZION) | Účel |
+|---|--------|---------------|------|
 | 7 | `zion1s27490u7n823g098w42077h8f2n824w0y75w0s3` | 1 000 000 000 | Granty & Bounties |
 | 8 | `zion1n0r7k274z3t030h4v4g3g5h704c737z658aa238` | 500 000 000 | Ecosystem Bootstrap |
 
@@ -189,7 +194,8 @@ pro vejení částky do `u64` limitů. Adresa je odvozena z
 |-----------|-------|---------------|-------------|
 | OASIS + Golden Egg | 3 | 4 950 000 000 | 29,5 % |
 | L5 Free World Projects | 2 | 3 300 000 000 | 19,7 % |
-| DAO Treasury | 3 | 4 000 000 000 | 23,8 % |
+| L6 Issobella | 1 | 2 500 000 000 | 14,9 % |
+| DAO Treasury | 2 | 1 500 000 000 | 8,9 % |
 | Infrastruktura | 3 | 2 590 000 000 | 15,4 % |
 | Humanitární | 1 | 1 440 000 000 | 8,6 % |
 | Bridge Seed | 1 | 400 000 000 | 2,4 % |
@@ -338,7 +344,7 @@ Zdroj: `V3/L1/core/src/admin.rs` + `docs/3.0.4/GENESIS_HARD_RESET_CANONICAL.md` 
 Všech 14 premine outputů používá **obouvrstvý zámek**. Odemčení vyžaduje:
 
 1. **Time-lock** (`unlock_height`): Bloková výška, která musí být dosažena.
-   - DAO Treasury sloty (6, 7, 8): blok 144 000 (~100 dní)
+   - L6 Issobella slot (6) a DAO Treasury sloty (7, 8): blok 144 000 (~100 dní)
    - Všechny ostatní: bez time-locku (okamžitě po admin-odemčení)
 2. **Admin multisig (3-of-3)** — všichni 3 admini (Rama + Sita + Hanuman)
    musí podepsat `TreasurySpend` operaci. `admin_unlocked` closure

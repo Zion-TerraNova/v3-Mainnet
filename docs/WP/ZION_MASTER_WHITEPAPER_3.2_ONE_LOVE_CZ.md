@@ -112,7 +112,7 @@ rezonuje. Jeden akord, jedna láska, jeden cíl.
 
 A pak přichází Hiranyagarbha — Zlaté vejce. Není to poklad pro vyvolené.
 Je to cesta zasvěcení. Kdo najde 108 stop, projde zkouškou duše. Vejce
-skrývá 8,25 miliardy ZION, ale ta miliarda není cíl. Cílem je cesta.
+skrývá 4,95 miliardy ZION, ale ta miliarda není cíl. Cílem je cesta.
 Cesta, kde se člověk vrací sám k sobě. K Jah. Ke kořenům.
 
 odložen (TBD) je Mainnet Dawn — start sítě. Ale neber to jako konec.

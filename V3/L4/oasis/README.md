@@ -109,7 +109,7 @@ Each avatar has quests. Complete all = 245 quests total.
 
 - **108 clues** across 7 categories (Sacred Trinity Profiles, Sacred Knowledge Levels, ZION Whitepaper, Source Code, Blockchain Data, Community Events, EKAM Temple Pilgrimage)
 - **3 master keys**: Ramayana Key (30 clues), Mahabharata Key (35 clues), Unity Key (43 clues — requires both previous keys)
-- **10 prize tiers** (total 8.25B ZION reward pool)
+- **10 prize tiers** (total 4.95B ZION reward pool)
 - First 3 players to CL9 + 108 clues + 3 keys win:
   - 1st: 1,000,000,000 ZION
   - 2nd: 500,000,000 ZION

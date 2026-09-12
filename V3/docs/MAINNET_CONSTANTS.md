@@ -45,8 +45,9 @@
 
 | # | Category | Amount (ZION) |
 |---|----------|---------------|
-| 1–5 | OASIS + Golden Egg/XP (5 × 1.65B) | 8,250,000,000 |
-| 6 | DAO Treasury (main) | 2,500,000,000 |
+| 1–3 | OASIS + Golden Egg/XP (3 × 1.65B) | 4,950,000,000 |
+| 4–5 | L5 Free World Projects (repurposed from OASIS, 2 × 1.65B) | 3,300,000,000 |
+| 6 | L6 Issobella — Orbital Station & Quantum Research Fund (repurposed from DAO Treasury) | 2,500,000,000 |
 | 7 | DAO Grants & Bounties | 1,000,000,000 |
 | 8 | DAO Ecosystem Bootstrap | 500,000,000 |
 | 9 | Core Development Fund | 1,000,000,000 |

@@ -224,7 +224,7 @@ The UTXO model is inherently safe — `validate_inputs_exist()` and `validate_va
 
 **Description:** Prior to F4.7, there was no upper bound on the `amount_zion` field in account-model transactions beyond the F5 balance check. While F5 prevents inflation from zero-balance addresses, F4.7 adds a hard cap equal to `emission::TOTAL_SUPPLY` (144 billion ZION) as a second layer of defense. Any transaction attempting to move more than the entire money supply is rejected outright, before the F5 balance check runs.
 
-**Design decision:** The cap is set to `TOTAL_SUPPLY` (not 100M as initially proposed) to avoid colliding with legitimate premine-scale transfers (DAO treasury: 2.5B ZION, OASIS: 1.65B ZION). The cap is a supply-invariant: no legitimate transaction can exceed it, but inflationary garbage (e.g., `u64::MAX` or `u128::MAX`) is blocked.
+**Design decision:** The cap is set to `TOTAL_SUPPLY` (not 100M as initially proposed) to avoid colliding with legitimate premine-scale transfers (L6 Issobella: 2.5B ZION, DAO treasury: 1.5B ZION, OASIS: 1.65B ZION). The cap is a supply-invariant: no legitimate transaction can exceed it, but inflationary garbage (e.g., `u64::MAX` or `u128::MAX`) is blocked.
 
 **Exceptions:** `from == "genesis"` and `from == "coinbase"` are exempt (genesis premine allocation and block rewards).
 
@@ -294,7 +294,7 @@ The root cause was the use of TeamViewer remote desktop software on the primary 
 
 After the TeamViewer compromise, **all cryptographic material must be considered burned**:
 
-- 14 premine wallet keypairs (8.25B + 4B + 2.59B + 1.44B + 0.5B ZION)
+- 14 premine wallet keypairs (4.95B OASIS + 3.3B L5 + 2.5B L6 + 1.5B DAO + 2.59B infra + 1.44B humanitarian + 0.5B bridge ZION)
 - 5 canonical subsidy wallet keypairs (block reward recipients)
 - Bridge vault seed (100M ZION)
 - Pool payout signing key

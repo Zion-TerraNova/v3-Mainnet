@@ -41,7 +41,7 @@
 | 101–1,000 | 1,000,000 ZION each | CL 5 + 36 clues |
 | 1,001–10,000 | 100,000 ZION each | CL 3 + 18 clues |
 
-**Total prize pool:** 8.25B ZION.
+**Total prize pool:** 4.95B ZION.
 
 ---
 

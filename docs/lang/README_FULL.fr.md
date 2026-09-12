@@ -250,7 +250,7 @@ Chaque avatar a des quêtes. Tout compléter = **245 quêtes au total**.
 
 - **108 indices** dans 7 catégories (Sacred Trinity Profiles, Sacred Knowledge Levels, ZION Whitepaper, Source Code, Blockchain Data, Community Events, EKAM Temple Pilgrimage)
 - **3 master keys** : Ramayana (30 indices), Mahabharata (35 indices), Unity (43 indices — nécessite les deux précédentes)
-- **10 niveaux de prix** avec un reward pool total de **8,25 milliards de ZION**
+- **10 niveaux de prix** avec un reward pool total de **4,95 milliards de ZION**
 - **Boss final** : Hiranyagarbha — l'entité de conscience cosmique
 - **3 premiers solveurs** (CL9 + 108 indices + 3 master keys) :
   - 1ère place : **1 000 000 000 ZION**
@@ -277,7 +277,7 @@ Chaque avatar a des quêtes. Tout compléter = **245 quêtes au total**.
 - **Non-consensus** : Oasis n'affecte jamais le minage L1 ni la validation de la blockchain
 
 #### Reward Pool
-- **8,25 milliards de ZION** reward pool total pour la chasse au trésor Golden Egg
+- **4,95 milliards de ZION** reward pool total pour la chasse au trésor Golden Egg
 
 ## Structure du dépôt
 

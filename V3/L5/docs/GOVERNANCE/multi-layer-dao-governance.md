@@ -104,7 +104,7 @@ No Co-Admin should hold power in **more than 2 adjacent layers** to prevent conc
 ### 3.2 L2 — DAO Treasury & Bridge Governance
 
 **What is governed:**
-- Treasury spend (4B ZION premine + ongoing revenue)
+- Treasury spend (1.5B ZION DAO premine, sloty 7–8 + ongoing revenue)
 - Bridge parameters (fees, validator thresholds, supported chains)
 - Grant allocation (humanitarian, development, research)
 - Emergency actions (pause, rotate guardians)

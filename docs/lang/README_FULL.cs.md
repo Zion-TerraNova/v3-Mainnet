@@ -250,7 +250,7 @@ Každý avatar má úkoly. Kompletní = **245 úkolů celkem**.
 
 - **108 stop** napříč 7 kategoriemi (Sacred Trinity Profiles, Sacred Knowledge Levels, ZION Whitepaper, Source Code, Blockchain Data, Community Events, EKAM Temple Pilgrimage)
 - **3 master keys**: Ramayana (30 stop), Mahabharata (35 stop), Unity (43 stop — vyžaduje obě předchozí)
-- **10 cenových úrovní** s celkovým reward poolem **8,25 miliardy ZION**
+- **10 cenových úrovní** s celkovým reward poolem **4,95 miliardy ZION**
 - **Finální boss**: Hiranyagarbha — entita kosmického vědomí
 - **První 3 řešitelé** (CL9 + 108 stop + 3 master keys):
   - 1. místo: **1 000 000 000 ZION**
@@ -277,7 +277,7 @@ Každý avatar má úkoly. Kompletní = **245 úkolů celkem**.
 - **Non-consensus**: Oasis nikdy neovlivňuje L1 těžbu ani validaci blockchainu
 
 #### Reward Pool
-- **8,25 miliardy ZION** celkový reward pool pro treasure hunt Golden Egg
+- **4,95 miliardy ZION** celkový reward pool pro treasure hunt Golden Egg
 
 ## Struktura repozitáře
 

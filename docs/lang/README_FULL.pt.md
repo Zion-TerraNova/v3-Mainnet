@@ -250,7 +250,7 @@ Cada avatar tem missões. Completar todas = **245 missões no total**.
 
 - **108 pistas** em 7 categorias (Sacred Trinity Profiles, Sacred Knowledge Levels, ZION Whitepaper, Source Code, Blockchain Data, Community Events, EKAM Temple Pilgrimage)
 - **3 master keys**: Ramayana (30 pistas), Mahabharata (35 pistas), Unity (43 pistas — requer as duas anteriores)
-- **10 níveis de prêmio** com reward pool total de **8,25 bilhões de ZION**
+- **10 níveis de prêmio** com reward pool total de **4,95 bilhões de ZION**
 - **Chefe final**: Hiranyagarbha — a entidade de consciência cósmica
 - **3 primeiros solucionadores** (CL9 + 108 pistas + 3 master keys):
   - 1º lugar: **1.000.000.000 ZION**
@@ -277,7 +277,7 @@ Cada avatar tem missões. Completar todas = **245 missões no total**.
 - **Non-consensus**: Oasis nunca afeta a mineração L1 nem a validação da blockchain
 
 #### Reward Pool
-- **8,25 bilhões de ZION** reward pool total para a caça ao tesouro Golden Egg
+- **4,95 bilhões de ZION** reward pool total para a caça ao tesouro Golden Egg
 
 ## Estrutura do repositório
 

@@ -31,9 +31,9 @@
 
 | Konstanta | Hodnota | Popis |
 |-----------|---------|-------|
-| `DAO_TREASURY_ADDRESSES` | 3 adresy | Treasury na L1 (4B ZION) |
+| `DAO_TREASURY_ADDRESSES` | 3 adresy | Treasury na L1 (legacy 4B ZION) † |
 | `FLOWERS_PER_ZION` | 10⁶ | Atomická přesnost (updated 3.0.3 fork) |
-| `DAO_TREASURY_TOTAL` | 4×10²¹ flowers | Celkový treasury |
+| `DAO_TREASURY_TOTAL` | 4×10²¹ flowers | Celkový treasury (legacy) † |
 | `PROPOSAL_THRESHOLD` | 1M ZION (flowers) | Min. balance pro návrh |
 | `VOTING_PERIOD_SECS` | 604 800 (7 dní) | Hlasovací období |
 | `TIMELOCK_SECS` | 172 800 (48h) | Timelock delay |
@@ -41,6 +41,8 @@
 | `MULTISIG_THRESHOLD` | 5 | Signatáři nutní |
 | `MULTISIG_TOTAL` | 7 | Celkem signatářů |
 | `DAILY_SPEND_LIMIT` | 100M ZION (flowers) | Denní limit výdajů |
+
+† Kanonický premine (V31 `v3_compat.rs` `PREMINE_OUTPUTS`): DAO Treasury = **1.5B ZION** (sloty 7–8, time-lock do bloku 144 000); slot 6 (2.5B) = L6 Issobella. Legacy V3 konstanta `DAO_TREASURY_TOTAL = 4_000_000_000` je překonaná.
 
 **DAO Memo Protokol:**
 

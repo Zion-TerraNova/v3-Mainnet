@@ -94,7 +94,7 @@
       "unlock_condition": "CL 1 + Participation reward"
     }
   ],
-  "_note": "Prize tiers mirror the 9 consciousness levels + participation. Total distributed from the 8.25B OASIS pool. Flowers use 6-decimal scale (1 ZION = 1e6 flowers).",
+  "_note": "Prize tiers mirror the 9 consciousness levels + participation. Total distributed from the 4.95B OASIS pool. Flowers use 6-decimal scale (1 ZION = 1e6 flowers).",
   "dao_approval_required": true,
   "donation_requirement": "100% of 1st place must be donated to humanitarian projects to unlock full title"
 }

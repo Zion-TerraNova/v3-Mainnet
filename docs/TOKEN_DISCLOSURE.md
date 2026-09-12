@@ -48,7 +48,8 @@ a v [`genesis.md`](./genesis.md). Žádná část není skrytá.
 |-----------|---------------|---|------|
 | OASIS + Golden Egg (3 sloty) | 4 950 000 000 | 29,5 % | admin-locked |
 | L5 Free World Projects (2 sloty) | 3 300 000 000 | 19,7 % | admin-locked |
-| DAO Treasury (3 sloty) | 4 000 000 000 | 23,8 % | admin + time-locked (blok 144 000) |
+| L6 Issobella — Orbital Station & Quantum Research Fund (1 slot, repurposed z DAO Treasury) | 2 500 000 000 | 14,9 % | admin + time-locked (blok 144 000) |
+| DAO Treasury (2 sloty) | 1 500 000 000 | 8,9 % | admin + time-locked (blok 144 000) |
 | Infrastruktura (3 sloty) | 2 590 000 000 | 15,4 % | admin-locked |
 | Humanitární (Children Future Fund) | 1 440 000 000 | 8,6 % | admin-locked |
 | Bridge Seed | 400 000 000 | 2,4 % | admin-locked |
@@ -169,15 +170,15 @@ prostředky.
 
 ---
 
-## 9. DAO treasury
+## 9. DAO treasury + L6 Issobella
 
 | Slot | Adresa | Částka | Lock |
 |------|--------|--------|------|
-| 6 | `zion1j5a327c7d3w7h4e474n5p4z0z827f8p874mr2p7` | 2,5B | blok 144 000 + admin + DAO |
-| 7 | `zion1f7g4h034m5l0x3g6q4l5d298d597v5a4q3wc3t7` | 1,0B | blok 144 000 + admin + DAO |
-| 8 | `zion1a6s5y727s0d5m5s3u448d5g3g60032s6p5xy2l5` | 0,5B | blok 144 000 + admin + DAO |
+| 6 — L6 Issobella | `zion1j5a327c7d3w7h4e474n5p4z0z827f8p874mr2p7` | 2,5B | blok 144 000 + admin + DAO |
+| 7 — DAO Grants | `zion1f7g4h034m5l0x3g6q4l5d298d597v5a4q3wc3t7` | 1,0B | blok 144 000 + admin + DAO |
+| 8 — DAO Bootstrap | `zion1a6s5y727s0d5m5s3u448d5g3g60032s6p5xy2l5` | 0,5B | blok 144 000 + admin + DAO |
 
-DAO treasury (4B ZION) je **trojí zámek**:
+Sloty 6–8 (celkem 4B ZION: L6 Issobella 2,5B + DAO treasury 1,5B) jsou **trojí zámek**:
 1. Time-lock: blok 144 000 (~100 dní)
 2. Admin multisig: 3-of-3
 3. DAO vote: quorum 15 %, 14d

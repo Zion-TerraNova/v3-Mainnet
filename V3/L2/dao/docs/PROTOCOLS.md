@@ -115,6 +115,8 @@ Pravidlo: 5 z 7 pro treasury operace
 
 ## 3. DAO Treasury Funding
 
+> **Pozn. (V31 canonical):** Tato sekce dokumentuje legacy V3 DAO model (treasury 4B+ ZION, konstanta `DAO_TREASURY_TOTAL` v `types.rs`). Kanonický genesis premine — `V31/L1/core/src/v3_compat.rs` `PREMINE_OUTPUTS` — alokuje DAO Treasury pouze **1.5B ZION** (sloty 7–8: Grants 1B + Bootstrap 0.5B, time-lock do bloku 144 000); slot 6 (2.5B) je **L6 Issobella — Orbital Station & Quantum Research Fund**.
+
 ### 3.1 Zdroje příjmů
 
 | Zdroj | Mechanismus | Výše |
