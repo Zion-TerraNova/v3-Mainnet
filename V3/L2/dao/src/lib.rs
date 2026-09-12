@@ -43,7 +43,7 @@
 //!
 //! | Parameter        | Value              | Source                |
 //! |------------------|--------------------|-----------------------|
-//! | Treasury         | 4,000,000,000 ZION | Genesis premine       |
+//! | Treasury         | 1,500,000,000 ZION | Genesis premine †     |
 //! | Proposal thresh. | 1,000,000 ZION     | Min to create         |
 //! | Quorum           | 10% participation  | Of circulating supply |
 //! | Voting period    | 7 days             | Standard proposals    |

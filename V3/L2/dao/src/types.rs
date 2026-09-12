@@ -9,7 +9,9 @@ use serde::{Deserialize, Serialize};
 // ---------------------------------------------------------------------------
 
 /// DAO Treasury address on L1 (from genesis premine)
-/// Total: 4,000,000,000 ZION across 3 addresses
+/// Canonical total: 1,500,000,000 ZION across slots 7–8.
+/// (Legacy V3 snapshot below: 4B across 3 addresses — slot 6 (2.5B)
+/// repurposed to L6 Issobella; addresses shown are pre-reset keys.)
 pub const DAO_TREASURY_ADDRESSES: &[&str] = &[
     "zion1j5a327c7d3w7h4e474n5p4z0z827f8p874mr2p7", // Community Governance (main) — 2.5B ZION
     "zion1f7g4h034m5l0x3g6q4l5d298d597v5a4q3wc3t7", // Grants & Bounties — 1.0B ZION
@@ -19,7 +21,8 @@ pub const DAO_TREASURY_ADDRESSES: &[&str] = &[
 /// Flowers per ZION — V3 canonical 6-decimal precision (post-3.0.3 fork).
 pub const FLOWERS_PER_ZION: u64 = 1_000_000;
 
-/// Total DAO treasury in flowers (4B ZION × 10⁶) — u128 required.
+/// Total DAO treasury in flowers (legacy snapshot: 4B ZION × 10⁶) — u128 required.
+/// Canonical treasury is 1.5B ZION (slots 7–8); see `DAO_TREASURY_ADDRESSES` note.
 pub const DAO_TREASURY_TOTAL: u128 = 4_000_000_000_u128 * FLOWERS_PER_ZION as u128;
 
 /// Minimum ZION balance to create a proposal (1M ZION in flowers)

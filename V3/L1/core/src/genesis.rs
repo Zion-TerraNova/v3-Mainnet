@@ -147,7 +147,9 @@ pub const PREMINE_OUTPUTS: &[PremineOutput] = &[
         unlock_height: None,
         admin_locked: true,
     },
-    // --- DAO Treasury (3 slots = 4.0B) — locked until height 144,000 ---
+    // --- Slots 6–8 (4.0B total) — locked until height 144,000 ---
+    // Canonical 2026-09: slot 6 (2.5B) repurposed to L6 Issobella — Orbital Station
+    // & Quantum Research Fund; DAO Treasury = slots 7–8 (1.5B). Labels below are legacy.
     PremineOutput {
         address: "zion1j5a327c7d3w7h4e474n5p4z0z827f8p874mr2p7",
         purpose: "DAO Treasury — Community Governance (main)",

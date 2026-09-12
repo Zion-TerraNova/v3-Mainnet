@@ -2,7 +2,7 @@
 //!
 //! ## Treasury Model
 //!
-//! - Total: 4,000,000,000 ZION (genesis premine)
+//! - Total: 1,500,000,000 ZION canonical (legacy snapshot: 4B — slot 6 repurposed to L6 Issobella)
 //! - Multi-sig: 5-of-7 guardians required for any spend
 //! - Daily limit: 100M ZION/day
 //! - All spends require passed + timelocked DAO proposal

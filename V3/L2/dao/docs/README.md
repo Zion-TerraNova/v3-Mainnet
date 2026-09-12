@@ -6,7 +6,7 @@
 
 ## Co je ZION DAO?
 
-**ZION DAO** (Decentralized Autonomous Organization) je governance vrstva ekosystému ZION. Spravuje treasury (4B ZION z genesis), schvaluje granty, řídí protokolové změny a zajišťuje 20-letý přechod od centralizované správy k plné decentralizaci.
+**ZION DAO** (Decentralized Autonomous Organization) je governance vrstva ekosystému ZION. Spravuje treasury (kanonicky 1.5B ZION z genesis — sloty 7–8; slot 6 s 2.5B byl repurposed na L6 Issobella), schvaluje granty, řídí protokolové změny a zajišťuje 20-letý přechod od centralizované správy k plné decentralizaci.
 
 DAO není jen technická struktura — je to **dharmická organizace** založená na posvátné geometrii, kde consciousness a komunita společně řídí budoucnost.
 
