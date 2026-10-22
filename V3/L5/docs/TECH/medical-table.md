@@ -142,7 +142,7 @@ Every L5 community maintains a **local herbal database**:
   "plant_id": "rosmarinus-officinalis-algarve",
   "common_names": {"en": "Rosemary", "pt": "Alecrim", "cs": "Rozmarýna"},
   "latin_name": "Rosmarinus officinalis",
-  "local_variety": "Algarve coastal",
+  "local_variety": "Ribatejo inland",
   "habitat": "Coastal scrub, full sun, well-drained soil",
   "harvest": {"part": "leaves and flowering tops", "season": "spring", "method": "cut 10cm from tip"},
   "preparations": [
@@ -242,10 +242,10 @@ Every treatment requires **documented informed consent**:
 | Phase | Timeline | Deliverable |
 |-------|----------|-------------|
 | Phase 0 | 2026 | WFR-certified Guardian at each community |
-| Phase 1 | 2027 | Level 1 first-aid station operational |
-| Phase 2 | 2028 | Level 2 herbal + biophysical center |
-| Phase 3 | 2029 | Level 3 integrated wellness center (select communities) |
-| Phase 4 | 2030+ | Hiran-integrated diagnostics, inter-node health data sharing |
+| Phase 1 | 2029 | Level 1 first-aid station operational |
+| Phase 2 | 2030 | Level 2 herbal + biophysical center |
+| Phase 3 | 2031 | Level 3 integrated wellness center (select communities) |
+| Phase 4 | 2032+ | Hiran-integrated diagnostics, inter-node health data sharing |
 
 ---
 

@@ -92,7 +92,7 @@ ZION je vícevrstvá blockchain infrastruktura postavená na proof-of-work konse
 
 - **L1 Konsenzus** — Rust-based PoW uzel s Ed25519 podpisy, BLAKE3 hashováním, LWMA obtížností, UTXO + account transakčními modely a P2P sítí
 - **L2 DeFi** — Smart kontrakty na Base Mainnet (Governance, Treasury, Staking, Farm) + cross-chain bridge relay + atomic swap + DAO governance
-- **L2 Bridge** — ZION L1 ↔ EVM bridge s validátorským kvórem (5/5 threshold), deploynutý na 6 EVM chainech
+- **L2 Bridge** — ZION L1 ↔ EVM bridge s validátorským kvórem (4/5 threshold), deploynutý na 6 EVM chainech
 - **L3 WARP** — Cross-chain protokol se 12 registrovanými chain adaptéry (EVM, Solana, Aptos, Sui, Cardano, TON, atd.; 11 plně funkčních, TON aktuálně watch-only)
 - **L3 Hiran** — AI-native agent framework (Hiranyagarbha) s multi-modal language model, Dharma validátorem a enginem vědomí
 - **L4 Oasis** — AAA spiritual MMORPG: consciousness mining hra s 199 posvátnými avatary, 9 úrovněmi vědomí, gildovním válečenictvím a treasure hunt Golden Egg
@@ -170,7 +170,7 @@ ZION je vícevrstvá blockchain infrastruktura postavená na proof-of-work konse
 
 ### L2 DeFi (Base Mainnet)
 - **wZION** — ERC-20 wrapped ZION token (`0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6`)
-- **ZIONBridge** — 5/5 validátorský threshold bridge (`0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467`)
+- **ZIONBridge** — 4/5 validátorský threshold bridge (`0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467`)
 - **ZIONGovernance** — Token-weighted hlasování, 15% quorum, 14d období
 - **ZIONTreasury** — 3-of-3 multisig
 - **ZIONStaking** — 12% APR, 7d cooldown
@@ -179,7 +179,7 @@ ZION je vícevrstvá blockchain infrastruktura postavená na proof-of-work konse
 
 ### Bridge
 - 6 EVM chainů: Base, BSC, Polygon, Arbitrum, Optimism, Avalanche
-- Validátorský quorum: 5/5 threshold
+- Validátorský quorum: 4/5 threshold
 - L1 RPC: `getBridgeLocks`, `submitBridgeUnlock`, `getBridgeVaultBalance`
 
 ### L3 WARP — Cross-Chain Protocol

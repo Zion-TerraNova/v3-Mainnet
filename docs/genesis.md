@@ -138,7 +138,8 @@ Všech 14 premine outputů je **admin-locked** (vyžaduje 3-of-3 admin multisig
 | Projekt Te Piko Ora | 500 000 000 |
 | Project Bohemia | 500 000 000 |
 | Project Bodhi Lanka | 500 000 000 |
-| L5 rezervní fond | 800 000 000 |
+| Projekt LUMI — Nová Amerika (Kostarika) | 500 000 000 |
+| L5 rezervní fond | 300 000 000 |
 | **Celkem L5** | **3 300 000 000** |
 
 > **Poznámka:** Správce jednotlivých L5 projektů jmenuje Trustee. Jména správců budou zveřejněna po dosažení bodu globální expanze (~0,20 USD/ZION). Do té doby jsou informace o správcích důvěrné.

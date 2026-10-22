@@ -207,8 +207,8 @@ When block `F_{n+1}` arrives, the capsule unlocks automatically. The content is:
 | Fibonacci Slot | Approx. Era | Theme | Seeded By | Unlocked By |
 |----------------|-------------|-------|-----------|-------------|
 | F_10 = 55 | Genesis (2026) | "Why we began" | Founding Guardians | First youth cohort |
-| F_15 = 610 | Early growth (2028) | "The first test of ahimsa" | Dharma Temple elders | Teen circle |
-| F_20 = 6765 | Maturation (2032) | "What the ocean remembers" | Te Pīko Ora keepers | Young adults |
+| F_15 = 610 | Early growth (2030) | "The first test of ahimsa" | Dharma Temple elders | Teen circle |
+| F_20 = 6765 | Maturation (2034) | "What the ocean remembers" | Te Pīko Ora keepers | Young adults |
 | F_25 = 75025 | Cross-node web (2038) | "The silence between stars" | L6 Stewards | New Guardians |
 | F_30 = 832040 | Century mark (2054) | "The voice of the 7th generation" | Unknown elders | Unborn youth |
 

@@ -92,7 +92,7 @@ ZION é uma infraestrutura blockchain multicamada construída sobre consenso pro
 
 - **L1 Consenso** — Nó PoW baseado em Rust com assinaturas Ed25519, hash BLAKE3, ajuste de dificuldade LWMA, modelos de transação UTXO + account e rede P2P
 - **L2 DeFi** — Smart contracts na Base Mainnet (Governance, Treasury, Staking, Farm) + relé de ponte cross-chain + atomic swap + governança DAO
-- **L2 Bridge** — Ponte ZION L1 ↔ EVM com quórum de validadores (limiar 5/5), implantada em 6 cadeias EVM
+- **L2 Bridge** — Ponte ZION L1 ↔ EVM com quórum de validadores (limiar 4/5), implantada em 6 cadeias EVM
 - **L3 WARP** — Protocolo cross-chain com 12 adaptadores de cadeia registrados (EVM, Solana, Aptos, Sui, Cardano, TON, etc.; 11 totalmente funcionais, TON atualmente watch-only)
 - **L3 Hiran** — Framework de agente nativo de IA (Hiranyagarbha) com modelo de linguagem multimodal, validador Dharma e motor de consciência
 - **L4 Oasis** — MMORPG espiritual AAA: jogo de mineração de consciência com 199 avatares sagrados, 9 níveis de consciência, guerra de guildas e caça ao tesouro Golden Egg
@@ -170,7 +170,7 @@ ZION é uma infraestrutura blockchain multicamada construída sobre consenso pro
 
 ### L2 DeFi (Base Mainnet)
 - **wZION** — token ERC-20 wrapped ZION (`0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6`)
-- **ZIONBridge** — ponte com limiar 5/5 de validadores (`0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467`)
+- **ZIONBridge** — ponte com limiar 4/5 de validadores (`0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467`)
 - **ZIONGovernance** — Votação ponderada por tokens, 15% quorum, período de 14 dias
 - **ZIONTreasury** — multisig 3-de-3
 - **ZIONStaking** — 12% APR, 7 dias de cooldown
@@ -179,7 +179,7 @@ ZION é uma infraestrutura blockchain multicamada construída sobre consenso pro
 
 ### Bridge
 - 6 cadeias EVM: Base, BSC, Polygon, Arbitrum, Optimism, Avalanche
-- Quórum de validadores: limiar 5/5
+- Quórum de validadores: limiar 4/5
 - RPC L1: `getBridgeLocks`, `submitBridgeUnlock`, `getBridgeVaultBalance`
 
 ### L3 WARP — Protocolo Cross-Chain

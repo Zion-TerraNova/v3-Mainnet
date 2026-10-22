@@ -92,7 +92,7 @@ ZION est une infrastructure blockchain multicouche construite sur un consensus p
 
 - **L1 Consensus** — Nœud PoW basé sur Rust avec signatures Ed25519, hachage BLAKE3, ajustement de difficulté LWMA, modèles de transaction UTXO + account et réseau P2P
 - **L2 DeFi** — Smart contracts sur Base Mainnet (Governance, Treasury, Staking, Farm) + relais de pont cross-chain + atomic swap + gouvernance DAO
-- **L2 Bridge** — Pont ZION L1 ↔ EVM avec quorum de validateurs (seuil 5/5), déployé sur 6 chaînes EVM
+- **L2 Bridge** — Pont ZION L1 ↔ EVM avec quorum de validateurs (seuil 4/5), déployé sur 6 chaînes EVM
 - **L3 WARP** — Protocole cross-chain avec 12 adaptateurs de chaîne enregistrés (EVM, Solana, Aptos, Sui, Cardano, TON, etc.; 11 pleinement fonctionnels, TON actuellement watch-only)
 - **L3 Hiran** — Framework d'agent natif à l'IA (Hiranyagarbha) avec modèle de langage multimodal, validateur Dharma et moteur de conscience
 - **L4 Oasis** — MMORPG spirituel AAA : jeu de minage de conscience avec 199 avatars sacrés, 9 niveaux de conscience, guerre de guildes et chasse au trésor Golden Egg
@@ -170,7 +170,7 @@ ZION est une infrastructure blockchain multicouche construite sur un consensus p
 
 ### L2 DeFi (Base Mainnet)
 - **wZION** — token ERC-20 wrapped ZION (`0x0c493763d107ab0ABb0aee1Ca3999292d8202bb6`)
-- **ZIONBridge** — pont avec seuil 5/5 de validateurs (`0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467`)
+- **ZIONBridge** — pont avec seuil 4/5 de validateurs (`0x72c8f0Dc60E27aB7A83fe3B416fab4F0600a6467`)
 - **ZIONGovernance** — Vote pondéré par tokens, 15% quorum, période de 14 jours
 - **ZIONTreasury** — multisig 3-sur-3
 - **ZIONStaking** — 12% APR, 7 jours de cooldown
@@ -179,7 +179,7 @@ ZION est une infrastructure blockchain multicouche construite sur un consensus p
 
 ### Bridge
 - 6 chaînes EVM : Base, BSC, Polygon, Arbitrum, Optimism, Avalanche
-- Quorum de validateurs : seuil 5/5
+- Quorum de validateurs : seuil 4/5
 - RPC L1 : `getBridgeLocks`, `submitBridgeUnlock`, `getBridgeVaultBalance`
 
 ### L3 WARP — Protocole Cross-Chain

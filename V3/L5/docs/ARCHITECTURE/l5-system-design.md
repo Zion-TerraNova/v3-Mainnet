@@ -270,12 +270,12 @@ Root key (BIP39 mnemonic)
 
 ### 6.2 Network-Wide (All L5 Communities)
 
-| Metric | 2026 | 2028 | 2030 |
+| Metric | 2028 | 2030 | 2032 |
 |--------|------|------|------|
-| Active communities | 2 | 5 | 12+ |
-| Total Guardian nodes | 2 | 5 | 15+ |
-| Inter-node mesh links | 0 | 1 (Genesis↔Dharma) | 5+ |
-| Shared seed varieties | 20 | 100 | 500+ |
+| Active communities | 0 | 2 | 6+ |
+| Total Guardian nodes | 0 | 2 | 8+ |
+| Inter-node mesh links | 0 | 1 (Genesis↔Dharma) | 3+ |
+| Shared seed varieties | 5 | 50 | 300+ |
 
 ---
 
@@ -285,11 +285,11 @@ Root key (BIP39 mnemonic)
 |-----------|--------|-----|
 | Guardian Node hardware spec | ✅ Done | `V3/L5/docs/TECH/zion-node-spec.md` |
 | LoRa mesh spec | 🟡 Draft | `V3/L5/docs/TECH/mesh-network.md` (planned) |
-| L5 Local Agent | 🔵 Not started | 2027 |
-| Community dashboard | 🔵 Not started | 2027 |
-| Seed library protocol | 🔵 Not started | 2028 |
-| Medical Table v2 (Hiran) | 🔵 Not started | 2029 |
-| Inter-node payment channels | 🔵 Not started | 2029 |
+| L5 Local Agent | 🔵 Not started | 2028 |
+| Community dashboard | 🔵 Not started | 2028 |
+| Seed library protocol | 🔵 Not started | 2029 |
+| Medical Table v2 (Hiran) | 🔵 Not started | 2030 |
+| Inter-node payment channels | 🔵 Not started | 2030 |
 
 ---
 

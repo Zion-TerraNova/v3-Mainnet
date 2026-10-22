@@ -3,7 +3,7 @@
 **Date:** 2026-07-10  
 **Version:** 3.0.5-beta  
 **Binary:** `zion` (5.0 MB, Linux x86_64, stripped)  
-**Commit:** `de04887`
+**Commit:** `b9c9691`
 
 ---
 

@@ -286,7 +286,7 @@ In Te Pīko Ora, this is taught as a **meditation practice** and a **governance 
 | **Power** | Solar + battery | No grid backup in Raiatea (unreliable) |
 | **Connectivity** | Starlink (primary) + 4G (Tahiti only) + satellite phone (Iridium) | Raiatea has limited 4G; Starlink is essential |
 | **Special** | **Marine-grade enclosure** — humidity, salt, tropical heat | IP67+, passive cooling |
-| **Installation** | Phase 2 (2028) | |
+| **Installation** | Phase 2 (2030) | |
 
 ### 6.2 Polynesian Governance + ZION DAO
 
@@ -333,7 +333,7 @@ This is **higher than the 10% standard** because Polynesia is on the front line 
 
 ## 7. Development Timeline
 
-### Phase 0 — Seed (2026–2027) 🔵
+### Phase 0 — Seed (2026–2028) 🟡
 - [ ] Core team formation (5 Guardians, including at least 1 Polynesian elder / advisor)
 - [ ] Land scouting (Raiatea — Opoa Valley, Fa'aroa Bay)
 - [ ] Legal entity registration (Association Loi 1901 in Papeete)
@@ -342,17 +342,17 @@ This is **higher than the 10% standard** because Polynesia is on the front line 
 - [ ] Connection to Hawaii lineage (KNIHA-LEHUA) — shared Pacific protocols
 - [ ] Starlink order (lead time 3–6 months in FP)
 
-### Phase 1 — Roots (2027–2028) 🔵
+### Phase 1 — Roots (2029) 🔵
 - [ ] Land lease secured (emphyteutic or long-term)
 - [ ] First *fare pote'e* (round houses) built (traditional, community effort)
 - [ ] Solar installation (10 kWp)
 - [ ] Water cistern (50 m³)
 - [ ] First agroforestry planting (100 coconut palms + mixed orchard)
-- [ ] First guests (Q4 2028) — "Wayfinding Immersion" program
+- [ ] First guests (Q4 2029) — "Wayfinding Immersion" program
 - [ ] Traditional canoe (*va'a*) acquired or built
 - [ ] ZION wallet + DAO framework
 
-### Phase 2 — Community (2029) 🔵
+### Phase 2 — Community (2030) 🔵
 - [ ] Guardian node installation (marine-grade)
 - [ ] Marine permaculture initiated (fish ponds, seaweed)
 - [ ] Pearl farming cooperative (small-scale)
@@ -361,7 +361,7 @@ This is **higher than the 10% standard** because Polynesia is on the front line 
 - [ ] Revenue target: EUR 150,000/year
 - [ ] Full protocol sync with Genesis Garden + Dharma Temple
 
-### Phase 3 — Network (2030) 🔵
+### Phase 3 — Network (2031) 🔵
 - [ ] Floating fare (lagoon bungalows)
 - [ ] Educational center + ZION node rack
 - [ ] Inter-node marine product export (seaweed, pearls, fish)
@@ -369,7 +369,7 @@ This is **higher than the 10% standard** because Polynesia is on the front line 
 - [ ] Revenue target: EUR 400,000/year
 - [ ] Support new L5 community (mentorship to Pacific node #2)
 
-### Phase 4 — Radiance (2031+) 🔵
+### Phase 4 — Radiance (2032+) 🔵
 - [ ] "Te Pīko Ora" recognized as center of Polynesian ZION
 - [ ] ZION-native payments default
 - [ ] Knowledge commons published (Polynesian permaculture, wayfinding, governance)

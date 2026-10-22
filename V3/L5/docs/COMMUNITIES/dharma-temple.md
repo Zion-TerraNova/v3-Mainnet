@@ -169,7 +169,7 @@ Both projects are nodes of the same network: different energy, same intent.
 | **Power draw** | 15–25W (no issue with solar + hydro) |
 | **Connectivity** | Starlink + 4G + LoRa mesh |
 | **Revenue split** | 90% operator / 10% community treasury |
-| **Installation target** | Phase 2 (2028) |
+| **Installation target** | Phase 2 (2030) |
 | **Special** | Redundant power (hydro runs at night when solar sleeps) |
 
 ### 5.2 Wallet Structure
@@ -258,7 +258,7 @@ Same mechanism as Genesis Garden, with one addition:
 
 ## 7. Development Timeline
 
-### Phase 0 — Seed (2026 Q2–Q4) 🔵
+### Phase 0 — Seed (2026–2028) 🟡
 - [ ] Core team formation (5 Guardians)
 - [ ] Land scouting (west La Palma, 400–800 m elevation)
 - [ ] Legal entity registration (Asociación)
@@ -266,17 +266,17 @@ Same mechanism as Genesis Garden, with one addition:
 - [ ] Budget confirmation (EUR 60,000 Phase 1)
 - [ ] Connection to Genesis Garden (shared protocol draft)
 
-### Phase 1 — Sanctuary Foundation (2027) 🔵
+### Phase 1 — Sanctuary Foundation (2029) 🔵
 - [ ] Meditation pavilion (circular stone, 40 m²)
 - [ ] Sanitary block (constructed wetland)
 - [ ] Community kitchen + outdoor dining
 - [ ] Solar installation (8 kWp)
 - [ ] Rainwater harvesting (30 m³)
 - [ ] First syntropic planting (0.3 ha)
-- [ ] First retreat guests (Q4 2027)
+- [ ] First retreat guests (Q4 2029)
 - [ ] ZION wallet + DAO framework
 
-### Phase 2 — Community (2028) 🔵
+### Phase 2 — Community (2030) 🔵
 - [ ] Guardian node installation
 - [ ] Meditation cells (3–5 units)
 - [ ] Dharma hall (multipurpose, 80 m²)
@@ -286,7 +286,7 @@ Same mechanism as Genesis Garden, with one addition:
 - [ ] Revenue target: EUR 120,000/year
 - [ ] Full protocol sync with Genesis Garden
 
-### Phase 3 — Network (2029) 🔵
+### Phase 3 — Network (2031) 🔵
 - [ ] Silence cottages (2–3 units)
 - [ ] Educational center + ZION node rack
 - [ ] Astronomical observatory / meditation deck
@@ -294,7 +294,7 @@ Same mechanism as Genesis Garden, with one addition:
 - [ ] Revenue target: EUR 250,000/year
 - [ ] Support new L5 community (mentorship)
 
-### Phase 4 — Radiance (2030+) 🔵
+### Phase 4 — Radiance (2032+) 🔵
 - [ ] International teacher residencies
 - [ ] ZION-native payments default
 - [ ] Knowledge commons published
@@ -346,7 +346,7 @@ Same mechanism as Genesis Garden, with one addition:
 - [ ] Connection to existing La Palma eco-communities (Finca Inagua, etc.)
 - [ ] Financing Phase 0–1: ZION fund, crowdfunding, EU grants, private investors?
 - [ ] Volcanic insurance: available and affordable?
-- [ ] Seed library coordination with Genesis Garden (first exchange: 2028?)
+- [ ] Seed library coordination with Genesis Garden (first exchange: 2030?)
 - [ ] Astronomical observatory: collaboration with Roque de los Muchachos?
 
 ---
@@ -492,7 +492,7 @@ La Palma's west side (400–800 m) offers: mild temperatures (15–25°C), relia
 | **Word of mouth / alumni** | EUR 0 | EUR 0 | Referral discount 10% for alumni who bring friends |
 | **SEO / blog** | EUR 0 | EUR 0 | Essays on: silence, volcano as teacher, syntropic farming |
 
-**Launch campaign (Q4 2027):**
+**Launch campaign (Q4 2029):**
 - **Month 1 (Oct):** "Soft open" — ZION Guardians, friends, teachers. Document everything.
 - **Month 2 (Nov):** "Volcano vigil" — first public retreat. Theme: Cumbre Vieja anniversary reflection.
 - **Month 3 (Dec):** "Solstice silence" — premium pricing, full program. Goal: 70% occupancy.

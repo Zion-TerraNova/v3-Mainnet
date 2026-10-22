@@ -69,7 +69,7 @@ A machine-readable JSON catalogue is available at [`vulnerabilities.json`](./vul
 | **Severity** | HIGH (CVSS 8.1) |
 | **Type** | Consensus — missing signature verification on P2P path |
 | **Introduced** | v3.0.0 (account model introduction) |
-| **Fixed** | v3.0.4 (commit `9341344d`) |
+| **Fixed** | v3.0.4 (commit `056b67a4`) |
 | **Deployed** | 2026-07-02 |
 | **Exploited** | YES — forged account TX from external IP `109.81.30.165`, chain rolled back to height 22180 |
 
@@ -89,7 +89,7 @@ A machine-readable JSON catalogue is available at [`vulnerabilities.json`](./vul
 | **Severity** | CRITICAL (CVSS 9.8) |
 | **Type** | Consensus — missing balance check enables unlimited inflation |
 | **Introduced** | v3.0.0 (account model introduction) |
-| **Fixed** | v3.0.4 (commit `69d12c7`) |
+| **Fixed** | v3.0.4 (commit `7019d88`) |
 | **Deployed** | 2026-07-02, activated at block 22394 |
 | **Exploited** | YES — accidentally during escrow key rotation; 100,002 ZION created from empty address, subsequently burned |
 
@@ -99,7 +99,7 @@ The UTXO model is inherently safe — `validate_inputs_exist()` and `validate_va
 
 **Impact:** Unlimited inflation. Any participant with an Ed25519 keypair could mint arbitrary ZION. One accidental exploitation occurred during escrow key rotation: 100,002 ZION created from a placeholder address `zion1s2g3...` (0 balance). The inflationary funds were burned to a provably-unspendable address `zion1n3570...` (derived from `[0xFF; 32]`, not a valid Ed25519 public key) in block 22362.
 
-**Fix:** Added `account_balance_for()` helper to ChainState that computes confirmed balance minus pending mempool debits. Both RPC and P2P paths now reject transactions where `sender_balance < amount + fee`. Height-gated via `ZION_BALANCE_CHECK_HEIGHT` environment variable to avoid rejecting pre-fix blocks during IBD. 5 fuzz tests added (commit `a5472ec6`).
+**Fix:** Added `account_balance_for()` helper to ChainState that computes confirmed balance minus pending mempool debits. Both RPC and P2P paths now reject transactions where `sender_balance < amount + fee`. Height-gated via `ZION_BALANCE_CHECK_HEIGHT` environment variable to avoid rejecting pre-fix blocks during IBD. 5 fuzz tests added (commit `33e9a8aa`).
 
 **Full technical report:** [`F5_SECURITY_INCIDENT_REPORT_2026-07-02.md`](../../F5_SECURITY_INCIDENT_REPORT_2026-07-02.md)
 
@@ -218,7 +218,7 @@ The UTXO model is inherently safe — `validate_inputs_exist()` and `validate_va
 | **Severity** | LOW (defense-in-depth, not directly exploitable) |
 | **Type** | Consensus — missing sanity cap on transaction amount |
 | **Introduced** | v3.0.0 |
-| **Fixed** | v3.0.4 (commit `690b6dfe`) |
+| **Fixed** | v3.0.4 (commit `bed8ed2c`) |
 | **Deployed** | 2026-07-07, activated at height 1 |
 | **Exploited** | No — defense-in-depth measure |
 
@@ -245,7 +245,7 @@ The UTXO model is inherently safe — `validate_inputs_exist()` and `validate_va
 | 2026-07-02 | ~18:00 | TeamViewer compromise detected. Attacker had root access to Edge server for ~47 minutes. |
 | 2026-07-02 | 18:30 | SSH session terminated. Tailscale down. Emergency lockdown initiated. |
 | 2026-07-02 | 19:00 | F1 vulnerability discovered — forged account TX from `109.81.30.165` in chain. |
-| 2026-07-02 | 19:15 | Chain rollback to block 22180. F1 fix implemented (commit `9341344d`). |
+| 2026-07-02 | 19:15 | Chain rollback to block 22180. F1 fix implemented (commit `056b67a4`). |
 | 2026-07-02 | 19:30 | Escrow key rotation initiated. F5 vulnerability discovered accidentally. |
 | 2026-07-02 | 19:37 | F5 confirmed: 100,002 ZION created from zero-balance address. |
 | 2026-07-02 | 19:48 | Inflationary 100,002 ZION burned to unspendable address (block 22362). |

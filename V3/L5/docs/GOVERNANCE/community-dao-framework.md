@@ -116,7 +116,7 @@ Every on-chain proposal must include:
 
 ```json
 {
-  "proposal_id": "genesis-2027-03-015",
+  "proposal_id": "genesis-2029-03-015",
   "community": "genesis-garden",
   "title": "Purchase 10 kWp solar expansion",
   "author": "operations-guardian-01",
@@ -126,19 +126,19 @@ Every on-chain proposal must include:
   "amount_zion": "TBD at execution time",
   "recipient": "supplier-wallet-or-escrow",
   "rationale": "Current 5 kWp system insufficient for Phase 2. Expansion allows...",
-  "circle_consent_date": "2027-03-01",
+  "circle_consent_date": "2029-03-01",
   "circle_consent_proof": "hash-of-meeting-minutes",
-  "timeline": "2027-04-01 to 2027-05-15",
+  "timeline": "2029-04-01 to 2029-05-15",
   "milestones": [
-    {"date": "2027-04-15", "deliverable": "Panels delivered", "release_pct": 50},
-    {"date": "2027-05-15", "deliverable": "Installation complete", "release_pct": 50}
+    {"date": "2029-04-15", "deliverable": "Panels delivered", "release_pct": 50},
+    {"date": "2029-05-15", "deliverable": "Installation complete", "release_pct": 50}
   ],
   "kpis": [
     "Daily energy production > 40 kWh",
     "Guest capacity increased by 10"
   ],
   "risk_mitigation": "Supplier vetted. Backup supplier identified. Insurance covers transport.",
-  "review_date": "2027-06-01"
+  "review_date": "2029-06-01"
 }
 ```
 
@@ -262,9 +262,9 @@ Network Council decisions are recorded on-chain as **multi-community proposals**
 | **ZION core node** | Block validation, RPC, wallet | ✅ Implemented |
 | **L2 DAO (Axum)** | Proposals, voting, treasury tracking | ✅ Implemented |
 | **Multisig wallet** | Threshold spending | ✅ Implemented (script-based) |
-| **Reputation registry** | Guardian points, history | 🔵 Planned (2027) |
-| **Quadratic voting** | Large / constitutional decisions | 🔵 Planned (2028) |
-| **Escrow contracts** | Milestone-based payments | 🔵 Planned (2028) |
+| **Reputation registry** | Guardian points, history | 🔵 Planned (2028) |
+| **Quadratic voting** | Large / constitutional decisions | ✅ Live (pilot round) |
+| **Escrow contracts** | Milestone-based payments | 🔵 Planned (2029) |
 
 ---
 

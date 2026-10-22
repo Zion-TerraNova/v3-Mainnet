@@ -83,7 +83,7 @@ The L5 Mesh Network provides **reliable, low-power, long-range communication** t
 ```
 
 **Inter-node range:**
-- Genesis Garden (Algarve, sea level) to hilltop repeater: 10–15 km
+- Genesis Garden (Sabacheira, Nabão valley) to hilltop repeater: 10–15 km
 - Hilltop repeater to Dharma Temple (La Palma, 400m): Not possible directly (ocean)
 - **Reality:** Inter-node communication is **not direct LoRa**. It uses:
   1. Internet bridge at each community

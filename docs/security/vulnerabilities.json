@@ -14,7 +14,7 @@
     "severity": "high",
     "CVE": null,
     "check": "zion-v3-node/(3\\.0\\.[0-3])",
-    "commits": ["9341344d"]
+    "commits": ["056b67a4"]
   },
   {
     "name": "AccountModelBalanceBypass",
@@ -32,7 +32,7 @@
     "severity": "critical",
     "CVE": null,
     "check": "zion-v3-node/(3\\.0\\.[0-3])",
-    "commits": ["69d12c7", "fe8d449", "a5472ec6"]
+    "commits": ["7019d88", "9a438a0", "33e9a8aa"]
   },
   {
     "name": "TeamViewerServerCompromise",
@@ -101,6 +101,6 @@
     "severity": "low",
     "CVE": null,
     "check": "zion-v3-node/(3\\.0\\.[0-3])",
-    "commits": ["690b6dfe"]
+    "commits": ["bed8ed2c"]
   }
 ]
